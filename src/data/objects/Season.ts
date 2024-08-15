@@ -2,7 +2,7 @@ import { Episode } from './Episode';
 import { Cast } from './Cast';
 
 export class Season {
-    id: string;
+  id: string;
   name: string;
   overview: string;
   year: string;
@@ -138,5 +138,256 @@ export class Season {
       writtenBy: this.writtenBy,
       productionStudios: this.productionStudios
     };
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  setName(name: string): void {
+    this.name = name;
+  }
+
+  getOverview(): string {
+    return this.overview;
+  }
+
+  setOverview(overview: string): void {
+    this.overview = overview;
+  }
+
+  getYear(): string {
+    return this.year;
+  }
+
+  setYear(year: string): void {
+    this.year = year;
+  }
+
+  getOrder(): number {
+    return this.order;
+  }
+
+  setOrder(order: number): void {
+    this.order = order;
+  }
+
+  getScore(): number {
+    return this.score;
+  }
+
+  setScore(score: number): void {
+    this.score = score;
+  }
+
+  getSeasonNumber(): number {
+    return this.seasonNumber;
+  }
+
+  setSeasonNumber(seasonNumber: number): void {
+    this.seasonNumber = seasonNumber;
+  }
+
+  getLogoSrc(): string {
+    return this.logoSrc;
+  }
+
+  setLogoSrc(logoSrc: string): void {
+    this.logoSrc = logoSrc;
+  }
+
+  getCoverSrc(): string {
+    return this.coverSrc;
+  }
+
+  setCoverSrc(coverSrc: string): void {
+    this.coverSrc = coverSrc;
+  }
+
+  getBackgroundSrc(): string {
+    return this.backgroundSrc;
+  }
+
+  setBackgroundSrc(backgroundSrc: string): void {
+    this.backgroundSrc = backgroundSrc;
+  }
+
+  getVideoSrc(): string {
+    return this.videoSrc;
+  }
+
+  setVideoSrc(videoSrc: string): void {
+    this.videoSrc = videoSrc;
+  }
+
+  getMusicSrc(): string {
+    return this.musicSrc;
+  }
+
+  setMusicSrc(musicSrc: string): void {
+    this.musicSrc = musicSrc;
+  }
+
+  getSeriesID(): string {
+    return this.seriesID;
+  }
+
+  setSeriesID(seriesID: string): void {
+    this.seriesID = seriesID;
+  }
+
+  getThemdbID(): number {
+    return this.themdbID;
+  }
+
+  setThemdbID(themdbID: number): void {
+    this.themdbID = themdbID;
+  }
+
+  getImdbID(): string {
+    return this.imdbID;
+  }
+
+  setImdbID(imdbID: string): void {
+    this.imdbID = imdbID;
+  }
+
+  getLastDisc(): number {
+    return this.lastDisc;
+  }
+
+  setLastDisc(lastDisc: number): void {
+    this.lastDisc = lastDisc;
+  }
+
+  getFolder(): string {
+    return this.folder;
+  }
+
+  setFolder(folder: string): void {
+    this.folder = folder;
+  }
+
+  isShowName(): boolean {
+    return this.showName;
+  }
+
+  setShowName(showName: boolean): void {
+    this.showName = showName;
+  }
+
+  getAudioTrackLanguage(): string {
+    return this.audioTrackLanguage;
+  }
+
+  setAudioTrackLanguage(audioTrackLanguage: string): void {
+    this.audioTrackLanguage = audioTrackLanguage;
+  }
+
+  getSelectedAudioTrack(): number {
+    return this.selectedAudioTrack;
+  }
+
+  setSelectedAudioTrack(selectedAudioTrack: number): void {
+    this.selectedAudioTrack = selectedAudioTrack;
+  }
+
+  getSubtitleTrackLanguage(): string {
+    return this.subtitleTrackLanguage;
+  }
+
+  setSubtitleTrackLanguage(subtitleTrackLanguage: string): void {
+    this.subtitleTrackLanguage = subtitleTrackLanguage;
+  }
+
+  getSelectedSubtitleTrack(): number {
+    return this.selectedSubtitleTrack;
+  }
+
+  setSelectedSubtitleTrack(selectedSubtitleTrack: number): void {
+    this.selectedSubtitleTrack = selectedSubtitleTrack;
+  }
+
+  getEpisodes(): Episode[] {
+    return this.episodes;
+  }
+
+  addEpisode(episode: Episode): void {
+    this.episodes.push(episode);
+  }
+
+  removeEpisode(episode: Episode): void {
+    this.episodes = this.episodes.filter(e => e.getId() !== episode.getId());
+  }
+
+  getGenres(): string {
+    return Season.getString(this.genres);
+  }
+
+  setGenres(genres: string[]): void {
+    this.genres = genres;
+  }
+
+  getCurrentlyWatchingEpisode(): Episode | null {
+    if (this.currentlyWatchingEpisode !== -1 && this.currentlyWatchingEpisode < this.episodes.length) {
+      return this.episodes[this.currentlyWatchingEpisode];
+    }
+    return null;
+  }
+
+  getCurrentlyWatchingEpisodeIndex(): number {
+    return this.currentlyWatchingEpisode;
+  }
+
+  setCurrentlyWatchingEpisode(index: number): void {
+    this.currentlyWatchingEpisode = index;
+  }
+
+  getCast(): Cast[] {
+    return this.cast;
+  }
+
+  setCast(cast: Cast[]): void {
+    this.cast = cast;
+  }
+
+  getCreator(): string {
+    return this.creator;
+  }
+
+  setCreator(creator: string): void {
+    this.creator = creator;
+  }
+
+  getMusicComposer(): string {
+    return this.musicComposer;
+  }
+
+  setMusicComposer(musicComposer: string): void {
+    this.musicComposer = musicComposer;
+  }
+
+  getDirectedBy(): string {
+    return this.directedBy;
+  }
+
+  setDirectedBy(directedBy: string): void {
+    this.directedBy = directedBy;
+  }
+
+  getWrittenBy(): string {
+    return this.writtenBy;
+  }
+
+  setWrittenBy(writtenBy: string): void {
+    this.writtenBy = writtenBy;
+  }
+
+  private static getString(genres: string[]): string {
+    return genres.join(', ');
   }
 }

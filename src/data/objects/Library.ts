@@ -14,18 +14,13 @@ export class Library {
   seasonFolders: Map<string, string> = new Map();
 
   constructor(name: string, lang: string, type: string, order: number, folders: string[], showOnFullscreen: boolean) {
-    this.id = this.generateUUID();
+    this.id = crypto.randomUUID();
     this.name = name;
     this.language = lang;
     this.type = type;
     this.order = order;
     this.folders = folders;
     this.showOnFullscreen = showOnFullscreen;
-  }
-
-  // Método para generar UUID (puedes ajustar si prefieres otra implementación)
-  private generateUUID(): string {
-    return crypto.randomUUID();
   }
 
   // Convertir Library a JSON
@@ -63,5 +58,94 @@ export class Library {
     library.seasonFolders = new Map(jsonData.seasonFolders);
 
     return library;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  setName(name: string): void {
+    this.name = name;
+  }
+
+  getLanguage(): string {
+    return this.language;
+  }
+
+  setLanguage(language: string): void {
+    this.language = language;
+  }
+
+  getType(): string {
+    return this.type;
+  }
+
+  setType(type: string): void {
+    this.type = type;
+  }
+
+  getFolders(): string[] {
+    return this.folders;
+  }
+
+  setFolders(folders: string[]): void {
+    this.folders = folders;
+  }
+
+  isShowOnFullscreen(): boolean {
+    return this.showOnFullscreen;
+  }
+
+  setShowOnFullscreen(showOnFullscreen: boolean): void {
+    this.showOnFullscreen = showOnFullscreen;
+  }
+
+  getSeries(): Series[] {
+    return this.series;
+  }
+
+  getAnalyzedFiles(): Map<string, string> {
+    return this.analyzedFiles;
+  }
+
+  setAnalyzedFiles(analyzedFiles: Map<string, string>): void {
+    this.analyzedFiles = analyzedFiles;
+  }
+
+  getAnalyzedFolders(): Map<string, string> {
+    return this.analyzedFolders;
+  }
+
+  setAnalyzedFolders(analyzedFolders: Map<string, string>): void {
+    this.analyzedFolders = analyzedFolders;
+  }
+
+  getSeasonFolders(): Map<string, string> {
+    return this.seasonFolders;
+  }
+
+  setSeasonFolders(seasonFolders: Map<string, string>): void {
+    this.seasonFolders = seasonFolders;
+  }
+
+  removeSeries(s: Series): void {
+    this.analyzedFolders.delete(s.getFolder());
+    this.series = this.series.filter(serie => serie.getId() !== s.getId());
+  }
+
+  getSeriesById(id: string): Series | null {
+    return this.series.find(serie => serie.getId() === id) || null;
+  }
+
+  getOrder(): number {
+    return this.order;
+  }
+
+  setOrder(order: number): void {
+    this.order = order;
   }
 }

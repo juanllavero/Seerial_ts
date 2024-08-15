@@ -110,4 +110,199 @@ export class Episode {
         writtenBy: this.writtenBy
       };
     }
+
+    getId(): string {
+      return this.id;
+    }
+
+    getName(): string {
+      return this.name;
+    }
+
+    setName(name: string): void {
+      this.name = name;
+    }
+
+    getOrder(): number {
+      return this.order;
+    }
+
+    setOrder(order: number): void {
+      this.order = order;
+    }
+
+    getSeasonID(): string {
+      return this.seasonID;
+    }
+
+    setSeasonID(seasonID: string): void {
+      this.seasonID = seasonID;
+    }
+
+    getVideoSrc(): string {
+      return this.videoSrc;
+    }
+
+    setVideoSrc(videoSrc: string): void {
+      this.videoSrc = videoSrc;
+    }
+
+    getEpisodeNumber(): number {
+      return this.episodeNumber;
+    }
+
+    setEpisodeNumber(episodeNumber: number): void {
+      this.episodeNumber = episodeNumber;
+    }
+
+    getOverview(): string {
+      return this.overview;
+    }
+
+    setOverview(overview: string): void {
+      this.overview = overview;
+    }
+
+    getYear(): string {
+      return this.year;
+    }
+
+    setYear(year: string): void {
+      this.year = year;
+    }
+
+    getScore(): number {
+      return this.score;
+    }
+
+    setScore(score: number): void {
+      this.score = score;
+    }
+
+    getImdbScore(): number {
+      return this.imdbScore;
+    }
+
+    setImdbScore(imdbScore: number): void {
+      this.imdbScore = imdbScore;
+    }
+
+    getRuntime(): number {
+      return this.runtime;
+    }
+
+    setRuntime(runtime: number): void {
+      this.runtime = runtime;
+    }
+
+    getRuntimeInSeconds(): number {
+      if (this.runtimeInSeconds <= 0) {
+        return this.runtime * 60;
+      }
+      return this.runtimeInSeconds;
+    }
+
+    setRuntimeInSeconds(runtimeInSeconds: number): void {
+      this.runtimeInSeconds = runtimeInSeconds;
+      this.runtime = Math.floor(runtimeInSeconds / 60);
+    }
+
+    getSeasonNumber(): number {
+      return this.seasonNumber;
+    }
+
+    setSeasonNumber(seasonNumber: number): void {
+      this.seasonNumber = seasonNumber;
+    }
+
+    getImgSrc(): string {
+      return this.imgSrc;
+    }
+
+    setImgSrc(imgSrc: string): void {
+      this.imgSrc = imgSrc;
+    }
+
+    setWatched(): void {
+      this.timeWatched = 0;
+      this.watched = true;
+    }
+
+    setUnWatched(): void {
+      this.timeWatched = 0;
+      this.watched = false;
+    }
+
+    isWatched(): boolean {
+        return this.watched;
+    }
+
+    setTimeWatched(seconds: number): void {
+      this.timeWatched = seconds;
+
+      // If we have watched more than 90% of the video, it is marked as watched
+      if (this.timeWatched > (this.getRuntimeInSeconds() * 0.9)) {
+        this.setWatched();
+      }
+    }
+
+    getTimeWatched(): number {
+      return this.timeWatched;
+    }
+
+    getChapters(): Chapter[] {
+      return this.chapters;
+    }
+
+    addChapter(chapter: Chapter): void {
+      this.chapters.push(chapter);
+    }
+
+    getMediaInfo(): MediaInfo | undefined {
+      return this.mediaInfo;
+    }
+
+    setMediaInfo(mediaInfo: MediaInfo): void {
+      this.mediaInfo = mediaInfo;
+    }
+
+    getVideoTracks(): VideoTrack[] {
+      return this.videoTracks;
+    }
+
+    setVideoTracks(videoTracks: VideoTrack[]): void {
+      this.videoTracks = videoTracks;
+    }
+
+    getAudioTracks(): AudioTrack[] {
+      return this.audioTracks;
+    }
+
+    setAudioTracks(audioTracks: AudioTrack[]): void {
+      this.audioTracks = audioTracks;
+    }
+
+    getSubtitleTracks(): SubtitleTrack[] {
+      return this.subtitleTracks;
+    }
+
+    setSubtitleTracks(subtitleTracks: SubtitleTrack[]): void {
+      this.subtitleTracks = subtitleTracks;
+    }
+
+    getDirectedBy(): string {
+      return this.directedBy;
+    }
+
+    setDirectedBy(directedBy: string): void {
+      this.directedBy = directedBy;
+    }
+
+    getWrittenBy(): string {
+      return this.writtenBy;
+    }
+
+    setWrittenBy(writtenBy: string): void {
+      this.writtenBy = writtenBy;
+    }
   }

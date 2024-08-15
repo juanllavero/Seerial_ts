@@ -3,11 +3,23 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import * as fs from 'fs';
 
-const MovieDB = require('moviedb-promise');
-require('dotenv').config();
+import propertiesReader from 'properties-reader';
+import { MovieDb } from 'moviedb-promise';
 
-const THEMOVIEDB_API_KEY = process.env.TheMovieDBAPI;
-const moviedb = new MovieDB(THEMOVIEDB_API_KEY);
+// Leer el archivo de propiedades
+const properties = propertiesReader('keys.properties');
+
+// Obtener la clave API
+const apiKey = properties.get('TMDB_API_KEY');
+
+if (apiKey) {
+    const moviedb = new MovieDb(String(apiKey));
+
+    if (!moviedb)
+      console.error('This App needs an API Key from TheMovieDB');
+} else {
+    console.error('This App needs an API Key from TheMovieDB');
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -35,7 +47,7 @@ const loadData = (): any => {
 // Save data in JSON
 const saveData = (newData: any) => {
   try {
-    fs.writeFileSync(jsonFilePath, JSON.stringify(newData, null, 2), 'utf8');
+    fs.writeFileSync(jsonFilePath, JSON.stringify(newData), 'utf8');
     return true;
   } catch (err) {
     console.error("Error saving data:", err);
@@ -54,7 +66,10 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       sandbox: true,
-      contextIsolation: true
+      contextIsolation: true,
+      offscreen: false,  // Para evitar la renderización offscreen si no es necesario
+      webgl: true,       // Habilitar WebGL
+      webSecurity: false
     },
   })
 
@@ -111,5 +126,13 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+// To ensure hardware acceleration
+app.commandLine.appendSwitch('enable-webgl');
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('enable-accelerated-video');
+app.commandLine.appendSwitch('enable-accelerated-video-decode');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy'); 
 
 app.whenReady().then(createWindow)

@@ -45,11 +45,6 @@ function App() {
           </select>
         </div>
         <div className="series-list scroll">
-        <h1>Biblioteca Multimedia</h1>
-          <pre>{JSON.stringify(library, null, 2)}</pre>
-
-          {/* Botón para guardar los datos modificados */}
-          <button onClick={() => saveLibrary(library)}>Guardar Biblioteca</button>
           {seriesNames.map((name, index) => (
             <button key={index} className="series-button">{name}</button>
           ))}
