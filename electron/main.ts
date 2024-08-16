@@ -127,12 +127,6 @@ app.on('activate', () => {
   }
 })
 
-// To ensure hardware acceleration
-app.commandLine.appendSwitch('enable-webgl');
-app.commandLine.appendSwitch('ignore-gpu-blacklist');
-app.commandLine.appendSwitch('enable-accelerated-video');
-app.commandLine.appendSwitch('enable-accelerated-video-decode');
-app.commandLine.appendSwitch('enable-gpu-rasterization');
-app.commandLine.appendSwitch('enable-zero-copy'); 
+app.disableHardwareAcceleration(); 
 
 app.whenReady().then(createWindow)

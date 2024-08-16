@@ -17,6 +17,7 @@ html, body {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  user-select: none;    /* To disable mouse dragging selection */
 }
 
 .container {
@@ -93,8 +94,8 @@ html, body {
   margin-left: 10px;
 }
 
-/* SERIES LIST */
-.series-list {
+/* LIBRARIES LIST */
+.libraries-list {
   margin-top: 20px;
   margin-bottom: 50px;
   background-color: #3f3f3f59;
@@ -105,7 +106,7 @@ html, body {
   flex-grow: 1;
 }
 
-.series-button {
+.libraries-button {
   margin-bottom: 5px;
   padding: 10px;
   text-align: left;
@@ -114,7 +115,7 @@ html, body {
   cursor: pointer;
 }
 
-.series-button:hover {
+.libraries-button:hover {
   background-color: #ccc;
   color: black;
 }
@@ -128,6 +129,15 @@ html, body {
   flex-direction: column;
   flex: 1;
   height: 100%; /* Asegura que el panel derecho ocupe todo el alto */
+}
+
+/* LIBRARY AND SLICER BAR */
+.library-slicer-bar{
+  margin-top: 100px;
+  margin-left: 40px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-flow: row nowrap;
 }
 
 /* SERIES CONTAINER */
@@ -302,8 +312,6 @@ html, body {
 }
 
 .video-button img {
-  width: 430px;
-  height: 241px;
   margin-bottom: 8px;
   border-radius: 5px;
 }
