@@ -51,6 +51,48 @@ html, body {
   margin-left: 10px;
 }
 
+.svg-button-desktop-controls{
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 5px;
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.svg-button-desktop-controls:hover{
+  background-color: rgba(0, 0, 0, 0.739);
+}
+
+.svg-button-desktop-controls svg{
+  width: 24px;
+  height: 24px;
+}
+
+.svg-add-library-btn {
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 5px;
+  padding: 10px 15px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg-add-library-btn:hover{
+  background-color:rgba(0, 0, 0, 0.739);
+}
+
+.svg-add-library-btn svg{
+  width: 16px;
+  height: 16px;
+}
+
+.svg-add-library-btn span{
+  color: var(--color-text-primary);
+  margin-left: 10px;
+}
+
 /* SERIES LIST */
 .series-list {
   margin-top: 20px;
@@ -86,6 +128,14 @@ html, body {
   flex-direction: column;
   flex: 1;
   height: 100%; /* Asegura que el panel derecho ocupe todo el alto */
+}
+
+/* SERIES CONTAINER */
+.series-container{
+  margin: 100px 40px 40px 40px;
+  display: flex;
+  flex-flow: row wrap;
+  overflow-y: auto;
 }
 
 /* SEASON INFO */

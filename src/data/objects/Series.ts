@@ -8,7 +8,6 @@ export class Series {
   year: string;
   score: number;
   order: number;
-  numberOfEpisodes: number;
   numberOfSeasons: number;
   coverSrc: string;
   logoSrc: string;
@@ -30,7 +29,6 @@ export class Series {
     this.year = '';
     this.score = 0;
     this.order = order;
-    this.numberOfEpisodes = 0;
     this.numberOfSeasons = 0;
     this.coverSrc = '';
     this.logoSrc = '';
@@ -52,7 +50,6 @@ export class Series {
       year: this.year,
       score: this.score,
       order: this.order,
-      numberOfEpisodes: this.numberOfEpisodes,
       numberOfSeasons: this.numberOfSeasons,
       coverSrc: this.coverSrc,
       logoSrc: this.logoSrc,
@@ -76,7 +73,6 @@ export class Series {
     series.overview = jsonData.overview;
     series.year = jsonData.year;
     series.score = jsonData.score;
-    series.numberOfEpisodes = jsonData.numberOfEpisodes;
     series.numberOfSeasons = jsonData.numberOfSeasons;
     series.coverSrc = jsonData.coverSrc;
     series.logoSrc = jsonData.logoSrc;
@@ -197,14 +193,6 @@ export class Series {
 
   setNumberOfSeasons(numberOfSeasons: number): void {
     this.numberOfSeasons = numberOfSeasons;
-  }
-
-  getNumberOfEpisodes(): number {
-    return this.numberOfEpisodes;
-  }
-
-  setNumberOfEpisodes(numberOfEpisodes: number): void {
-    this.numberOfEpisodes = numberOfEpisodes;
   }
 
   getLogoSrc(): string {
