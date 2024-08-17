@@ -6,6 +6,8 @@ import episodeSlice from './slices/episodeSlice';
 import seriesImageSlice from "./slices/seriesImageSlice";
 import episodeImageSlice from "./slices/episodeImageSlice";
 import contextMenuSlice from "./slices/contextMenuSlice";
+import imageLoadedSlice from "./slices/imageLoadedSlice";
+import transparentImageLoadedSlice from "./slices/transparentImageLoadedSlice"
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +17,9 @@ export const store = configureStore({
     episodes: episodeSlice,
     seriesImage: seriesImageSlice,
     episodeImage: episodeImageSlice,
-    contextMenu: contextMenuSlice
+    contextMenu: contextMenuSlice,
+    imageLoaded: imageLoadedSlice,
+    transparentImageLoaded: transparentImageLoadedSlice
   }
 })
 

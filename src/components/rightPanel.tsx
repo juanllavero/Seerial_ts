@@ -1,14 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSeries, selectSeason, resetSelection } from '../redux/slices/seriesSlice';
-import { increaseEpisodeImageSize, reduceEpisodeImageSize } from '../redux/slices/episodeImageSlice';
-import { increaseSeriesImageSize, reduceSeriesImageSize } from '../redux/slices/seriesImageSlice';
-import { selectLibrary } from '../redux/slices/librarySlice';
+import { selectSeries, selectSeason } from '../redux/slices/seriesSlice';
 import { RootState } from '../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { closeContextMenu, toggleContextMenu } from 'redux/slices/contextMenuSlice';
 import { useTranslation } from 'react-i18next';
 import '../i18n';
+import { renderTransparentImage } from '@components/transparentImage';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -25,29 +23,6 @@ export const renderRightPanelContent = () => {
     const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
     const episodeImageWidth = useSelector((state: RootState) => state.episodeImage.width);
     const episodeImageHeight = useSelector((state: RootState) => state.episodeImage.height);
-
-    const handleSeriesSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newSize = parseInt(event.target.value, 10);
-        if (newSize > seriesImageWidth) {
-            dispatch(increaseSeriesImageSize());
-        } else {
-            dispatch(reduceSeriesImageSize());
-        }
-    };
-
-    const handleEpisodeSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newSize = parseInt(event.target.value, 10);
-        if (newSize > episodeImageWidth) {
-            dispatch(increaseEpisodeImageSize());
-        } else {
-            dispatch(reduceEpisodeImageSize());
-        }
-    };
-
-    const handleSelectLibrary = (library: any) => {
-        dispatch(selectLibrary(library));
-        dispatch(resetSelection());
-    };
 
     const handleSeriesSelection = (series: SeriesData) => {
         dispatch(selectSeries(series));
@@ -87,8 +62,8 @@ export const renderRightPanelContent = () => {
                     <img className="poster-image" src="./src/assets/poster.jpg" alt="Poster"
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
                   </div>
-                <a id="seriesName" title={series.name}>
-                  <span onClick={() => handleSeriesSelection(series)}>{series.name}</span>  
+                <a id="seriesName" title={series.name} onClick={() => handleSeriesSelection(series)}>
+                  {series.name}
                 </a>
                 <span id="episodeNumber">{series.seasons[0].year}</span>
               </div>
@@ -102,9 +77,7 @@ export const renderRightPanelContent = () => {
     if (selectedSeries && selectedSeason) {
       return (
         <>
-          <div className="background-image">
-            <img src="./src/assets/transparencyEffect.png" alt="Background" />
-          </div>
+          {renderTransparentImage()}
           <div className="season-episodes-container scroll">
             <div className="info-container">
               <div className="poster-image">

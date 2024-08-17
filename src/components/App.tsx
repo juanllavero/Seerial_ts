@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import {renderLibrariesList} from "@components/librariesList";
 import {renderRightPanelContent} from "@components/rightPanel";
 import {renderLibraryAndSlider} from "@components/libraryAndSlider"
+import {renderMainBackgroundImage} from "@components/mainBackgroundImage"
 import { setLibraries } from 'redux/slices/librarySlice';
 import { useTranslation } from 'react-i18next';
 import '../App.css';
@@ -41,6 +42,8 @@ function App() {
 
   return (
     <section className="container blur-background-image">
+      {renderMainBackgroundImage()}
+
       {/* Left Panel */}
       <section className="left-panel">
         <div className="top-controls">

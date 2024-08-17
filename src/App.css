@@ -35,6 +35,7 @@ html, body {
   overflow-y: hidden;
   margin: 0 8px 8px 0;
   height: 100%;
+  z-index: 1;
 }
 
 /* LEFT PANEL CONTROLS */
@@ -109,6 +110,7 @@ html, body {
 .libraries-button {
   background-color: transparent;
   padding: 5px;
+  margin-bottom: 5px;
   text-align: left;
   border: none;
   cursor: pointer;
@@ -230,32 +232,43 @@ html, body {
 
 /* SERIES CONTAINER */
 .series-container{
-  margin: 150px 40px 40px 40px;
+  margin: 150px 0 0 40px;
+  padding: 0 40px 40px 0;
   display: flex;
   flex-flow: row wrap;
   overflow-y: auto;
 }
 
 #seriesName {
-  margin-top: 5px;
-  display: flex;
-}
-
-#seriesName span{
-  margin: 4px 0 2px 4px;
+  margin: 8px 0 2px 4px;
   color: var(--color-text-primary);
-  border-bottom: 1px solid transparent;
+  position: relative;
+  display: inline-block;
+  width: fit-content;
 
-  display: -webkit-box;
-  overflow: hidden;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: nowrap !important;
+  max-width: 100%;
 }
 
-#seriesName span:hover{
-  border-bottom: 1px solid white;
+#seriesName:hover{
   cursor: pointer;
+}
+
+#seriesName::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+#seriesName:hover::after {
+  width: 100%;
 }
 
 /* SEASON INFO */
@@ -371,6 +384,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .play-button-desktop:hover {
@@ -392,6 +406,7 @@ html, body {
   border-color: transparent;
   padding: 5px 12px 5px 12px;
   margin-left: 10px;
+  cursor: pointer;
 }
 
 .svg-button-desktop:hover{
@@ -462,11 +477,10 @@ html, body {
   font-size: medium;
   color: var(--color-text-primary);
 
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;  
-  overflow: hidden;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: nowrap !important;
+  max-width: 100%;
 }
 
 .episode-box #episodeNumber{
@@ -487,6 +501,7 @@ html, body {
 
 .video-button:hover {
   background-color: var(--app-color);
+  transition: background-color 0.3s ease;
 }
 
 /* WINDOW TOP BAR */
@@ -543,14 +558,43 @@ html, body {
 .background-image img {
   width: 100%;
   height: auto;   /* To keep aspect ratio */
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.background-image img.loaded {
+  opacity: 1;
+}
+
+.main-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.main-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.main-background img.loaded {
+  opacity: 1;
 }
 
 .blur-background-image {
-  flex-grow: 1;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.587), rgba(0, 0, 0, .587)), url('./src/assets/fullBlur.jpg');
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
+  background-color: #101010;
 }
 
 .poster-image img {
