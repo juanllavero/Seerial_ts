@@ -13,10 +13,10 @@ i18n
     supportedLngs: ['en', 'es', 'de', 'fr', 'it'], // Supported languages
     debug: true,
     interpolation: {
-      escapeValue: false, // React ya se encarga de escapar las variables
+      escapeValue: false,
     },
     backend: {
-      loadPath: './src/locales/{{lng}}.json', // Ruta donde se encuentran los archivos de traducción
+      loadPath: './src/locales/{{lng}}.json',
     },
   });
 

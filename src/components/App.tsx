@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import {renderLibrariesList} from "@components/librariesList";
 import {renderRightPanelContent} from "@components/rightPanel";
+import {renderLibraryAndSlider} from "@components/libraryAndSlider"
 import { setLibraries } from 'redux/slices/librarySlice';
 import { useTranslation } from 'react-i18next';
 import '../App.css';
@@ -15,7 +16,7 @@ function App() {
     // @ts-ignore
     window.electronAPI.getLibraryData()
       .then((data: any[]) => {
-        dispatch(setLibraries(data)); // Usar dispatch para actualizar el estado global
+        dispatch(setLibraries(data));
       })
       .catch((error: unknown) => {
         if (error instanceof Error) {
@@ -40,7 +41,7 @@ function App() {
 
   return (
     <section className="container blur-background-image">
-      {/* Panel Izquierdo */}
+      {/* Left Panel */}
       <section className="left-panel">
         <div className="top-controls">
           <button className="svg-button-desktop-controls">
@@ -54,7 +55,7 @@ function App() {
         {renderLibrariesList()}
       </section>
 
-      {/* Panel Derecho */}
+      {/* Right Panel */}
       <section className="right-panel">
         <div className="top-bar">
           <div className="window-buttons-container">
@@ -63,6 +64,7 @@ function App() {
             <button className="window-button close-button" onClick={() => window.electronAPI.closeWindow()}>X</button>
           </div>
         </div>
+        {renderLibraryAndSlider()}
         {renderRightPanelContent()}
       </section>
     </section>

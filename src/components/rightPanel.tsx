@@ -6,10 +6,15 @@ import { selectLibrary } from '../redux/slices/librarySlice';
 import { RootState } from '../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
+import { closeContextMenu, toggleContextMenu } from 'redux/slices/contextMenuSlice';
+import { useTranslation } from 'react-i18next';
+import '../i18n';
 
-// Renderizado condicional del contenido de la sección derecha
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation();
+
+    const isContextMenuShown = useSelector((state: RootState) => state.contextMenu.isContextShown);
 
     const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
     const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
@@ -45,32 +50,22 @@ export const renderRightPanelContent = () => {
     };
 
     const handleSeriesSelection = (series: SeriesData) => {
-        dispatch(selectSeries(series)); // Despacha la acción para seleccionar la serie y la primera temporada
+        dispatch(selectSeries(series));
     };
 
     const handleSeasonSelection = (season: SeasonData) => {
-        dispatch(selectSeason(season)); // Despacha la acción para seleccionar la temporada
+        dispatch(selectSeason(season));
+        dispatch(closeContextMenu());
+    };
+
+    const toggleMenu = () => {
+        dispatch(toggleContextMenu());
     };
     
-    // Si no se ha seleccionado ninguna librería, mostrar el contenido inicial
+    // Show no content view
     if (!selectedLibrary) {
       return (
         <>
-            <div className="library-slicer-bar">
-                <button onClick={() => handleSelectLibrary(selectLibrary)}>
-                        {selectLibrary.name}
-                </button>
-                <input
-                type="range"
-                min="130"
-                max="300"
-                step="10"
-                value={seriesImageWidth}
-                onChange={handleSeriesSliderChange}
-                className="slider"
-                id="imageSizeSlider"
-                />
-            </div>
             <div className="series-container">
                 <p>Selecciona una librería para ver las series disponibles.</p>
             </div>
@@ -78,46 +73,32 @@ export const renderRightPanelContent = () => {
       );
     }
 
-    // Si hay una librería seleccionada pero no una serie, mostrar la lista de series
+    // Show series view
     if (selectedLibrary && !selectedSeries) {
       return (
         <>
           <div className="series-container scroll">
-            <div className="library-slicer-bar">
-                <button onClick={() => handleSelectLibrary(selectLibrary)}>
-                        {selectLibrary.name}
-                </button>
-                <input
-                type="range"
-                min="130"
-                max="300"
-                step="10"
-                value={seriesImageWidth}
-                onChange={handleSeriesSliderChange}
-                className="slider"
-                id="imageSizeSlider"
-                />
-            </div>
             {selectedLibrary.series.map((series: any, index: number) => (
-              <button
+              <div className="episode-box"
                 key={index}
-                className="libraries-button"
-                onClick={() => handleSeriesSelection(series)
-                } // Al hacer clic en la serie, pasamos a la vista de temporada
-              >
-                <div className="poster-image">
-                  <img src={"./src/assets/poster.jpg"} alt="Poster"
-                  style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
-                </div>
-                {series.name}
-              </button>
+                style={{ maxWidth: `${seriesImageWidth}px`}}>
+                  <div key={index} className="video-button" onClick={() => handleSeriesSelection(series)}
+                  style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
+                    <img className="poster-image" src="./src/assets/poster.jpg" alt="Poster"
+                    style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
+                  </div>
+                <a id="seriesName" title={series.name}>
+                  <span onClick={() => handleSeriesSelection(series)}>{series.name}</span>  
+                </a>
+                <span id="episodeNumber">{series.seasons[0].year}</span>
+              </div>
             ))}
           </div>
         </>
       );
     }
 
-    // Si hay una serie seleccionada, mostrar la temporada y episodios
+    // Show season view
     if (selectedSeries && selectedSeason) {
       return (
         <>
@@ -125,21 +106,6 @@ export const renderRightPanelContent = () => {
             <img src="./src/assets/transparencyEffect.png" alt="Background" />
           </div>
           <div className="season-episodes-container scroll">
-            <div className="library-slicer-bar">
-                <button onClick={() => handleSelectLibrary(selectLibrary)}>
-                        {selectLibrary.name}
-                </button>
-                <input
-                type="range"
-                min="290"
-                max="460"
-                step="10"
-                value={episodeImageWidth}
-                onChange={handleEpisodeSliderChange}
-                className="slider"
-                id="imageSizeSlider"
-                />
-            </div>
             <div className="info-container">
               <div className="poster-image">
                 <img src={"./src/assets/poster.jpg" || selectedSeason.coverSrc} alt="Poster"/>
@@ -160,7 +126,7 @@ export const renderRightPanelContent = () => {
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
                   <span id="playText">Reproducir</span>
                 </button>
-                <button className="svg-button-desktop">
+                <button className="svg-button-desktop" title="Mark as watched">
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
                 <button className="svg-button-desktop">
                 <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
@@ -175,13 +141,34 @@ export const renderRightPanelContent = () => {
                 </div>
               </section>
             </div>
+            <section className="season-selector-container">
+              <button className="season-selector" onClick={toggleMenu}>
+                {selectedSeason.name}
+              </button>
+              {isContextMenuShown && (
+                <div className="dropdown-menu">
+                  {selectedSeries.seasons.map((season: SeasonData, index: number) => (
+                    <a
+                      key={index}
+                      className="dropdown-element"
+                      onClick={() => handleSeasonSelection(season)}>{season.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </section>
             <div className="episodes-container">
               {selectedSeason.episodes.map((episode: any, index: number) => (
-                <button key={index} className="video-button">
-                  <img src="./src/assets/fullBlur.jpg"
-                  style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}/>
-                  {episode.name}
-                </button>
+                <div className="episode-box" 
+                style={{ maxWidth: `${episodeImageWidth}px`}}>
+                  <div key={index} className="video-button"
+                  style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}>
+                    <img src="./src/assets/fullBlur.jpg"
+                    style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}/>
+                  </div>
+                  <span id="episodeName" title={episode.name}>{episode.name}</span>
+                  <span id="episodeNumber">{t("episode") + " " + episode.episodeNumber}</span>
+                </div>
               ))}
             </div>
           </div>

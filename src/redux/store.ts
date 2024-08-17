@@ -5,6 +5,7 @@ import seasonSlice from './slices/seasonSlice';
 import episodeSlice from './slices/episodeSlice';
 import seriesImageSlice from "./slices/seriesImageSlice";
 import episodeImageSlice from "./slices/episodeImageSlice";
+import contextMenuSlice from "./slices/contextMenuSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,10 +14,10 @@ export const store = configureStore({
     season: seasonSlice,
     episodes: episodeSlice,
     seriesImage: seriesImageSlice,
-    episodeImage: episodeImageSlice
+    episodeImage: episodeImageSlice,
+    contextMenu: contextMenuSlice
   }
 })
 
-// Tipos para el estado y el dispatch para su uso en componentes
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

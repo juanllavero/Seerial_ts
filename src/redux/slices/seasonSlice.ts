@@ -9,7 +9,7 @@ const initialState: SeasonState = {
   selectedSeason: null,
 };
 
-export const seasonSlice = createSlice({
+const seasonSlice = createSlice({
   name: 'season',
   initialState,
   reducers: {

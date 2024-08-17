@@ -11,7 +11,7 @@ const initialState: LibraryState = {
   selectedLibrary: null,
 };
 
-export const librarySlice = createSlice({
+const librarySlice = createSlice({
   name: 'library',
   initialState,
   reducers: {

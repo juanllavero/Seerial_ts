@@ -33,8 +33,8 @@ html, body {
   flex-direction: column;
   padding: 30px;
   overflow-y: hidden;
-  margin: 0 8px 8px 0; /* Asegura que los márgenes no interfieran con el alto total */
-  height: 100%; /* Para asegurar que el panel izquierdo ocupe todo el alto */
+  margin: 0 8px 8px 0;
+  height: 100%;
 }
 
 /* LEFT PANEL CONTROLS */
@@ -107,17 +107,44 @@ html, body {
 }
 
 .libraries-button {
-  margin-bottom: 5px;
-  padding: 10px;
+  background-color: transparent;
+  padding: 5px;
   text-align: left;
   border: none;
-  background-color: #0c0c0c;
   cursor: pointer;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: left;
 }
 
-.libraries-button:hover {
-  background-color: #ccc;
-  color: black;
+.libraries-button.selected svg path {
+  fill: var(--app-color);
+}
+
+.libraries-button .library-name {
+  color: var(--color-text-default);
+  margin-left: 10px;
+  transition: color 0.3s ease;
+
+  font-size: medium;
+  display: -webkit-box;
+  overflow: hidden;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.libraries-button.selected .library-name {
+  color: var(--app-color);
+}
+
+.libraries-button:hover .library-name {
+  color: var(--color-text-primary);
+}
+
+.libraries-button span:hover{
+  color: var(--color-text-primary);
 }
 
 /* RIGHT PANEL */
@@ -128,24 +155,107 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: 100%; /* Asegura que el panel derecho ocupe todo el alto */
+  height: 100%;
 }
 
 /* LIBRARY AND SLICER BAR */
 .library-slicer-bar{
-  margin-top: 100px;
-  margin-left: 40px;
+  background-color: #191a1ca8;
+  z-index: 20;
+  position: fixed;
+  padding: 10px;
+  margin-top: 80px;
+  margin-left: 50px;
   margin-bottom: 40px;
+
+  border-radius: 5px;
+
   display: flex;
   flex-flow: row nowrap;
+  justify-content: left;
+}
+
+.library-button{
+  font-size: medium;
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-default);
+}
+
+.library-button:hover{
+  color: var(--color-text-primary);
+}
+
+.svg-button-desktop-transparent{
+  background-color: transparent;
+  border: none;
+}
+
+.svg-button-desktop-transparent path{
+  opacity: 0.8;
+}
+
+.svg-button-desktop-transparent:hover path{
+  opacity: 1;
+}
+
+.desktopSlider {
+  margin-left: 20px;
+  margin-right: 10px;
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 80px;
+  height: 3px;
+  border-radius: 25px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.desktopSlider:hover {
+  opacity: 1;
+}
+
+.desktopSlider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50px;
+  background: var(--color-text-primary);
+  cursor: pointer;
 }
 
 /* SERIES CONTAINER */
 .series-container{
-  margin: 100px 40px 40px 40px;
+  margin: 150px 40px 40px 40px;
   display: flex;
   flex-flow: row wrap;
   overflow-y: auto;
+}
+
+#seriesName {
+  margin-top: 5px;
+  display: flex;
+}
+
+#seriesName span{
+  margin: 4px 0 2px 4px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid transparent;
+
+  display: -webkit-box;
+  overflow: hidden;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+#seriesName span:hover{
+  border-bottom: 1px solid white;
+  cursor: pointer;
 }
 
 /* SEASON INFO */
@@ -293,32 +403,90 @@ html, body {
   height: 24px;
 }
 
+/* SEASON SELECTOR */
+.season-selector-container{
+  position: relative;
+}
+
+.season-selector{
+  display: flex;
+  flex-flow: row nowrap;
+  max-width: 500px;
+  margin-left: 40px;
+}
+
+.dropdown-menu{
+  margin-left: 50px;
+  position: absolute;
+  background-color: #191a1c;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .35);
+  font-size: 13px;
+  padding: 8px 0;
+  transform-origin: center top;
+  transition: background .15s ease-out;
+}
+
+.dropdown-element{
+  align-items: center;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  word-wrap: break-word;
+  display: block;
+  font-size: small;
+  padding: 4px 20px;
+  text-align: left;
+}
+
+
 /* EPISODES CONTAINER */
 .episodes-container{
+  margin: 20px;
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
 }
 
-.video-button{
+.episode-box{
   margin: 10px;
-  padding: 10px;
-  text-align: left;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
   display: flex;
-  flex-direction: column;
+  flex-flow: column wrap;
+  text-align: left;
+}
+
+.episode-box #episodeName{
+  margin-top: 10px;
+  margin-left: 0.3em;
+  font-size: medium;
+  color: var(--color-text-primary);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+.episode-box #episodeNumber{
+  margin-left: 0.3em;
+  font-size: small;
+  color: rgb(184, 184, 184);
+}
+
+.video-button{
+  padding: 1px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .video-button img {
-  margin-bottom: 8px;
   border-radius: 5px;
 }
 
 .video-button:hover {
-  background-color: #ccc;
-  color: black;
+  background-color: var(--app-color);
 }
 
 /* WINDOW TOP BAR */

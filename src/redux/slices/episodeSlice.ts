@@ -9,7 +9,7 @@ const initialState: EpisodeState = {
   episodes: [],
 };
 
-export const episodeSlice = createSlice({
+const episodeSlice = createSlice({
   name: 'episodes',
   initialState,
   reducers: {
