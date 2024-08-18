@@ -109,6 +109,10 @@ ipcMain.on('maximize-window', () => {
   }
 })
 
+ipcMain.handle('window-is-maximized', async () => {
+  return win?.isMaximized();
+});
+
 ipcMain.on('close-window', () => {
   win?.close()
 })
@@ -127,6 +131,7 @@ app.on('activate', () => {
   }
 })
 
+app.commandLine.appendSwitch("ignore-gpu-blacklist");
 app.disableHardwareAcceleration(); 
 
 app.whenReady().then(createWindow)

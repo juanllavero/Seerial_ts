@@ -4,6 +4,7 @@ import { ipcRenderer, contextBridge } from 'electron'
 contextBridge.exposeInMainWorld('electronAPI', {
   minimizeWindow: () => ipcRenderer.send('minimize-window'),
   maximizeWindow: () => ipcRenderer.send('maximize-window'),
+  isWindowMaximized: () => ipcRenderer.invoke('window-is-maximized'),
   closeWindow: () => ipcRenderer.send('close-window'),
   getLibraryData: () => ipcRenderer.invoke('get-library-data'),
   saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData)

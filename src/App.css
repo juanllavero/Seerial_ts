@@ -9,6 +9,8 @@
   --app-color-darken: #86ccd5;
   --color-text-primary: #ffffff;
   --color-text-default: #ffffffcc;
+
+  color: var(--color-text-default);
 }
 
 html, body {
@@ -26,12 +28,24 @@ html, body {
   height: 100%;
 }
 
+.no-libraries-container{
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.no-libraries-container h2{
+  margin-bottom: 0;
+}
+
 /* LEFT PANEL */
 .left-panel {
   width: 260px;
   display: flex;
   flex-direction: column;
-  padding: 30px;
+  padding: 10px 15px 10px 20px;
   overflow-y: hidden;
   margin: 0 8px 8px 0;
   height: 100%;
@@ -40,6 +54,7 @@ html, body {
 
 /* LEFT PANEL CONTROLS */
 .top-controls {
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -49,16 +64,11 @@ html, body {
   margin-right: 5px;
 }
 
-.top-controls select {
-  margin-left: 10px;
-}
-
 .svg-button-desktop-controls{
   background-color: transparent;
   border-color: transparent;
   border-radius: 5px;
   padding: 5px;
-  margin-right: 10px;
 }
 
 .svg-button-desktop-controls:hover{
@@ -97,10 +107,11 @@ html, body {
 
 /* LIBRARIES LIST */
 .libraries-list {
-  margin-top: 20px;
-  margin-bottom: 50px;
-  background-color: #3f3f3f59;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  background-color: #0000005b;
   padding: 10px;
+  border-radius: 5px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -109,7 +120,7 @@ html, body {
 
 .libraries-button {
   background-color: transparent;
-  padding: 5px;
+  padding: 8px;
   margin-bottom: 5px;
   text-align: left;
   border: none;
@@ -153,7 +164,7 @@ html, body {
 .right-panel {
   width: 100%;
   position: relative;
-  background-color: #3f3f3f59;
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -162,11 +173,11 @@ html, body {
 
 /* LIBRARY AND SLICER BAR */
 .library-slicer-bar{
-  background-color: #191a1ca8;
+  background-color: #0000009a;
   z-index: 20;
   position: fixed;
   padding: 10px;
-  margin-top: 80px;
+  margin-top: 90px;
   margin-left: 50px;
   margin-bottom: 40px;
 
@@ -232,7 +243,7 @@ html, body {
 
 /* SERIES CONTAINER */
 .series-container{
-  margin: 150px 0 0 40px;
+  margin: 160px 0 0 40px;
   padding: 0 40px 40px 0;
   display: flex;
   flex-flow: row wrap;
@@ -271,10 +282,24 @@ html, body {
   width: 100%;
 }
 
+.logo-container{
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: flex-end;
+  text-align: left;
+  margin-left: 30px;
+  height: 200px;
+}
+
+.logo-container img{
+  max-height: 200px;
+  width: min-content;
+}
+
 /* SEASON INFO */
 .season-episodes-container{
-  background-color: #3f3f3f62;
-  padding: 300px 20px 20px 20px;
+  background-color: #0000005b;
+  padding: 220px 20px 20px 10px;
   overflow-y: auto;
   position: relative;
   z-index: 1;
@@ -284,7 +309,7 @@ html, body {
 }
 
 .info-container{
-  padding: 40px;
+  padding: 30px;
   display: flex;
   flex-flow: row nowrap;
 }
@@ -297,6 +322,12 @@ html, body {
 }
 
 #seriesTitle{
+  color: var(--color-text-primary);
+  font-size: 3.5em;
+  font-weight: bold;
+}
+
+#seasonTitle{
   color: var(--color-text-primary);
   font-size: 2em;
   font-weight: bold;
@@ -360,6 +391,14 @@ html, body {
   content: "Collapse";
 }
 
+.expand-svg{
+  fill: white;
+}
+
+.expand-btn:checked::before .expand-svg{
+  transform: rotate(180);
+}
+
 .overview-container p{
   color: var(--color-text-primary);
   display: -webkit-box;
@@ -371,7 +410,6 @@ html, body {
 
 .overview-container p:has(+ .expand-btn:checked){
   display: block;
-  transition: all 2s;
 }
 
 /* SEASON INFO BUTTONS */
@@ -419,19 +457,34 @@ html, body {
 }
 
 /* SEASON SELECTOR */
-.season-selector-container{
+.season-selector-container {
   position: relative;
 }
 
-.season-selector{
+.season-selector {
   display: flex;
   flex-flow: row nowrap;
-  max-width: 500px;
-  margin-left: 40px;
+  margin-left: 30px;
+  background-color: transparent;
+  border: none;
+  color: var(--color-text-default);
+  font-size: medium;
+  border-bottom: 1px solid var(--color-text-default);
+}
+
+.season-selector:hover {
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-text-primary);
+}
+
+#triangle{
+  margin-left: 5px;
+  transform: scale(0.9, 0.6);
 }
 
 .dropdown-menu{
   margin-left: 50px;
+  margin-top: 10px;
   position: absolute;
   background-color: #191a1c;
   border-radius: 4px;
@@ -508,7 +561,7 @@ html, body {
 .top-bar {
   display: flex;
   justify-content: flex-end;
-  padding: 10px;
+  padding: 5px;
   position: absolute;
   top: 0;
   width: 100%;
@@ -517,18 +570,25 @@ html, body {
 }
 
 .window-buttons-container {
-  padding-top: 25px;
-  padding-right: 50px;
+  padding-top: 10px;
+  padding-right: 40px;
 }
 
 .window-button {
-  padding: 15px 20px 15px 20px;
+  padding: 10px 15px 10px 15px;
   color: white;
   background: none;
   border: none;
   font-size: 16px;
   cursor: pointer;
   -webkit-app-region: no-drag; /* No arrastra la ventana en los botones */
+}
+
+.window-button svg{
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  overflow: middle;
 }
 
 .minimize-button:hover {
@@ -552,21 +612,22 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 0; /* Set the image at the back */
+  z-index: -1; /* Set the image at the back */
 }
 
 .background-image img {
   width: 100%;
-  height: auto;   /* To keep aspect ratio */
+  height: auto; /* To keep aspect ratio */
   opacity: 0;
-  transition: opacity 1s ease-in;
+  transition: opacity 0.5s ease-in;
 }
 
-.background-image img.loaded {
+.background-image img.imageLoaded {
   opacity: 1;
 }
 
 .main-background {
+  filter: brightness(0.5) blur(18px);
   position: absolute;
   top: 0;
   left: 0;
@@ -588,6 +649,25 @@ html, body {
 
 .main-background img.loaded {
   opacity: 1;
+}
+
+.noise-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.noise-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.02;
 }
 
 .blur-background-image {

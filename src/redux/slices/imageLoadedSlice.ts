@@ -5,7 +5,7 @@ const initialState = {
 };
 
 const imageLoadedSlice = createSlice({
-name: 'seasonMenu',
+name: 'imageLoaded',
 initialState,
 reducers: {
     loadImage: (state) => {

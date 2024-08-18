@@ -179,5 +179,7 @@
     "continueWatching": "Continua a guardare",
     "overview": "Sommario",
     "downloadingImages": "Scaricamento delle immagini",
-    "highSettingsPlayer": "Qualità video massima"
+    "highSettingsPlayer": "Qualità video massima",
+    "noLibraryFound": "Nessuna biblioteca disponibile",
+    "addLibraryMessage": "Aggiungine una con il pulsante \"Aggiungi biblioteca\""
 }  

@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLibrary } from '../redux/slices/librarySlice';
 import { resetSelection } from '../redux/slices/seriesSlice';
+import { removeTransparentImage } from '../redux/slices/transparentImageLoadedSlice';
 import { RootState } from '../redux/store';
 
 export const renderLibrariesList = () => {
@@ -11,6 +12,7 @@ export const renderLibrariesList = () => {
     const handleSelectLibrary = (library: any) => {
         dispatch(selectLibrary(library));
         dispatch(resetSelection());
+        dispatch(removeTransparentImage());
     };
 
     return (

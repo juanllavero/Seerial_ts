@@ -1,12 +1,14 @@
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSeries, selectSeason } from '../redux/slices/seriesSlice';
 import { RootState } from '../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { closeContextMenu, toggleContextMenu } from 'redux/slices/contextMenuSlice';
+import { loadTransparentImage } from 'redux/slices/transparentImageLoadedSlice';
 import { useTranslation } from 'react-i18next';
 import '../i18n';
-import { renderTransparentImage } from '@components/transparentImage';
+import { selectLibrary } from 'redux/slices/librarySlice';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -14,6 +16,7 @@ export const renderRightPanelContent = () => {
 
     const isContextMenuShown = useSelector((state: RootState) => state.contextMenu.isContextShown);
 
+    const libraries = useSelector((state: RootState) => state.library.libraries);
     const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
     const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
     const selectedSeason = useSelector((state: RootState) => state.series.selectedSeason);
@@ -23,6 +26,12 @@ export const renderRightPanelContent = () => {
     const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
     const episodeImageWidth = useSelector((state: RootState) => state.episodeImage.width);
     const episodeImageHeight = useSelector((state: RootState) => state.episodeImage.height);
+
+    const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
+
+    const handleTransparentImageLoad = () => {
+        dispatch(loadTransparentImage());
+    }
 
     const handleSeriesSelection = (series: SeriesData) => {
         dispatch(selectSeries(series));
@@ -39,13 +48,18 @@ export const renderRightPanelContent = () => {
     
     // Show no content view
     if (!selectedLibrary) {
-      return (
-        <>
-            <div className="series-container">
-                <p>Selecciona una librería para ver las series disponibles.</p>
+      if (libraries.length == 0){
+        return (
+          <>
+            <div className="no-libraries-container">
+              <h2>{t("noLibraryFound")}</h2>
+              <h4>{t("addLibraryMessage")}</h4>
             </div>
-        </>
-      );
+          </>
+        );
+      }else{
+        dispatch(selectLibrary(libraries[0]));
+      }
     }
 
     // Show series view
@@ -59,8 +73,15 @@ export const renderRightPanelContent = () => {
                 style={{ maxWidth: `${seriesImageWidth}px`}}>
                   <div key={index} className="video-button" onClick={() => handleSeriesSelection(series)}
                   style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
-                    <img className="poster-image" src="./src/assets/poster.jpg" alt="Poster"
-                    style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
+                    {
+                      series.coverSrc !== "" ? (
+                        <LazyLoadImage className="poster-image" src={"./src/" + series.coverSrc} alt="Poster"
+                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
+                      ) : (
+                        <LazyLoadImage className="poster-image" src="./src/resources/img/fileNotFound.png" alt="Poster"
+                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
+                      )
+                    }
                   </div>
                 <a id="seriesName" title={series.name} onClick={() => handleSeriesSelection(series)}>
                   {series.name}
@@ -74,19 +95,58 @@ export const renderRightPanelContent = () => {
     }
 
     // Show season view
-    if (selectedSeries && selectedSeason) {
+    if (selectedLibrary && selectedSeries && selectedSeason) {
       return (
         <>
-          {renderTransparentImage()}
           <div className="season-episodes-container scroll">
+            <div className="logo-container">
+              {
+                selectedLibrary && selectedLibrary.type === "Shows" ? (
+                  selectedSeries.logoSrc != "" ? (
+                    <LazyLoadImage src={"./src/" + selectedSeries.logoSrc}></LazyLoadImage>
+                  ) : (
+                    <span id="seriesTitle">{selectedSeries.name}</span>
+                  )
+                ) : (
+                  selectedSeason.logoSrc != "" ? (
+                    <LazyLoadImage src={"./src/" + selectedSeason.logoSrc}></LazyLoadImage>
+                  ) : (
+                    <span id="seriesTitle">{selectedSeries.name}</span>
+                  )
+                )
+              }
+            </div>
+              {selectedSeason.backgroundSrc != "" ? (<div className="background-image">
+                  <LazyLoadImage src={"./src/resources/img/backgrounds/" + selectedSeason.id + "/transparencyEffect.png"} alt="Season Background"
+                  onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}></LazyLoadImage>
+              </div>) : (<div></div>)}
             <div className="info-container">
               <div className="poster-image">
-                <img src={"./src/assets/poster.jpg" || selectedSeason.coverSrc} alt="Poster"/>
+                {
+                  selectedLibrary.type == "Shows" ? (
+                    selectedSeries.coverSrc != "" ? (
+                      <LazyLoadImage src={"./src/" + selectedSeries.coverSrc} alt="Poster"/>
+                    ) : (
+                      <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
+                    )
+                    
+                  ) : (
+                    selectedSeason.coverSrc != "" ? (
+                      <LazyLoadImage src={"./src/" + selectedSeason.coverSrc} alt="Poster"/>
+                    ) : (
+                      <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
+                    )
+                  )
+                }
               </div>
               <section className="season-info">
-                <span id="seriesTitle">{selectedSeries.name}</span>
+                <span id="seasonTitle">{selectedSeason.name}</span>
                 <section className="season-info-text">
-                  <span id="directedBy">{"Directed by " + selectedSeason.directedBy || ""}</span>
+                  {
+                    selectedSeason.directedBy != "" ? (
+                      <span id="directedBy">{"Directed by " + selectedSeason.directedBy || ""}</span>
+                    ) : (<span></span>)
+                  }
                   <span id="date">{selectedSeason.year || ""}</span>
                   <span id="genres">{selectedSeries.genres || ""}</span>
                 </section>
@@ -109,14 +169,23 @@ export const renderRightPanelContent = () => {
                 </button>
               </section>
                 <div className="overview-container">
-                  <p>{selectedSeason.overview || selectedSeries.overview || "Sin descripción disponible."}</p>
-                  <input type="checkbox" className="expand-btn"></input>
+                  <p>{selectedSeason.overview || selectedSeries.overview || t("defaultOverview")}</p>
+                  <input type="checkbox" className="expand-btn"
+                    style={{color: `white`}}></input>
+                  <svg className="expand-svg" aria-hidden="true" height="15" viewBox="0 0 48 48" width="15" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path></svg>
                 </div>
               </section>
             </div>
             <section className="season-selector-container">
               <button className="season-selector" onClick={toggleMenu}>
-                {selectedSeason.name}
+                <span>{selectedSeason.name}</span>
+                {
+                  isContextMenuShown ? (
+                    <span id="triangle">&#9650;</span>
+                  ) : (
+                    <span id="triangle">&#9660;</span>
+                  )
+                }
               </button>
               {isContextMenuShown && (
                 <div className="dropdown-menu">
@@ -136,8 +205,17 @@ export const renderRightPanelContent = () => {
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <div key={index} className="video-button"
                   style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}>
-                    <img src="./src/assets/fullBlur.jpg"
-                    style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}/>
+                    {
+                      episode.imgSrc != "" ? (
+                        <LazyLoadImage src={"./src/" + episode.imgSrc}
+                          style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                          alt="Video Thumbnail"/>
+                      ) : (
+                        <LazyLoadImage src={"./src/resources/img/Default_video_thumbnail.jpg"}
+                          style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                          alt="Video Thumbnail"/>
+                      )
+                    }
                   </div>
                   <span id="episodeName" title={episode.name}>{episode.name}</span>
                   <span id="episodeNumber">{t("episode") + " " + episode.episodeNumber}</span>

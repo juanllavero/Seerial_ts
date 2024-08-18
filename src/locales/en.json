@@ -179,5 +179,7 @@
     "continueWatching": "Continue watching",
     "overview": "Overview",
     "downloadingImages": "Downloading images",
-    "highSettingsPlayer": "Highest video quality"
+    "highSettingsPlayer": "Highest video quality",
+    "noLibraryFound": "No library available",
+    "addLibraryMessage": "Add one with the \"Add library\" button"
   }

@@ -5,7 +5,7 @@ const initialState = {
 };
 
 const transparentImageLoadedSlice = createSlice({
-name: 'seasonMenu',
+name: 'transparentImage',
 initialState,
 reducers: {
     loadTransparentImage: (state) => {
