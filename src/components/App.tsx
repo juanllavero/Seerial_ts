@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import Controls from '@components/controls';
 import {renderLibrariesList} from "@components/librariesList";
 import {renderRightPanelContent} from "@components/rightPanel";
 import {renderLibraryAndSlider} from "@components/libraryAndSlider"
@@ -12,6 +14,8 @@ import '../i18n';
 function App() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  const isVideoLoaded = useSelector((state: RootState) => state.video.isLoaded);
 
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
 
@@ -56,7 +60,10 @@ function App() {
   };
 
   return (
-    <section className="container blur-background-image">
+    isVideoLoaded ? (
+      <Controls/>
+    ) : (
+      <section className="container blur-background-image">
       {renderMainBackgroundImage()}
       <div className="noise-background">
         <img
@@ -107,6 +114,7 @@ function App() {
         {renderRightPanelContent()}
       </section>
     </section>
+    )
   );
 }
 

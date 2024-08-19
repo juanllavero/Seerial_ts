@@ -24,6 +24,7 @@ export class MPVController {
       '--no-border',            // Sin bordes
       '--autofit=100%',         // Ajusta el video al tamaño de la ventana
       '--input-ipc-server=/tmp/mpvsocket',  // IPC Socket para comunicación
+      '--input-vo-keyboard',
       '--log-file=mpv.log',     // Opcional: para depuración
       videoPath                 // Ruta del archivo de video a reproducir
     ];

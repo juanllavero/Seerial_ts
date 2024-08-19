@@ -66,6 +66,7 @@ function createWindow() {
     minWidth: 720,
     minHeight: 400,
     alwaysOnTop: false,
+    transparent: true,
     icon: "./src/assets/icon.ico",
     frame: false, // Quita la barra de título del sistema operativo
     webPreferences: {
@@ -117,14 +118,13 @@ function createWindow() {
 // Crear una ventana de controles
 function createControlWindow() {
   controlsWindow = new BrowserWindow({
-    parent: win!,
     width: win?.getBounds().width,
     height: win?.getBounds().height,
     minWidth: 720,
     minHeight: 400,
     alwaysOnTop: false,
     icon: "./src/assets/icon.ico",
-    transparent: true,
+    transparent: false,
     frame: false,
     hasShadow: false,
     webPreferences: {
@@ -136,7 +136,7 @@ function createControlWindow() {
   controlsWindow.loadFile(path.join(__dirname, '../controls.html'));
 
   // Mantener el tamaño y posición sincronizados con la ventana principal
-  if (win) {
+  /*if (win) {
     win.setBounds(controlsWindow.getBounds());
     win.on('resize', () => {
       if (win)
@@ -146,7 +146,7 @@ function createControlWindow() {
       if (win)
         win.setBounds(controlsWindow!.getBounds());
     });
-  }
+  }*/
 
   controlsWindow.on('closed', () => {
     controlsWindow = null;
@@ -154,12 +154,14 @@ function createControlWindow() {
 }
 
 ipcMain.on('play-video', (_event, videoSrc) => {
+  createControlWindow();
+  
   if (!mpvController)
-    mpvController = new MPVController(win!);
+    mpvController = new MPVController(controlsWindow!);
 
   mpvController.startMPV(videoSrc);
-  //createControlWindow();
   win?.webContents.send('video-playing');
+  win?.moveTop();
 });
 
 ipcMain.on('stop-video', () => {

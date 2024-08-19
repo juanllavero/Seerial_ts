@@ -1,20 +1,87 @@
-.container {
-    position: absolute;
-    z-index: 999;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background-color: rgb(255, 255, 255);
-    color: #fff;
+.controls-container {
+    border: 2px solid white;
+
+    color:white;
+
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px;
-    pointer-events: none;
+    flex: 1;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.controls-top-bar {
+    background-color: #101010;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    -webkit-app-region: drag;
+}
+
+.controls-top-bar button {
+    -webkit-app-region: no-drag;
+}
+
+.controls-botttom-bar {
+    background-color: #101010;
+    display: flex;
+    flex-direction: column;
+}
+
+.controls {
+    background-color: #101010;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.controls-svg-button {
+    background-color: transparent;
+    border-radius: 5px;
+    border-color: transparent;
+    padding: 5px 12px 5px 12px;
+    margin-left: 10px;
+    cursor: pointer;
+
+    color:white;
+
+    opacity: 0.8;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.controls-svg-button-desktop:hover{
+    opacity: 1;
+}
+
+.controls-svg-button-desktop svg{
+    width: 24px;
+    height: 24px;
 }
 
 .slider {
     flex: 1;
+    width: 100%;
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    height: 5px;
+    border-radius: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+  
+.slider:hover {
+    opacity: 1;
+}
+  
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    background: var(--color-text-primary);
+    cursor: pointer;
 }

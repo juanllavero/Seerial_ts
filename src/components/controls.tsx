@@ -41,19 +41,50 @@ function Controls() {
     };
 
     return (
-        <div className="container">
-        <button onClick={handlePlayPause}>
-            {paused ? 'Play' : 'Pause'}
-        </button>
-        <input
-            type="range"
-            min="0"
-            max={duration}
-            value={currentTime}
-            onChange={handleSeek}
-            className="slider"
-        />
-        <button onClick={handleClose}>Close</button>
+        <div className="controls-container">
+            <section className="controls-top-bar">
+                <button className="controls-svg-button" onClick={handleClose}>Close</button>
+                <button className="controls-svg-button" onClick={handleClose}>Maximize</button>
+            </section>
+            <section className="controls-bottom-bar">
+                <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    className="slider"
+                />
+                <section className="controls">
+                    <div className="left-controls">
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                    </div>
+                    <div className="center-controls">
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                    </div>
+                    <div className="right-controls">
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                        <button className="controls-svg-button" onClick={handlePlayPause}>
+                            {paused ? 'Play' : 'Pause'}
+                        </button>
+                    </div>
+                </section>
+            </section>
         </div>
     );
 };
