@@ -7,7 +7,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isWindowMaximized: () => ipcRenderer.invoke('window-is-maximized'),
   closeWindow: () => ipcRenderer.send('close-window'),
   getLibraryData: () => ipcRenderer.invoke('get-library-data'),
-  saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData)
+  saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData),
+  startMPV: (videoPath: string) => ipcRenderer.send('play-video', videoPath),
+  stopMPV: () => ipcRenderer.send('stop-video'),
+  sendCommand: (command: string, args: string[] = []) => ipcRenderer.send('mpv-command', command, args),
 })
 
 // Mantén las otras exposiciones si es necesario

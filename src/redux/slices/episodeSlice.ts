@@ -3,10 +3,12 @@ import { EpisodeData } from '@interfaces/EpisodeData';
 
 interface EpisodeState {
   episodes: EpisodeData[];
+  selectedEpisode: EpisodeData | null;
 }
 
 const initialState: EpisodeState = {
   episodes: [],
+  selectedEpisode: null
 };
 
 const episodeSlice = createSlice({
@@ -18,9 +20,12 @@ const episodeSlice = createSlice({
     },
     clearEpisodes: (state) => {
       state.episodes = [];
+    },
+    selectEpisode: (state, action) => {
+      state.selectedEpisode = action.payload;
     }
   }
 });
 
-export const { setEpisodes, clearEpisodes } = episodeSlice.actions;
+export const { setEpisodes, clearEpisodes, selectEpisode } = episodeSlice.actions;
 export default episodeSlice.reducer;

@@ -1,7 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
-import path from 'node:path'
+import path from 'path';
 import * as fs from 'fs';
+
+import { MPVController } from '../src/data/objects/MPVController';
 
 import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
@@ -29,7 +31,9 @@ export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-let win: BrowserWindow | null
+let win: BrowserWindow | null;
+let controlsWindow: BrowserWindow | null;
+let mpvController: MPVController | null = null;
 
 const jsonFilePath = "./src/data/data.json";
 
@@ -61,6 +65,7 @@ function createWindow() {
     height: 1080,
     minWidth: 720,
     minHeight: 400,
+    alwaysOnTop: false,
     icon: "./src/assets/icon.ico",
     frame: false, // Quita la barra de título del sistema operativo
     webPreferences: {
@@ -69,7 +74,8 @@ function createWindow() {
       contextIsolation: true,
       offscreen: false,  // Para evitar la renderización offscreen si no es necesario
       webgl: true,       // Habilitar WebGL
-      webSecurity: false
+      webSecurity: false,
+      plugins: true
     },
   })
 
@@ -85,7 +91,90 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+
+  /*const mpvPath = path.join(__dirname, '../src/mpv/win/test/mpv.exe');
+  const videoPath = path.join(__dirname, '../src/test.mkv');
+
+  console.log(mpvPath);
+
+  const mpv = new MPV({
+    "audio_only": false,
+    "verbose": true,
+  });
+
+  mpv.load(videoPath); // Reemplaza con la ruta a tu vídeo
+  mpv.play();
+
+  mpv.on('statuschange', (status) => {
+    console.log('Cambio de estado en MPV:', status);
+  });
+
+  mpv.on('error', (err) => {
+    console.error('Error en MPV:', err);
+  });*/
 }
+
+// Crear una ventana de controles
+function createControlWindow() {
+  controlsWindow = new BrowserWindow({
+    parent: win!,
+    width: win?.getBounds().width,
+    height: win?.getBounds().height,
+    minWidth: 720,
+    minHeight: 400,
+    alwaysOnTop: false,
+    icon: "./src/assets/icon.ico",
+    transparent: true,
+    frame: false,
+    hasShadow: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: true
+    }
+  });
+
+  controlsWindow.loadFile(path.join(__dirname, '../controls.html'));
+
+  // Mantener el tamaño y posición sincronizados con la ventana principal
+  if (win) {
+    win.setBounds(controlsWindow.getBounds());
+    win.on('resize', () => {
+      if (win)
+        win.setBounds(controlsWindow!.getBounds());
+    });
+    win.on('move', () => {
+      if (win)
+        win.setBounds(controlsWindow!.getBounds());
+    });
+  }
+
+  controlsWindow.on('closed', () => {
+    controlsWindow = null;
+  });
+}
+
+ipcMain.on('play-video', (_event, videoSrc) => {
+  if (!mpvController)
+    mpvController = new MPVController(win!);
+
+  mpvController.startMPV(videoSrc);
+  //createControlWindow();
+  win?.webContents.send('video-playing');
+});
+
+ipcMain.on('stop-video', () => {
+  if (mpvController) {
+    mpvController.stop();
+    controlsWindow?.close();
+    win?.webContents.send('video-stopped');
+  }
+});
+
+ipcMain.on('mpv-command', (_event, command, args) => {
+  if (mpvController) {
+    mpvController.sendCommand(command, args);
+  }
+});
 
 // Process comunication for library data
 ipcMain.handle('get-library-data', async () => {

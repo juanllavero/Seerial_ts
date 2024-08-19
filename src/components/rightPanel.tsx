@@ -1,11 +1,14 @@
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSeries, selectSeason } from '../redux/slices/seriesSlice';
+import { selectEpisode } from '../redux/slices/episodeSlice';
 import { RootState } from '../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
+import { EpisodeData } from '@interfaces/EpisodeData';
 import { closeContextMenu, toggleContextMenu } from 'redux/slices/contextMenuSlice';
 import { loadTransparentImage } from 'redux/slices/transparentImageLoadedSlice';
+import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
 import '../i18n';
 import { selectLibrary } from 'redux/slices/librarySlice';
@@ -29,18 +32,26 @@ export const renderRightPanelContent = () => {
 
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
 
+    const videoLoaded = useSelector((state: RootState) => state.video.isLoaded);
+
     const handleTransparentImageLoad = () => {
-        dispatch(loadTransparentImage());
+      dispatch(loadTransparentImage());
     }
 
     const handleSeriesSelection = (series: SeriesData) => {
-        dispatch(selectSeries(series));
+      dispatch(selectSeries(series));
     };
 
     const handleSeasonSelection = (season: SeasonData) => {
-        dispatch(selectSeason(season));
-        dispatch(closeContextMenu());
+      dispatch(selectSeason(season));
+      dispatch(closeContextMenu());
     };
+
+    const handleEpisodeSelection = (episode: EpisodeData) => {
+      dispatch(selectEpisode(episode));
+      window.electronAPI.startMPV(episode.videoSrc);
+      dispatch(loadVideo());
+    }
 
     const toggleMenu = () => {
         dispatch(toggleContextMenu());
@@ -48,7 +59,9 @@ export const renderRightPanelContent = () => {
     
     // Show no content view
     if (!selectedLibrary) {
-      if (libraries.length == 0){
+      if (libraries.length > 0){
+        dispatch(selectLibrary(libraries[0]));
+      }else{
         return (
           <>
             <div className="no-libraries-container">
@@ -57,8 +70,6 @@ export const renderRightPanelContent = () => {
             </div>
           </>
         );
-      }else{
-        dispatch(selectLibrary(libraries[0]));
       }
     }
 
@@ -98,6 +109,7 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedSeries && selectedSeason) {
       return (
         <>
+          {videoLoaded && <div className="overlay"></div>}
           <div className="season-episodes-container scroll">
             <div className="logo-container">
               {
@@ -204,7 +216,8 @@ export const renderRightPanelContent = () => {
                 <div className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <div key={index} className="video-button"
-                  style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}>
+                  style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                  onClick={() => handleEpisodeSelection(episode)}>
                     {
                       episode.imgSrc != "" ? (
                         <LazyLoadImage src={"./src/" + episode.imgSrc}
