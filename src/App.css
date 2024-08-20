@@ -40,19 +40,6 @@ html, body {
   margin-bottom: 0;
 }
 
-/* Overlay to block interaction when the video player is on */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0);
-  z-index: 999;
-  pointer-events: auto;
-  user-select: none;
-}
-
 /* LEFT PANEL */
 .left-panel {
   width: 260px;

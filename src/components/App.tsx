@@ -60,61 +60,60 @@ function App() {
   };
 
   return (
-    isVideoLoaded ? (
+    <>
       <Controls/>
-    ) : (
       <section className="container blur-background-image">
-      {renderMainBackgroundImage()}
-      <div className="noise-background">
-        <img
-          src={`./src/resources/img/noise.png`}
-          alt="Background noise"
-        />
-      </div>
-      {/* Left Panel */}
-      <section className="left-panel">
-        <div className="top-controls">
-          <button className="svg-button-desktop-controls">
-            <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fill-opacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
-          </button>
-          <button className="svg-add-library-btn">
-            <svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" stroke-miterlimit="1.414" stroke-linejoin="round" id="plex-icon-add-560" aria-hidden="true" width="48" height="48"><path d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0" fill="#FFFFFF"></path></svg>
-            <span>{t('libraryWindowTitle')}</span>
-          </button>
+        {renderMainBackgroundImage()}
+        <div className="noise-background">
+          <img
+            src={`./src/resources/img/noise.png`}
+            alt="Background noise"
+          />
         </div>
-        {renderLibrariesList()}
-      </section>
-
-      {/* Right Panel */}
-      <section className="right-panel">
-        <div className="top-bar">
-          <div className="window-buttons-container">
-            <button className="window-button minimize-button" onClick={() => window.electronAPI.minimizeWindow()}>
-            <img src="./src/assets/svg/windowMin.svg" 
-              style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+        {/* Left Panel */}
+        <section className="left-panel">
+          <div className="top-controls">
+            <button className="svg-button-desktop-controls">
+              <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fill-opacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
             </button>
-            <button className="window-button maximize-button" onClick={() => window.electronAPI.maximizeWindow()}>
-              {
-                isMaximized ? (
-                  <img src="./src/assets/svg/windowRestore.svg" 
-                  style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
-                ) : (
-                  <img src="./src/assets/svg/windowMax.svg" 
-                  style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
-                )
-              }
-            </button>
-            <button className="window-button close-button" onClick={() => window.electronAPI.closeWindow()}>
-              <img src="./src/assets/svg/windowClose.svg" 
-              style={{width: '18px', height: '18px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+            <button className="svg-add-library-btn">
+              <svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" stroke-miterlimit="1.414" stroke-linejoin="round" id="plex-icon-add-560" aria-hidden="true" width="48" height="48"><path d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0" fill="#FFFFFF"></path></svg>
+              <span>{t('libraryWindowTitle')}</span>
             </button>
           </div>
-        </div>
-        {renderLibraryAndSlider()}
-        {renderRightPanelContent()}
+          {renderLibrariesList()}
+        </section>
+
+        {/* Right Panel */}
+        <section className="right-panel">
+          <div className="top-bar">
+            <div className="window-buttons-container">
+              <button className="window-button minimize-button" onClick={() => window.electronAPI.minimizeWindow()}>
+              <img src="./src/assets/svg/windowMin.svg" 
+                style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+              </button>
+              <button className="window-button maximize-button" onClick={() => window.electronAPI.maximizeWindow()}>
+                {
+                  isMaximized ? (
+                    <img src="./src/assets/svg/windowRestore.svg" 
+                    style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+                  ) : (
+                    <img src="./src/assets/svg/windowMax.svg" 
+                    style={{width: '16px', height: '16px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+                  )
+                }
+              </button>
+              <button className="window-button close-button" onClick={() => window.electronAPI.closeWindow()}>
+                <img src="./src/assets/svg/windowClose.svg" 
+                style={{width: '18px', height: '18px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+              </button>
+            </div>
+          </div>
+          {renderLibraryAndSlider()}
+          {renderRightPanelContent()}
+        </section>
       </section>
-    </section>
-    )
+    </>
   );
 }
 

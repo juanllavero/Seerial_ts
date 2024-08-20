@@ -13,5 +13,3 @@ declare global {
     electronAPI: ElectronAPI;
   }
 }
-
-declare module 'node-mpv';

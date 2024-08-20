@@ -49,8 +49,8 @@ export const renderRightPanelContent = () => {
 
     const handleEpisodeSelection = (episode: EpisodeData) => {
       dispatch(selectEpisode(episode));
-      window.electronAPI.startMPV(episode.videoSrc);
       dispatch(loadVideo());
+      window.electronAPI.startMPV(episode.videoSrc);
     }
 
     const toggleMenu = () => {
@@ -109,7 +109,6 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedSeries && selectedSeason) {
       return (
         <>
-          {videoLoaded && <div className="overlay"></div>}
           <div className="season-episodes-container scroll">
             <div className="logo-container">
               {

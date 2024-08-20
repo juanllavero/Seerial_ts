@@ -1,11 +1,17 @@
 .controls-container {
-    border: 2px solid white;
+    position: absolute;
+    z-index: 999;
+    background-color: #1010101d;
 
     color:white;
+
+    display: none;
+    visibility: hidden;
 
     display: flex;
     flex: 1;
     height: 100%;
+    width: 100%;
     flex-direction: column;
     justify-content: space-between;
 }
