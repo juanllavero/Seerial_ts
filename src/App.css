@@ -561,7 +561,7 @@ html, body {
 .top-bar {
   display: flex;
   justify-content: flex-end;
-  padding: 5px;
+  padding: 5px 5px 0 5px;
   position: absolute;
   top: 0;
   width: 100%;
@@ -579,9 +579,8 @@ html, body {
   color: white;
   background: none;
   border: none;
-  font-size: 16px;
   cursor: pointer;
-  -webkit-app-region: no-drag; /* No arrastra la ventana en los botones */
+  -webkit-app-region: no-drag;
 }
 
 .window-button svg{

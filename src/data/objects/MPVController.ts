@@ -13,7 +13,7 @@ export class MPVController {
   // Método para iniciar MPV en la ventana de Electron
   public startMPV(videoPath: string): void {
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
-    const mpvPath = path.join(__dirname, '../src/mpv/win/test/mpv.exe');
+    const mpvPath = path.join(__dirname, '../src/mpv/mpv.exe');
 
     // Identificamos el HWND de la ventana de Electron para asignarlo al proceso MPV
     const hwnd = this.window.getNativeWindowHandle().readInt32LE(0).toString();

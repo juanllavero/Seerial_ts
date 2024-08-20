@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import { loadImage, removeImage } from '../redux/slices/imageLoadedSlice'; 
+import { RootState } from '../../redux/store';
+import { loadImage, removeImage } from '../../redux/slices/imageLoadedSlice'; 
 
 // Componente definido sin React.FC
 export function renderMainBackgroundImage() {

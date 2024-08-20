@@ -1,8 +1,8 @@
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSeries, selectSeason } from '../redux/slices/seriesSlice';
-import { selectEpisode } from '../redux/slices/episodeSlice';
-import { RootState } from '../redux/store';
+import { selectSeries, selectSeason } from '../../redux/slices/seriesSlice';
+import { selectEpisode } from '../../redux/slices/episodeSlice';
+import { RootState } from '../../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
@@ -10,7 +10,7 @@ import { closeContextMenu, toggleContextMenu } from 'redux/slices/contextMenuSli
 import { loadTransparentImage } from 'redux/slices/transparentImageLoadedSlice';
 import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
-import '../i18n';
+import '../../i18n';
 import { selectLibrary } from 'redux/slices/librarySlice';
 
 export const renderRightPanelContent = () => {

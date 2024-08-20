@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import Controls from '@components/controls';
-import {renderLibrariesList} from "@components/librariesList";
-import {renderRightPanelContent} from "@components/rightPanel";
-import {renderLibraryAndSlider} from "@components/libraryAndSlider"
-import {renderMainBackgroundImage} from "@components/mainBackgroundImage"
+import { RootState } from '../../redux/store';
+import Controls from '@components/controls/controls';
+import {renderLibrariesList} from "@components/desktop/librariesList";
+import {renderRightPanelContent} from "@components/desktop/rightPanel";
+import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
+import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
 import { setLibraries } from 'redux/slices/librarySlice';
 import { useTranslation } from 'react-i18next';
-import '../App.css';
-import '../i18n';
+import '../../App.css';
+import '../../i18n';
 
 function App() {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ function App() {
 
   return (
     <>
-      <Controls/>
+      <Controls />
       <section className="container blur-background-image">
         {renderMainBackgroundImage()}
         <div className="noise-background">

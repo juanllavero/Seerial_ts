@@ -3,8 +3,6 @@ import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
 
-import MPV from 'node-mpv';
-
 import { MPVController } from '../src/data/objects/MPVController';
 import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
@@ -169,8 +167,11 @@ function createTransparentWindow() {
 // Crear una ventana de controles
 function createControlWindow() {
   controlsWindow = new BrowserWindow({
-    width: win?.getBounds().width,
-    height: win?.getBounds().height,
+    //width: win?.getBounds().width,
+    //height: win?.getBounds().height,
+    parent: win!,
+    width: 1000,
+    height: 800,
     minWidth: 720,
     minHeight: 400,
     alwaysOnTop: false,
@@ -179,13 +180,15 @@ function createControlWindow() {
     frame: false,
     hasShadow: false,
     webPreferences: {
-      preload: path.join(__dirname, 'controls-preload.mjs'),
-      contextIsolation: false,
-      nodeIntegration: true
+      preload: path.join(__dirname, 'preload.mjs'),
+      contextIsolation: true,
+      nodeIntegration: true,
+      plugins: true
     }
   });
 
-  controlsWindow.loadFile(path.join(__dirname, '../controls.html'));
+  controlsWindow.loadFile(path.join(__dirname, '../controls.html'))
+  
 
   // Mantener el tamaño y posición sincronizados con la ventana principal
   /*if (win) {
@@ -213,7 +216,7 @@ ipcMain.on('play-video', async (_event, videoSrc) => {
   //win?.webContents.send('video-playing');
   //win?.moveTop();
 
-  //createTransparentWindow();
+  createControlWindow();
 });
 
 ipcMain.on('stop-video', () => {

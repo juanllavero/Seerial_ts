@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { resetSelection } from '../redux/slices/seriesSlice';
-import { increaseEpisodeImageSize, reduceEpisodeImageSize } from '../redux/slices/episodeImageSlice';
-import { increaseSeriesImageSize, reduceSeriesImageSize } from '../redux/slices/seriesImageSlice';
-import { removeTransparentImage } from '../redux/slices/transparentImageLoadedSlice';
-import { selectLibrary } from '../redux/slices/librarySlice';
-import { RootState } from '../redux/store';
+import { resetSelection } from '../../redux/slices/seriesSlice';
+import { increaseEpisodeImageSize, reduceEpisodeImageSize } from '../../redux/slices/episodeImageSlice';
+import { increaseSeriesImageSize, reduceSeriesImageSize } from '../../redux/slices/seriesImageSlice';
+import { removeTransparentImage } from '../../redux/slices/transparentImageLoadedSlice';
+import { selectLibrary } from '../../redux/slices/librarySlice';
+import { RootState } from '../../redux/store';
 
 export const renderLibraryAndSlider = () => {
     const dispatch = useDispatch();
