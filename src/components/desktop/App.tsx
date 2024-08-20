@@ -61,7 +61,7 @@ function App() {
 
   return (
     <>
-      <Controls />
+      { isVideoLoaded && <div className={`overlay ${isVideoLoaded ? 'visible' : ''}`}></div> }
       <section className="container blur-background-image">
         {renderMainBackgroundImage()}
         <div className="noise-background">

@@ -114,94 +114,44 @@ function createWindow() {
   });*/
 }
 
-function createTransparentWindow() {
-  controlsWindow = new BrowserWindow({
-    width: 1920,
-    height: 1080,
-    minWidth: 720,
-    minHeight: 400,
-    alwaysOnTop: false,
-    transparent: true,
-    titleBarStyle: 'hidden',
-    frame: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
-      sandbox: true,
-      contextIsolation: true,
-      webSecurity: false,
-      plugins: true
-    },
-  })
-
-  controlsWindow.webContents.on('did-finish-load', () => {
-    controlsWindow?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
-
-  if (VITE_DEV_SERVER_URL) {
-    controlsWindow.loadURL(VITE_DEV_SERVER_URL)
-  } else {
-    controlsWindow.loadFile(path.join(RENDERER_DIST, 'index.html'))
-  }
-
-  /*controlsWindow.setBounds(win!.getBounds());
-  controlsWindow.on('resize', () => {
-    if (controlsWindow)
-      win!.setBounds(controlsWindow.getBounds());
-  });
-  controlsWindow.on('move', () => {
-    if (controlsWindow)
-      win!.setBounds(controlsWindow.getBounds());
-  });*/
-
-  controlsWindow.on('closed', () => {
-    mpvController?.stop();
-    win?.webContents.send('video-stopped');
-    controlsWindow = null;
-  });
-
-  controlsWindow.once('ready-to-show', () => {
-    controlsWindow?.show()
-  })
-}
-
 // Crear una ventana de controles
 function createControlWindow() {
   controlsWindow = new BrowserWindow({
-    //width: win?.getBounds().width,
-    //height: win?.getBounds().height,
-    parent: win!,
-    width: 1000,
-    height: 800,
+    width: win?.getBounds().width,
+    height: win?.getBounds().height,
     minWidth: 720,
     minHeight: 400,
     alwaysOnTop: false,
     icon: "./src/assets/icon.ico",
-    transparent: false,
+    transparent: true,
     frame: false,
     hasShadow: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true,
       nodeIntegration: true,
       plugins: true
     }
   });
 
-  controlsWindow.loadFile(path.join(__dirname, '../controls.html'))
-  
 
-  // Mantener el tamaño y posición sincronizados con la ventana principal
-  /*if (win) {
+  if (VITE_DEV_SERVER_URL) {
+    controlsWindow.loadURL(path.join(VITE_DEV_SERVER_URL, 'controls'))
+  } else {
+    controlsWindow.loadFile(path.join(RENDERER_DIST, '../controls.html'))
+  }  
+
+  // Keep window on top of main window and keep size
+  if (win) {
     controlsWindow.setBounds(win.getBounds());
-    win.on('resize', () => {
+    controlsWindow.on('resize', () => {
       if (controlsWindow)
-        controlsWindow.setBounds(win!.getBounds());
+        win?.setBounds(controlsWindow.getBounds());
     });
-    win.on('move', () => {
+    controlsWindow.on('move', () => {
       if (controlsWindow)
-        controlsWindow.setBounds(win!.getBounds());
+        win?.setBounds(controlsWindow.getBounds());
     });
-  }*/
+  }
 
   controlsWindow.on('closed', () => {
     controlsWindow = null;
@@ -209,19 +159,20 @@ function createControlWindow() {
 }
 
 ipcMain.on('play-video', async (_event, videoSrc) => {
-  //if (!mpvController)
-    //mpvController = new MPVController(win!);
+  if (!controlsWindow){
+    if (!mpvController)
+      mpvController = new MPVController(win!);
 
-  //mpvController.startMPV(videoSrc);
-  //win?.webContents.send('video-playing');
-  //win?.moveTop();
+    //mpvController.startMPV(videoSrc);
+    win?.webContents.send('video-playing');
 
-  createControlWindow();
+    createControlWindow();
+  }
 });
 
 ipcMain.on('stop-video', () => {
   if (mpvController) {
-    //mpvController.stop();
+    mpvController.stop();
     controlsWindow?.close();
     win?.webContents.send('video-stopped');
   }
@@ -229,7 +180,7 @@ ipcMain.on('stop-video', () => {
 
 ipcMain.on('mpv-command', (_event, command, args) => {
   if (mpvController) {
-    //mpvController.sendCommand(command, args);
+    mpvController.sendCommand(command, args);
   }
 });
 

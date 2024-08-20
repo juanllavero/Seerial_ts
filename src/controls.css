@@ -1,12 +1,31 @@
+#root {
+    margin: 0 auto;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    --app-color: #8EDCE6;
+    --app-color-darken: #86ccd5;
+    --color-text-primary: #ffffff;
+    --color-text-default: #ffffffcc;
+
+    color: var(--color-text-default);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    user-select: none;    /* To disable mouse dragging selection */
+}
+
 .controls-container {
     position: absolute;
-    z-index: 999;
-    background-color: #1010101d;
 
     color:white;
-
-    display: none;
-    visibility: hidden;
 
     display: flex;
     flex: 1;

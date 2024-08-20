@@ -40,6 +40,23 @@ html, body {
   margin-bottom: 0;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  pointer-events: auto;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
 /* LEFT PANEL */
 .left-panel {
   width: 260px;
@@ -275,7 +292,7 @@ html, body {
   width: 0;
   height: 1px;
   background-color: white;
-  transition: width 0.3s ease;
+  transition: width 0.2s ease;
 }
 
 #seriesName:hover::after {

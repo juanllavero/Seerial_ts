@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { togglePause, setCurrentTime, setDuration } from 'redux/slices/videoSlice';
 import { closeVideo } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
-import '../../controls.css'
+import '../../Controls.css'
 
 function Controls() {
     const dispatch = useDispatch();
