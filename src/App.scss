@@ -1,3 +1,8 @@
+$app-color: #8EDCE6;
+$app-color-darken: #86ccd5;
+$color-text-primary: #ffffff;
+$color-text-default: #ffffffcc;
+
 #root {
   margin: 0 auto;
   text-align: center;
@@ -5,12 +10,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  --app-color: #8EDCE6;
-  --app-color-darken: #86ccd5;
-  --color-text-primary: #ffffff;
-  --color-text-default: #ffffffcc;
 
-  color: var(--color-text-default);
+  color: $color-text-default;
 }
 
 html, body {
@@ -118,7 +119,7 @@ html, body {
 }
 
 .svg-add-library-btn span{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
   margin-left: 10px;
 }
 
@@ -149,11 +150,11 @@ html, body {
 }
 
 .libraries-button.selected svg path {
-  fill: var(--app-color);
+  fill: $app-color;
 }
 
 .libraries-button .library-name {
-  color: var(--color-text-default);
+  color: $color-text-default;
   margin-left: 10px;
   transition: color 0.3s ease;
 
@@ -166,15 +167,15 @@ html, body {
 }
 
 .libraries-button.selected .library-name {
-  color: var(--app-color);
+  color: $app-color;
 }
 
 .libraries-button:hover .library-name {
-  color: var(--color-text-primary);
+  color: $color-text-primary;
 }
 
 .libraries-button span:hover{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
 }
 
 /* RIGHT PANEL */
@@ -209,11 +210,11 @@ html, body {
   font-size: medium;
   border: none;
   background-color: transparent;
-  color: var(--color-text-default);
+  color: $color-text-default;
 }
 
 .library-button:hover{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
 }
 
 .svg-button-desktop-transparent{
@@ -254,7 +255,7 @@ html, body {
   width: 15px;
   height: 15px;
   border-radius: 50px;
-  background: var(--color-text-primary);
+  background: $color-text-primary;
   cursor: pointer;
 }
 
@@ -269,7 +270,7 @@ html, body {
 
 #seriesName {
   margin: 8px 0 2px 4px;
-  color: var(--color-text-primary);
+  color: $color-text-primary;
   position: relative;
   display: inline-block;
   width: fit-content;
@@ -310,6 +311,7 @@ html, body {
 
 .logo-container img{
   max-height: 200px;
+  max-width: 700px;
   width: min-content;
 }
 
@@ -339,13 +341,13 @@ html, body {
 }
 
 #seriesTitle{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
   font-size: 3.5em;
   font-weight: bold;
 }
 
 #seasonTitle{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
   font-size: 2em;
   font-weight: bold;
 }
@@ -357,7 +359,7 @@ html, body {
 
 .season-info-text span{
   font-size: medium;
-  color: var(--color-text-default);
+  color: $color-text-default;
 }
 
 #directedBy{
@@ -380,7 +382,7 @@ html, body {
 }
 
 .rating-info span{
-  color: var(--color-text-default);
+  color: $color-text-default;
   font-weight: bold;
   margin-left: 5px;
 }
@@ -417,7 +419,7 @@ html, body {
 }
 
 .overview-container p{
-  color: var(--color-text-primary);
+  color: $color-text-primary;
   display: -webkit-box;
   overflow: hidden;
   line-clamp: 3;
@@ -431,7 +433,7 @@ html, body {
 
 /* SEASON INFO BUTTONS */
 .play-button-desktop {
-  background-color: var(--app-color-darken);
+  background-color: $app-color-darken;
   padding: 10px 15px;
   border-radius: 5px;
   border-color: transparent;
@@ -443,7 +445,7 @@ html, body {
 }
 
 .play-button-desktop:hover {
-  background-color: var(--app-color);
+  background-color: $app-color;
 }
 
 .play-button-desktop svg {
@@ -484,14 +486,14 @@ html, body {
   margin-left: 30px;
   background-color: transparent;
   border: none;
-  color: var(--color-text-default);
+  color: $color-text-default;
   font-size: medium;
-  border-bottom: 1px solid var(--color-text-default);
+  border-bottom: 1px solid $color-text-default;
 }
 
 .season-selector:hover {
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-text-primary);
+  color: $color-text-primary;
+  border-bottom: 1px solid $color-text-primary;
 }
 
 #triangle{
@@ -545,7 +547,7 @@ html, body {
   margin-top: 10px;
   margin-left: 0.3em;
   font-size: medium;
-  color: var(--color-text-primary);
+  color: $color-text-primary;
 
   overflow: hidden !important;
   text-overflow: ellipsis;
@@ -570,7 +572,7 @@ html, body {
 }
 
 .video-button:hover {
-  background-color: var(--app-color);
+  background-color: $app-color;
   transition: background-color 0.3s ease;
 }
 

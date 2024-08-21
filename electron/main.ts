@@ -7,6 +7,8 @@ import { MPVController } from '../src/data/objects/MPVController';
 import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
 
+//#region PROPERTIES AND DATA READING
+
 // Leer el archivo de propiedades
 const properties = propertiesReader('keys.properties');
 
@@ -58,6 +60,9 @@ const saveData = (newData: any) => {
   }
 };
 
+//#endregion
+
+//#region WINDOWS CREATION
 function createWindow() {
   win = new BrowserWindow({
     width: 1920,
@@ -87,6 +92,14 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+
+  win.on('maximize', () => {
+    win?.webContents.send('window-state-change', 'maximized');
+  });
+
+  win.on('unmaximize', () => {
+    win?.webContents.send('window-state-change', 'restored');
+  });
 
   win.once('ready-to-show', () => {
     win?.show()
@@ -127,6 +140,7 @@ function createControlWindow() {
     frame: false,
     hasShadow: false,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true,
       nodeIntegration: true,
       plugins: true
@@ -153,17 +167,28 @@ function createControlWindow() {
     });
   }
 
+  controlsWindow.on('enter-full-screen', () => {
+    controlsWindow?.webContents.send('window-state-change', 'fullscreen');
+  })
+
+  controlsWindow.on('leave-full-screen', () => {
+    controlsWindow?.webContents.send('window-state-change', 'exit-fullscreen');
+  })
+
   controlsWindow.on('closed', () => {
     controlsWindow = null;
   });
 }
 
+//#endregion
+
+//#region VIDEO PLAYER INTERACTION
 ipcMain.on('play-video', async (_event, videoSrc) => {
   if (!controlsWindow){
     if (!mpvController)
       mpvController = new MPVController(win!);
 
-    //mpvController.startMPV(videoSrc);
+    mpvController.startMPV(videoSrc);
     win?.webContents.send('video-playing');
 
     createControlWindow();
@@ -174,6 +199,7 @@ ipcMain.on('stop-video', () => {
   if (mpvController) {
     mpvController.stop();
     controlsWindow?.close();
+    controlsWindow = null;
     win?.webContents.send('video-stopped');
   }
 });
@@ -184,7 +210,10 @@ ipcMain.on('mpv-command', (_event, command, args) => {
   }
 });
 
-// Process comunication for library data
+//#endregion
+
+//#region LIBRARY DATA COMMUNICATION
+
 ipcMain.handle('get-library-data', async () => {
   return loadData();
 });
@@ -193,7 +222,9 @@ ipcMain.handle('save-library-data', async (_event, newData) => {
   return saveData(newData);
 });
 
-// Listen events to control window states
+//#endregion
+
+//#region WINDOW CONTROLS
 ipcMain.on('minimize-window', () => {
   win?.minimize()
 })
@@ -206,13 +237,19 @@ ipcMain.on('maximize-window', () => {
   }
 })
 
-ipcMain.handle('window-is-maximized', async () => {
-  return win?.isMaximized();
-});
+ipcMain.on('fullscreen-controls', () => {
+  if (controlsWindow?.isMaximized()){
+    controlsWindow?.unmaximize();
+  }else{
+    controlsWindow?.maximize();
+  }
+})
 
 ipcMain.on('close-window', () => {
   win?.close()
 })
+
+//#endregion
 
 // Quit when all windows are closed, except on macOS.
 app.on('window-all-closed', () => {

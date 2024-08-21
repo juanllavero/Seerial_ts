@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import Controls from '@components/controls/controls';
 import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
 import { setLibraries } from 'redux/slices/librarySlice';
 import { useTranslation } from 'react-i18next';
-import '../../App.css';
+import '../../App.scss';
 import '../../i18n';
+import { toggleMaximize } from 'redux/slices/windowStateSlice';
 
 function App() {
   const dispatch = useDispatch();
@@ -17,20 +17,11 @@ function App() {
 
   const isVideoLoaded = useSelector((state: RootState) => state.video.isLoaded);
 
-  const [isMaximized, setIsMaximized] = useState<boolean>(false);
+  const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
 
-  useEffect(() => {
-    const checkMaximized = async () => {
-      try {
-        const maximized = await window.electronAPI.isWindowMaximized();
-        setIsMaximized(maximized);
-      } catch (error) {
-        console.error('Error checking window maximized state:', error);
-      }
-    };
-
-    checkMaximized();
-  }, []);
+  window.electronAPI.onWindowStateChange((state: string) => {
+    dispatch(toggleMaximize(state === 'maximized'));
+  });
 
   useEffect(() => {
     // @ts-ignore

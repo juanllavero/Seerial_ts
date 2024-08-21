@@ -2,15 +2,18 @@ import { ipcRenderer, contextBridge } from 'electron'
 
 // Exponer la API de Electron a través del contexto seguro
 contextBridge.exposeInMainWorld('electronAPI', {
+  setFullscreenControls: () => ipcRenderer.send('fullscreen-controls'),
   minimizeWindow: () => ipcRenderer.send('minimize-window'),
   maximizeWindow: () => ipcRenderer.send('maximize-window'),
-  isWindowMaximized: () => ipcRenderer.invoke('window-is-maximized'),
   closeWindow: () => ipcRenderer.send('close-window'),
   getLibraryData: () => ipcRenderer.invoke('get-library-data'),
   saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData),
   startMPV: (videoPath: string) => ipcRenderer.send('play-video', videoPath),
   stopMPV: () => ipcRenderer.send('stop-video'),
   sendCommand: (command: string, args: string[] = []) => ipcRenderer.send('mpv-command', command, args),
+  onWindowStateChange: (callback: (state: string) => void) => {
+    ipcRenderer.on('window-state-change', (_, state) => callback(state));
+  },
 })
 
 // Mantén las otras exposiciones si es necesario

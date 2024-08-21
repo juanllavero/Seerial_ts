@@ -24,7 +24,6 @@ export class MPVController {
       '--no-border',            // Sin bordes
       '--autofit=100%',         // Ajusta el video al tamaño de la ventana
       '--input-ipc-server=/tmp/mpvsocket',  // IPC Socket para comunicación
-      '--input-vo-keyboard',
       '--log-file=mpv.log',     // Opcional: para depuración
       videoPath                 // Ruta del archivo de video a reproducir
     ];
@@ -32,13 +31,13 @@ export class MPVController {
     // Spawn del proceso MPV
     this.mpvProcess = spawn(mpvPath, args);
 
-    this.mpvProcess.stdout.on('data', (data) => {
+    /*this.mpvProcess.stdout.on('data', (data) => {
       console.log(`MPV STDOUT: ${data}`);
-    });
+    });*/
 
-    this.mpvProcess.stderr.on('data', (data) => {
+    /*this.mpvProcess.stderr.on('data', (data) => {
       console.error(`MPV STDERR: ${data}`);
-    });
+    });*/
 
     this.mpvProcess.on('close', (code) => {
       console.log(`MPV process exited with code ${code}`);

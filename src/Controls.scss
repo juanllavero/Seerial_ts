@@ -1,16 +1,19 @@
+$app-color: #8EDCE6;
+$app-color-darken: #86ccd5;
+$color-text-primary: #ffffff;
+$color-text-default: #ffffffcc;
+
 #root {
     margin: 0 auto;
     text-align: center;
 
+    pointer-events: auto;
+
     display: flex;
     flex-direction: column;
     height: 100%;
-    --app-color: #8EDCE6;
-    --app-color-darken: #86ccd5;
-    --color-text-primary: #ffffff;
-    --color-text-default: #ffffffcc;
 
-    color: var(--color-text-default);
+    color: $color-text-default;
 }
 
 html, body {
@@ -26,6 +29,8 @@ html, body {
     position: absolute;
 
     color:white;
+
+    pointer-events: auto;
 
     display: flex;
     flex: 1;
@@ -107,6 +112,6 @@ html, body {
     width: 15px;
     height: 15px;
     border-radius: 50px;
-    background: var(--color-text-primary);
+    background: $color-text-primary;
     cursor: pointer;
 }

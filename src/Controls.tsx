@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import { Provider } from "react-redux"
 import Controls from '@components/controls/controls'
 import { store } from "./redux/store"
-import './Controls.css'
+import './Controls.scss'
 
-ReactDOM.createRoot(document.getElementById('controls-root')!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <Controls />
