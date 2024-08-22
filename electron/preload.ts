@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData),
   startMPV: (videoPath: string) => ipcRenderer.send('play-video', videoPath),
   stopMPV: () => ipcRenderer.send('stop-video'),
-  sendCommand: (command: string, args: string[] = []) => ipcRenderer.send('mpv-command', command, args),
+  sendCommand: (args: string[] = []) => ipcRenderer.send('mpv-command', args),
+  getMPVController: () => ipcRenderer.invoke('get-mpv-controller'),
   onWindowStateChange: (callback: (state: string) => void) => {
     ipcRenderer.on('window-state-change', (_, state) => callback(state));
   },

@@ -7,7 +7,7 @@ export interface ElectronAPI {
   closeWindow: () => void;
   startMPV: (videoPath: string) => void;
   stopMPV: () => void;
-  sendCommand: (command: string, args: string[]) => void;
+  sendCommand: (args: string[]) => void;
   onWindowStateChange: (callback: (state: string) => void) => void;
 }
   

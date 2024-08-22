@@ -105,6 +105,8 @@ function createWindow() {
     win?.show()
   })
 
+  mpvController = new MPVController(win!);
+
   /*const mpvPath = path.join(__dirname, '../src/mpv/win/test/mpv.exe');
   const videoPath = path.join(__dirname, '../src/test.mkv');
 
@@ -189,6 +191,7 @@ ipcMain.on('play-video', async (_event, videoSrc) => {
       mpvController = new MPVController(win!);
 
     mpvController.startMPV(videoSrc);
+
     win?.webContents.send('video-playing');
 
     createControlWindow();
@@ -204,11 +207,15 @@ ipcMain.on('stop-video', () => {
   }
 });
 
-ipcMain.on('mpv-command', (_event, command, args) => {
+ipcMain.on('mpv-command', (_event, args) => {
   if (mpvController) {
-    mpvController.sendCommand(command, args);
+    mpvController.sendCommand(args);
   }
 });
+
+ipcMain.handle('get-mpv-controller', () => {
+  return mpvController;
+})
 
 //#endregion
 

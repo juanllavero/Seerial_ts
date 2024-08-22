@@ -26,16 +26,16 @@ function App() {
   useEffect(() => {
     // @ts-ignore
     window.electronAPI.getLibraryData()
-      .then((data: any[]) => {
-        dispatch(setLibraries(data));
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error) {
-          console.error('Error loading library data:', error.message);
-        } else {
-          console.error('Unexpected error:', error);
-        }
-      });
+    .then((data: any[]) => {
+      dispatch(setLibraries(data));
+    })
+    .catch((error: unknown) => {
+      if (error instanceof Error) {
+        console.error('Error loading library data:', error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    });
   }, [dispatch]);
 
   // Save data function

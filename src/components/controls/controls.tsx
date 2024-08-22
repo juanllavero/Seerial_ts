@@ -5,6 +5,7 @@ import { closeVideo } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
 import '../../Controls.scss'
 import { toggleMaximize } from 'redux/slices/windowStateSlice';
+import { MPVController } from '@objects/MPVController';
 
 function Controls() {
     const dispatch = useDispatch();
@@ -21,17 +22,28 @@ function Controls() {
         dispatch(toggleMaximize(state === 'fullscreen'));
     });
 
+    let mpvController: MPVController | null = null;
+
+    useEffect(() => {
+        // @ts-ignore
+        mpvController = window.electronAPI.getMPVController();
+    }, []);
+
     // Handle play/pause button click
     const handlePlayPause = () => {
         dispatch(togglePause());
-        window.electronAPI.sendCommand('toggle-pause', []);
+        
+        if (mpvController){
+            console.log("ASDASD");
+            mpvController.togglePause();
+        }  
     };
 
     // Handle seek slider change
     const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newTime = parseFloat(event.target.value);
         dispatch(setCurrentTime(newTime));
-        window.electronAPI.sendCommand('seek', [newTime.toString()]);
+        window.electronAPI.sendCommand(['seek', newTime.toString()]);
     };
 
     // Handle receiving updates from the main process
