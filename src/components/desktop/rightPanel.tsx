@@ -87,7 +87,11 @@ export const renderRightPanelContent = () => {
                     {
                       series.coverSrc !== "" ? (
                         <LazyLoadImage className="poster-image" src={"./src/" + series.coverSrc} alt="Poster"
-                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
+                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
+                        onError={(e: any) => {
+                          e.target.onerror = null; // To avoid infinite loop
+                          e.target.src = "./src/resources/img/fileNotFound.png";
+                        }}/>
                       ) : (
                         <LazyLoadImage className="poster-image" src="./src/resources/img/fileNotFound.png" alt="Poster"
                         style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
@@ -97,7 +101,19 @@ export const renderRightPanelContent = () => {
                 <a id="seriesName" title={series.name} onClick={() => handleSeriesSelection(series)}>
                   {series.name}
                 </a>
-                <span id="episodeNumber">{series.seasons[0].year}</span>
+                {
+                  series.seasons.length > 1 ? (
+                    <span id="episodeNumber">
+                      {(() => {
+                        const minYear = Math.min(...series.seasons.map((season: SeasonData) => season.year));
+                        const maxYear = Math.max(...series.seasons.map((season: SeasonData) => season.year));
+                        return minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
+                      })()}
+                    </span>
+                  ) : (
+                    <span id="episodeNumber">{series.seasons[0].year}</span>
+                  )
+                }
               </div>
             ))}
           </div>
@@ -114,13 +130,21 @@ export const renderRightPanelContent = () => {
               {
                 selectedLibrary && selectedLibrary.type === "Shows" ? (
                   selectedSeries.logoSrc != "" ? (
-                    <LazyLoadImage src={"./src/" + selectedSeries.logoSrc}></LazyLoadImage>
+                    <LazyLoadImage src={"./src/" + selectedSeries.logoSrc}
+                    onError={(e: any) => {
+                      e.target.onerror = null; // To avoid infinite loop
+                      e.target.src = "";
+                    }}/>
                   ) : (
                     <span id="seriesTitle">{selectedSeries.name}</span>
                   )
                 ) : (
                   selectedSeason.logoSrc != "" ? (
-                    <LazyLoadImage src={"./src/" + selectedSeason.logoSrc}></LazyLoadImage>
+                    <LazyLoadImage src={"./src/" + selectedSeason.logoSrc}
+                    onError={(e: any) => {
+                      e.target.onerror = null; // To avoid infinite loop
+                      e.target.src = "";
+                    }}/>
                   ) : (
                     <span id="seriesTitle">{selectedSeries.name}</span>
                   )
@@ -136,14 +160,22 @@ export const renderRightPanelContent = () => {
                 {
                   selectedLibrary.type == "Shows" ? (
                     selectedSeries.coverSrc != "" ? (
-                      <LazyLoadImage src={"./src/" + selectedSeries.coverSrc} alt="Poster"/>
+                      <LazyLoadImage src={"./src/" + selectedSeries.coverSrc} alt="Poster"
+                      onError={(e: any) => {
+                        e.target.onerror = null; // To avoid infinite loop
+                        e.target.src = "./src/resources/img/fileNotFound.png";
+                      }}/>
                     ) : (
                       <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
                     )
                     
                   ) : (
                     selectedSeason.coverSrc != "" ? (
-                      <LazyLoadImage src={"./src/" + selectedSeason.coverSrc} alt="Poster"/>
+                      <LazyLoadImage src={"./src/" + selectedSeason.coverSrc} alt="Poster"
+                      onError={(e: any) => {
+                        e.target.onerror = null; // To avoid infinite loop
+                        e.target.src = "./src/resources/img/fileNotFound.png";
+                      }}/>
                     ) : (
                       <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
                     )
@@ -151,7 +183,11 @@ export const renderRightPanelContent = () => {
                 }
               </div>
               <section className="season-info">
-                <span id="seasonTitle">{selectedSeason.name}</span>
+                {
+                  selectedLibrary.type == "Shows" && selectedSeries.seasons.length > 1 ? (
+                    <span id="seasonTitle">{selectedSeason.name}</span>
+                  ) : (<></>)
+                }
                 <section className="season-info-text">
                   {
                     selectedSeason.directedBy != "" ? (
@@ -187,29 +223,35 @@ export const renderRightPanelContent = () => {
                 </div>
               </section>
             </div>
-            <section className="season-selector-container">
-              <button className="season-selector" onClick={toggleMenu}>
-                <span>{selectedSeason.name}</span>
-                {
-                  isContextMenuShown ? (
-                    <span id="triangle">&#9650;</span>
-                  ) : (
-                    <span id="triangle">&#9660;</span>
-                  )
-                }
-              </button>
-              {isContextMenuShown && (
-                <div className="dropdown-menu">
-                  {selectedSeries.seasons.map((season: SeasonData, index: number) => (
-                    <a
-                      key={index}
-                      className="dropdown-element"
-                      onClick={() => handleSeasonSelection(season)}>{season.name}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </section>
+            {
+              selectedSeries.seasons.length > 1 ? (
+                <section className="season-selector-container">
+                  <button className="season-selector" onClick={toggleMenu}>
+                    <span>{selectedSeason.name}</span>
+                    {
+                      isContextMenuShown ? (
+                        <span id="triangle">&#9650;</span>
+                      ) : (
+                        <span id="triangle">&#9660;</span>
+                      )
+                    }
+                  </button>
+                  {isContextMenuShown && (
+                    <div className="dropdown-menu">
+                      {selectedSeries.seasons.map((season: SeasonData, index: number) => (
+                        <a
+                          key={index}
+                          className="dropdown-element"
+                          onClick={() => handleSeasonSelection(season)}>{season.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              ) : (
+                <></>
+              )
+            }
             <div className="episodes-container">
               {selectedSeason.episodes.map((episode: any, index: number) => (
                 <div className="episode-box" 
@@ -221,7 +263,11 @@ export const renderRightPanelContent = () => {
                       episode.imgSrc != "" ? (
                         <LazyLoadImage src={"./src/" + episode.imgSrc}
                           style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
-                          alt="Video Thumbnail"/>
+                          alt="Video Thumbnail"
+                          onError={(e: any) => {
+                            e.target.onerror = null; // To avoid infinite loop
+                            e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
+                          }}/>
                       ) : (
                         <LazyLoadImage src={"./src/resources/img/Default_video_thumbnail.jpg"}
                           style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
