@@ -121,7 +121,7 @@ export class MPVController {
       this.sendCommand(['set', 'pause', 'no']);
     }
 
-    this.sendCommand(['cycle', 'pause']);
+    //this.sendCommand(['cycle', 'pause']);
   }
 
   // Detener el video

@@ -132,6 +132,7 @@ function createWindow() {
 // Crear una ventana de controles
 function createControlWindow() {
   controlsWindow = new BrowserWindow({
+    parent: win!,
     width: win?.getBounds().width,
     height: win?.getBounds().height,
     minWidth: 720,
