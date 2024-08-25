@@ -2,10 +2,13 @@ $app-color: #8EDCE6;
 $app-color-darken: #86ccd5;
 $color-text-primary: #ffffff;
 $color-text-default: #ffffffcc;
+$color-text-dark: #d0d0d0cc;
 
 #root {
   margin: 0 auto;
   text-align: center;
+
+  font-family: sans-serif;
 
   display: flex;
   flex-direction: column;

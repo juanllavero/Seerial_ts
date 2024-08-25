@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
 
 import { MPVController } from '../src/data/objects/MPVController';
 import propertiesReader from 'properties-reader';
+
 import { MovieDb } from 'moviedb-promise';
 
 //#region PROPERTIES AND DATA READING
@@ -193,15 +194,20 @@ ipcMain.on('play-video', async (_event, videoSrc) => {
 
     mpvController.startMPV(videoSrc);
 
-    win?.webContents.send('video-playing');
-
     createControlWindow();
   }
+});
+
+ipcMain.on('send-data-controls', (_event, library, series, season, episode) => {
+  controlsWindow?.webContents.on('did-finish-load', () => {
+    controlsWindow?.webContents.send('data-to-controls', library, series, season, episode);
+  });
 });
 
 ipcMain.on('stop-video', () => {
   if (mpvController) {
     mpvController.stop();
+    mpvController = null;
     controlsWindow?.close();
     controlsWindow = null;
     win?.webContents.send('video-stopped');
@@ -213,10 +219,6 @@ ipcMain.on('mpv-command', (_event, args) => {
     mpvController.sendCommand(args);
   }
 });
-
-ipcMain.handle('get-mpv-controller', () => {
-  return mpvController;
-})
 
 //#endregion
 

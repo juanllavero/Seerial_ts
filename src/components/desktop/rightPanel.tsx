@@ -51,6 +51,9 @@ export const renderRightPanelContent = () => {
       dispatch(selectEpisode(episode));
       dispatch(loadVideo());
       window.electronAPI.startMPV(episode.videoSrc);
+
+      if (selectedLibrary && selectedSeries && selectedSeason && episode)
+        window.electronAPI.sendData(selectedLibrary, selectedSeries, selectedSeason, episode);
     }
 
     const toggleMenu = () => {

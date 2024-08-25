@@ -6,6 +6,11 @@ import { RootState } from 'redux/store';
 import '../../Controls.scss'
 import { toggleMaximize } from 'redux/slices/windowStateSlice';
 import { MPVController } from '@objects/MPVController';
+import { ipcRenderer } from 'electron';
+import { LibraryData } from '@interfaces/LibraryData';
+import { SeriesData } from '@interfaces/SeriesData';
+import { SeasonData } from '@interfaces/SeasonData';
+import { EpisodeData } from '@interfaces/EpisodeData';
 
 function Controls() {
     const dispatch = useDispatch();
@@ -15,10 +20,11 @@ function Controls() {
 
     const volume: number = 100;
 
-    const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
-    const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
-    const currentSeason = useSelector((state: RootState) => state.series.selectedSeason);
-    const episode = useSelector((state: RootState) => state.episodes.selectedEpisode);
+    const [selectedLibrary, setSelectedLibrary] = React.useState<LibraryData | null>(null);
+    const [selectedSeries, setSelectedSeries] = React.useState<SeriesData | null>(null);
+    const [currentSeason, setCurrentSeason] = React.useState<SeasonData | null>(null);
+    const [episode, setEpisode] = React.useState<EpisodeData | null>(null);
+    const [mpvController, setMpvController] = React.useState<MPVController | null>(null);
 
     const isFullscreen = useSelector((state: RootState) => state.windowState.isMaximized);
 
@@ -26,23 +32,22 @@ function Controls() {
         dispatch(toggleMaximize(state === 'fullscreen'));
     });
 
-    let mpvController: MPVController | null = null;
-
-    useEffect(() => {
-        do{
-            // @ts-ignore
-            mpvController = window.electronAPI.getMPVController();
-        }while(!mpvController)
-    }, []);
+    window.ipcRenderer.on('data-to-controls', (_event, library, series, season, e) => {        
+        setSelectedLibrary(library);
+        setSelectedSeries(series);
+        setCurrentSeason(season);
+        setEpisode(e);
+    });
 
     // Handle play/pause button click
     const handlePlayPause = () => {
         dispatch(togglePause());
         
-        if (mpvController){
-            console.log("ASDASD");
-            mpvController.togglePause();
-        }  
+        if (!paused){
+        window.electronAPI.sendCommand(['set', 'pause', 'yes']);
+        }else{
+            window.electronAPI.sendCommand(['set', 'pause', 'no']);
+        } 
     };
 
     // Handle seek slider change
@@ -65,7 +70,6 @@ function Controls() {
 
     const handleClose = () => {
         window.electronAPI.stopMPV();
-        dispatch(closeVideo());
     };
 
     return (
@@ -111,12 +115,12 @@ function Controls() {
                                 )
                             }
                         </span>
-                        <span id="time">{currentTime} " / " {duration - currentTime}</span>
+                        <span id="time">{currentTime} / {duration - currentTime}</span>
                     </div>
                     <div className="center-controls">
                         <button className="controls-svg-button" 
                             onClick={handlePlayPause}
-                            disabled={episode && currentSeason && (currentSeason?.episodes.indexOf(episode) > 0) ? (
+                            disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) > 0) ? (
                                 false
                             ) : (
                                 true
@@ -132,7 +136,7 @@ function Controls() {
                         </button>
                         <button className="controls-svg-button" 
                             onClick={handlePlayPause}
-                            disabled={episode && currentSeason && (currentSeason?.episodes.indexOf(episode) < currentSeason?.episodes.length - 1) ? (
+                            disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) < currentSeason.episodes.length - 1) ? (
                                 false
                             ) : (
                                 true

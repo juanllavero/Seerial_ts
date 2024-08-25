@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
 import { toggleMaximize } from 'redux/slices/windowStateSlice';
+import { closeVideo } from 'redux/slices/videoSlice';
 
 function App() {
   const dispatch = useDispatch();
@@ -21,6 +22,10 @@ function App() {
 
   window.electronAPI.onWindowStateChange((state: string) => {
     dispatch(toggleMaximize(state === 'maximized'));
+  });
+
+  window.ipcRenderer.on('video-stopped', (_event) => {
+    dispatch(closeVideo());
   });
 
   useEffect(() => {

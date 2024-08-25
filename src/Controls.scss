@@ -2,10 +2,13 @@ $app-color: #8EDCE6;
 $app-color-darken: #86ccd5;
 $color-text-primary: #ffffff;
 $color-text-default: #ffffffcc;
+$color-text-dark: #d0d0d0cc;
 
 #root {
     margin: 0 auto;
     text-align: center;
+
+    font-family: sans-serif;
 
     pointer-events: auto;
 
@@ -61,8 +64,9 @@ html, body {
 .controls {
     background-color: #101010;
     display: flex;
+    flex-flow: row nowrap;
     justify-content: space-between;
-    padding: 20px;
+    padding: 20px 25px 20px 25px;
 }
 
 .controls-svg-button {
@@ -86,6 +90,45 @@ html, body {
 .controls-svg-button-desktop svg{
     width: 24px;
     height: 24px;
+}
+
+.left-controls {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    text-align: left;
+    width: 350px;
+
+    #title {
+        font-size: medium;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    #subtitle {
+        font-size: medium;
+        margin-bottom: 4px;
+        font-weight: bold;
+        color: $color-text-dark;
+    }
+
+    #time {
+        font-size: small;
+        font-weight: bold;
+        color: $color-text-dark;
+    }
+}
+
+.center-controls {
+    display: flex;
+    justify-content: center;
+    width: 350px;
+}
+
+.right-controls {
+    display: flex;
+    justify-content: right;
+    width: 350px;
 }
 
 .slider {

@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import librarySlice from './slices/librarySlice';
 import seriesSlice from './slices/seriesSlice';
 import seasonSlice from './slices/seasonSlice';

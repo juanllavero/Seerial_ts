@@ -1,3 +1,7 @@
+import { EpisodeData } from '@interfaces/EpisodeData';
+import { LibraryData } from '@interfaces/LibraryData';
+import { SeasonData } from '@interfaces/SeasonData';
+import { SeriesData } from '@interfaces/SeriesData';
 import { ipcRenderer, contextBridge } from 'electron'
 
 // Exponer la API de Electron a través del contexto seguro
@@ -11,7 +15,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startMPV: (videoPath: string) => ipcRenderer.send('play-video', videoPath),
   stopMPV: () => ipcRenderer.send('stop-video'),
   sendCommand: (args: string[] = []) => ipcRenderer.send('mpv-command', args),
-  getMPVController: () => ipcRenderer.invoke('get-mpv-controller'),
+  sendData: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => ipcRenderer.send('send-data-controls', library, series, season, episode), 
   onWindowStateChange: (callback: (state: string) => void) => {
     ipcRenderer.on('window-state-change', (_, state) => callback(state));
   },
