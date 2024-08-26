@@ -1,5 +1,6 @@
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
+import { setShowPoster } from 'redux/slices/librarySlice';
 import { selectSeries, selectSeason } from '../../redux/slices/seriesSlice';
 import { selectEpisode } from '../../redux/slices/episodeSlice';
 import { RootState } from '../../redux/store';
@@ -31,8 +32,11 @@ export const renderRightPanelContent = () => {
     const episodeImageHeight = useSelector((state: RootState) => state.episodeImage.height);
 
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
+    const showCollectionPoster = useSelector((state: RootState) => state.library.showCollectionPoster);
 
-    const videoLoaded = useSelector((state: RootState) => state.video.isLoaded);
+    const changePoster = () => {
+      dispatch(setShowPoster(!showCollectionPoster));
+    }
 
     const handleTransparentImageLoad = () => {
       dispatch(loadTransparentImage());
@@ -51,6 +55,8 @@ export const renderRightPanelContent = () => {
       dispatch(selectEpisode(episode));
       dispatch(loadVideo());
       window.electronAPI.startMPV(episode.videoSrc);
+
+      console.log(episode.name);
 
       if (selectedLibrary && selectedSeries && selectedSeason && episode)
         window.electronAPI.sendData(selectedLibrary, selectedSeries, selectedSeason, episode);
@@ -161,7 +167,7 @@ export const renderRightPanelContent = () => {
             <div className="info-container">
               <div className="poster-image">
                 {
-                  selectedLibrary.type == "Shows" ? (
+                  selectedLibrary.type == "Shows" || showCollectionPoster ? (
                     selectedSeries.coverSrc != "" ? (
                       <LazyLoadImage src={"./src/" + selectedSeries.coverSrc} alt="Poster"
                       onError={(e: any) => {
@@ -171,7 +177,6 @@ export const renderRightPanelContent = () => {
                     ) : (
                       <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
                     )
-                    
                   ) : (
                     selectedSeason.coverSrc != "" ? (
                       <LazyLoadImage src={"./src/" + selectedSeason.coverSrc} alt="Poster"
@@ -183,6 +188,18 @@ export const renderRightPanelContent = () => {
                       <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
                     )
                   )
+                }
+                {
+                  selectedLibrary.type == "Shows" ? (
+                    <div className="continue-watching-info">
+                      <span>En progreso — T1 · E3</span>
+                    </div>
+                  ) : selectedSeries.seasons.length > 1 ? (
+                    <button className="show-poster-button"
+                      onClick={changePoster}>
+                      <span>{showCollectionPoster ? (t('seasonPoster')) : (t('collectionPoster'))}</span>
+                    </button>
+                  ) : (<></>)
                 }
               </div>
               <section className="season-info">

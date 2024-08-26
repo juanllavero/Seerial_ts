@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
@@ -65,9 +65,14 @@ const saveData = (newData: any) => {
 
 //#region WINDOWS CREATION
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  
+  const windowWidth = Math.floor(width * 0.8);
+  const windowHeight = Math.floor(height * 0.8);
+
   win = new BrowserWindow({
-    width: 1920,
-    height: 1080,
+    width: windowWidth,
+    height: windowHeight,
     minWidth: 720,
     minHeight: 400,
     alwaysOnTop: false,

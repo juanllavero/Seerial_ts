@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePause, setCurrentTime, setDuration } from 'redux/slices/videoSlice';
-import { closeVideo } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
 import '../../Controls.scss'
 import { toggleMaximize } from 'redux/slices/windowStateSlice';
-import { MPVController } from '@objects/MPVController';
-import { ipcRenderer } from 'electron';
 import { LibraryData } from '@interfaces/LibraryData';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
+import { useTranslation } from 'react-i18next';
+import '../../i18n';
 
 function Controls() {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const paused = useSelector((state: RootState) => state.video.paused);
     const currentTime = useSelector((state: RootState) => state.video.currentTime);
@@ -24,7 +24,6 @@ function Controls() {
     const [selectedSeries, setSelectedSeries] = React.useState<SeriesData | null>(null);
     const [currentSeason, setCurrentSeason] = React.useState<SeasonData | null>(null);
     const [episode, setEpisode] = React.useState<EpisodeData | null>(null);
-    const [mpvController, setMpvController] = React.useState<MPVController | null>(null);
 
     const isFullscreen = useSelector((state: RootState) => state.windowState.isMaximized);
 
@@ -37,6 +36,9 @@ function Controls() {
         setSelectedSeries(series);
         setCurrentSeason(season);
         setEpisode(e);
+
+        dispatch(setCurrentTime(e.currentTime));
+        dispatch(setDuration(e.duration));
     });
 
     // Handle play/pause button click
@@ -111,7 +113,7 @@ function Controls() {
                                 selectedLibrary?.type != "Shows" ? (
                                     episode?.year
                                 ) : (
-                                    "T1E1" + " - " + episode?.name
+                                    t('seasonLetter') + episode?.seasonNumber + " · " + t('episodeLetter') + episode?.episodeNumber + " — " + episode?.name
                                 )
                             }
                         </span>

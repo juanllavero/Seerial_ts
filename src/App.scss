@@ -330,6 +330,41 @@ html, body {
   flex-grow: 1;
 }
 
+.poster-image {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.continue-watching-info {
+  background-color: #0000006c;
+  border-radius: 0px 0px 5px 5px;
+  padding: 10px;
+}
+
+.continue-watching-info span {
+  font-size: small;
+}
+
+.show-poster-button {
+  border-color: transparent;
+  background-color: #0000006c;
+  border-radius: 0px 0px 5px 5px;
+  padding: 10px;
+}
+
+.show-poster-button:hover {
+  background-color: black;
+
+  span {
+    color: $color-text-primary;
+  }
+}
+
+.show-poster-button span {
+  font-size: small;
+  color: $color-text-default;
+}
+
 .info-container{
   padding: 30px;
   display: flex;
