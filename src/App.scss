@@ -64,6 +64,7 @@ html, body {
 /* LEFT PANEL */
 .left-panel {
   width: 260px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
   padding: 10px 15px 10px 20px;
@@ -539,7 +540,7 @@ html, body {
   transform: scale(0.9, 0.6);
 }
 
-.dropdown-menu{
+.dropdown-menu {
   margin-left: 50px;
   margin-top: 10px;
   position: absolute;
@@ -549,22 +550,24 @@ html, body {
   font-size: 13px;
   padding: 8px 0;
   transform-origin: center top;
-  transition: background .15s ease-out;
-}
 
-.dropdown-element{
-  align-items: center;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: space-between;
-  word-wrap: break-word;
-  display: block;
-  font-size: small;
-  padding: 4px 20px;
-  text-align: left;
+  .dropdown-element {
+    align-items: center;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    word-wrap: break-word;
+    display: block;
+    font-size: small;
+    padding: 4px 20px;
+    text-align: left;
+  }
+  
+  .dropdown-element:hover {
+    color: $app-color;
+  }
 }
-
 
 /* EPISODES CONTAINER */
 .episodes-container{
@@ -579,6 +582,84 @@ html, body {
   display: flex;
   flex-flow: column wrap;
   text-align: left;
+
+  .video-button{
+    cursor: pointer;
+    border: 2px solid transparent;
+    background-color: transparent;
+  }
+  
+  .video-button img {
+    border-radius: 5px;
+  }
+
+  .video-button-hover {
+    position: absolute;
+    opacity: 0.5;
+    background-color: #000000;
+
+    border: 2px solid transparent;
+    border-radius: 5px;
+  }
+
+  .video-button-hover:hover {
+    border: 2px solid $app-color;
+    transition: border-color 0.3s ease-in-out;
+  }
+
+  .play-button-episode {
+    background-color: rgba(0, 0, 0, 0.588);
+    border: 2px solid white;
+    border-radius: 50px;
+    width: 70px;
+    height: 70px;
+    padding: 15px;
+    transition: backgound-color 0.3s ease-in-out;
+  }
+
+  .play-button-episode:hover {
+    background-color: $app-color;
+    border-color: $app-color;
+  }
+
+  .play-button-episode svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .play-button-episode svg path{
+    fill: $color-text-primary;
+    transition: fill 0.2s ease-in-out;
+  }
+
+  .play-button-episode:hover svg path{
+    fill: rgb(38, 38, 38);
+  }
+
+  .video-button-hover-btns {
+    position: absolute;
+
+    border: 2px solid transparent;
+    border-radius: 5px;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+  }
+
+  .episode-buttons-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .video-button-hover-play-btn {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+  }
 }
 
 .episode-box #episodeName{
@@ -597,21 +678,6 @@ html, body {
   margin-left: 0.3em;
   font-size: small;
   color: rgb(184, 184, 184);
-}
-
-.video-button{
-  padding: 1px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.video-button img {
-  border-radius: 5px;
-}
-
-.video-button:hover {
-  background-color: $app-color;
-  transition: background-color 0.3s ease;
 }
 
 /* WINDOW TOP BAR */

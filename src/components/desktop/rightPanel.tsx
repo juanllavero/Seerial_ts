@@ -56,8 +56,6 @@ export const renderRightPanelContent = () => {
       dispatch(loadVideo());
       window.electronAPI.startMPV(episode.videoSrc);
 
-      console.log(episode.name);
-
       if (selectedLibrary && selectedSeries && selectedSeason && episode)
         window.electronAPI.sendData(selectedLibrary, selectedSeries, selectedSeason, episode);
     }
@@ -276,6 +274,36 @@ export const renderRightPanelContent = () => {
               {selectedSeason.episodes.map((episode: any, index: number) => (
                 <div className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
+                  {
+                    true ? (
+                      <>
+                        <div key={index} className="video-button-hover"
+                          style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                          onClick={() => handleEpisodeSelection(episode)}
+                          onMouseEnter={dispatch()}>
+                        </div>
+                        <div key={index} className="video-button-hover-btns"
+                          style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                          >
+                          <div className="episode-buttons-footer">
+                            <button className="svg-button-desktop-transparent">
+                              <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
+                            </button>
+                            <button className="svg-button-desktop-transparent">
+                              <svg aria-hidden="true" fill="currentColor" height="22" viewBox="0 0 48 48" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M24 15C25.6569 15 27 13.6569 27 12C27 10.3431 25.6569 9 24 9C22.3431 9 21 10.3431 21 12C21 13.6569 22.3431 15 24 15Z" fill="#FFFFFF"></path><path d="M24 27C25.6569 27 27 25.6569 27 24C27 22.3431 25.6569 21 24 21C22.3431 21 21 22.3431 21 24C21 25.6569 22.3431 27 24 27Z" fill="#FFFFFF"></path><path d="M27 36C27 37.6569 25.6569 39 24 39C22.3431 39 21 37.6569 21 36C21 34.3431 22.3431 33 24 33C25.6569 33 27 34.3431 27 36Z" fill="#FFFFFF"></path></svg>
+                            </button>
+                          </div>
+                        </div>
+                        <div key={index} className="video-button-hover-play-btn"
+                          style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                          >
+                          <button className="play-button-episode" onClick={() => handleEpisodeSelection(episode)}>
+                            <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
+                          </button>
+                        </div>
+                    </>
+                    ) : (<></>)
+                  }
                   <div key={index} className="video-button"
                   style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                   onClick={() => handleEpisodeSelection(episode)}>

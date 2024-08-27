@@ -31,7 +31,9 @@ function Controls() {
         dispatch(toggleMaximize(state === 'fullscreen'));
     });
 
-    window.ipcRenderer.on('data-to-controls', (_event, library, series, season, e) => {        
+    window.ipcRenderer.on('data-to-controls', (_event, library, series, season, e) => {
+        console.log(episode?.name);
+        
         setSelectedLibrary(library);
         setSelectedSeries(series);
         setCurrentSeason(season);
