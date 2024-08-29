@@ -3,11 +3,13 @@ import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 
 interface SeriesState {
+  seriesMenu: SeriesData | null;
   selectedSeries: SeriesData | null;
   selectedSeason: SeasonData | null;
 }
 
 const initialState: SeriesState = {
+  seriesMenu:null,
   selectedSeries: null,
   selectedSeason: null,
 };
@@ -16,6 +18,9 @@ const seriesSlice = createSlice({
   name: 'series',
   initialState,
   reducers: {
+    showSeriesMenu: (state, action: PayloadAction<SeriesData>) => {
+      state.seriesMenu = action.payload;
+    },
     selectSeries: (state, action: PayloadAction<SeriesData>) => {
       state.selectedSeries = action.payload;
       state.selectedSeason = action.payload.seasons[0];
@@ -30,5 +35,5 @@ const seriesSlice = createSlice({
   }
 });
 
-export const { selectSeries, selectSeason, resetSelection } = seriesSlice.actions;
+export const { showSeriesMenu, selectSeries, selectSeason, resetSelection } = seriesSlice.actions;
 export default seriesSlice.reducer;

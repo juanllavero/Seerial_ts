@@ -234,6 +234,10 @@ html, body {
   opacity: 1;
 }
 
+.svg-button-desktop-transparent:hover {
+  cursor: pointer;
+}
+
 .desktopSlider {
   margin-left: 20px;
   margin-right: 10px;
@@ -587,6 +591,7 @@ html, body {
     cursor: pointer;
     border: 2px solid transparent;
     background-color: transparent;
+    border-radius: 5px;
   }
   
   .video-button img {
@@ -595,16 +600,15 @@ html, body {
 
   .video-button-hover {
     position: absolute;
-    opacity: 0.5;
-    background-color: #000000;
+    background-color: #00000092;
 
     border: 2px solid transparent;
     border-radius: 5px;
   }
 
   .video-button-hover:hover {
-    border: 2px solid $app-color;
-    transition: border-color 0.3s ease-in-out;
+    border-color: $app-color;
+    transition: border-color 0.3s ease-in;
   }
 
   .play-button-episode {
@@ -620,6 +624,7 @@ html, body {
   .play-button-episode:hover {
     background-color: $app-color;
     border-color: $app-color;
+    cursor: pointer;
   }
 
   .play-button-episode svg {
@@ -634,31 +639,6 @@ html, body {
 
   .play-button-episode:hover svg path{
     fill: rgb(38, 38, 38);
-  }
-
-  .video-button-hover-btns {
-    position: absolute;
-
-    border: 2px solid transparent;
-    border-radius: 5px;
-
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-end;
-  }
-
-  .episode-buttons-footer {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .video-button-hover-play-btn {
-    position: absolute;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    background-color: transparent;
   }
 }
 
@@ -840,4 +820,25 @@ html, body {
   bottom: 0;
   left: 0;
   pointer-events: none;
+}
+
+/* AUXILIAR CLASSES */
+
+.center-align {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.left-corner-align {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+}
+
+.right-corner-align {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
 }
