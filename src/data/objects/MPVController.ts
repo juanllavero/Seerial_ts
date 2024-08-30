@@ -30,7 +30,6 @@ export class MPVController {
       '--autofit=100%',         // Ajusta el video al tamaño de la ventana
       '--input-ipc-server=\\\\.\\pipe\\mpv-pipe',  // IPC Socket para comunicación
       '--log-file=mpv.log',     // Opcional: para depuración
-      '--idle=yes',
       videoPath                 // Ruta del archivo de video a reproducir
     ];
 

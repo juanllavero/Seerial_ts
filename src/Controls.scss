@@ -43,22 +43,41 @@ html, body {
     justify-content: space-between;
 }
 
+.hidden-top {
+    transform: translateY(-100%);
+}
+
+.hidden-bottom {
+    transform: translateY(+100%);
+}
+
+.visible {
+    transform: translateY(0);
+}
+
+.controls-bar {
+    transition: transform 0.2s ease-in-out;
+}
+
 .controls-top-bar {
-    background-color: #101010;
+    background-color: transparent;
     display: flex;
     justify-content: space-between;
     padding: 20px;
-    -webkit-app-region: drag;
 }
 
 .controls-top-bar button {
     -webkit-app-region: no-drag;
 }
 
-.controls-botttom-bar {
-    background-color: #101010;
+.controls-bottom-bar {
     display: flex;
     flex-direction: column;
+}
+
+.controls-slider-div {
+    display: flex;
+    background-color: #101010;
 }
 
 .controls {
@@ -73,10 +92,13 @@ html, body {
     background-color: transparent;
     border-radius: 5px;
     border-color: transparent;
-    padding: 5px 12px 5px 12px;
+    padding: 15px;
     margin-left: 10px;
     cursor: pointer;
 
+    background-color: #00000003;
+
+    border-radius: 50px;
     color:white;
 
     opacity: 0.8;
@@ -132,21 +154,20 @@ html, body {
 }
 
 .slider {
-    flex: 1;
     width: 100%;
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
-    height: 5px;
+    height: 4px;
     border-radius: 25px;
-    background: #d3d3d3;
+    background-color: #646464;
     outline: none;
     opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
+    -webkit-transition: .3s;
+    transition: background-color .3s;
 }
   
 .slider:hover {
-    opacity: 1;
+    background-color: #dedede;
 }
   
 .slider::-webkit-slider-thumb {
@@ -157,4 +178,51 @@ html, body {
     border-radius: 50px;
     background: $color-text-primary;
     cursor: pointer;
+}
+
+.settings-box {
+    background-color: #10101046;
+    padding: 30px;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.settings-box h1 {
+    margin-top: 0;
+    margin-bottom: 40px;
+    font-size: x-large;
+}
+
+.settings-columns {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
+.settings-text-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    text-align: right;
+    margin-right: 50px;
+}
+
+.settings-options-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+}
+
+.settings-text-box span {
+    margin-bottom: 10px;
+    font-size: medium;
+    font-weight: bold;
+    color: $color-text-default
+}
+
+.settings-options-box select {
+    margin-bottom: 10px;
+    width: min-content;
 }

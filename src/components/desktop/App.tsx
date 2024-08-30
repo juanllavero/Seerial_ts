@@ -20,14 +20,6 @@ function App() {
 
   const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
 
-  window.electronAPI.onWindowStateChange((state: string) => {
-    dispatch(toggleMaximize(state === 'maximized'));
-  });
-
-  window.ipcRenderer.on('video-stopped', (_event) => {
-    dispatch(closeVideo());
-  });
-
   useEffect(() => {
     // @ts-ignore
     window.electronAPI.getLibraryData()
@@ -41,7 +33,23 @@ function App() {
         console.error('Unexpected error:', error);
       }
     });
+
+    window.electronAPI.onWindowStateChange((state: string) => {
+      dispatch(toggleMaximize(state === 'maximized'));
+    });
+  
+    window.ipcRenderer.on('video-stopped', (_event) => {
+      dispatch(closeVideo());
+    });
   }, [dispatch]);
+
+  const showControls = () => {
+    window.electronAPI.showControls();
+  }
+
+  const hideControls = () => {
+    window.electronAPI.hideControls();
+  }
 
   // Save data function
   const saveLibrary = (newData: any[]) => {
@@ -57,7 +65,16 @@ function App() {
 
   return (
     <>
-      { isVideoLoaded && <div className={`overlay ${isVideoLoaded ? 'visible' : ''}`}></div> }
+      {
+        isVideoLoaded ? (
+          <div className={`overlay ${isVideoLoaded ? 'visible' : ''}`}
+          onMouseMove={showControls}
+          onMouseDown={hideControls}
+          onKeyDown={showControls}/>
+        ) : (
+          <></>
+        )
+      }
       <section className="container blur-background-image">
         {renderMainBackgroundImage()}
         <div className="noise-background">

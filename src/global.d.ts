@@ -6,6 +6,7 @@ import { SeriesData } from "@interfaces/SeriesData";
 export interface ElectronAPI {
   on(arg0: string, handleResize: () => Promise<void>): void;
   off(arg0: string, handleResize: () => Promise<void>): void;
+  translate: (key) => String,
   setFullscreenControls: () => void,
   minimizeWindow: () => void;
   maximizeWindow: () => void;
@@ -15,6 +16,8 @@ export interface ElectronAPI {
   sendCommand: (args: string[]) => void;
   sendData: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => void;
   onWindowStateChange: (callback: (state: string) => void) => void;
+  showControls: () => void;
+  hideControls: () => void;
 }
   
 declare global {

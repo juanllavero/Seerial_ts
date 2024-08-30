@@ -127,14 +127,14 @@ export const renderRightPanelContent = () => {
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
-                          <LazyLoadImage className="poster-image" src={"./src/" + series.coverSrc} alt="Poster"
+                          <LazyLoadImage src={"./src/" + series.coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
                             e.target.src = "./src/resources/img/fileNotFound.png";
                           }}/>
                         ) : (
-                          <LazyLoadImage className="poster-image" src="./src/resources/img/fileNotFound.png" alt="Poster"
+                          <LazyLoadImage src="./src/resources/img/fileNotFound.png" alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
                         )
                       }

@@ -1,10 +1,12 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 interface VideoState {
   isLoaded: boolean;
   paused: boolean;
   currentTime: number;
   duration: number;
+  controlsSown: boolean;
+  inSettings: boolean;
 }
 
 const initialState: VideoState = {
@@ -12,6 +14,8 @@ const initialState: VideoState = {
   paused: false,
   currentTime: 0,
   duration: 0,
+  controlsSown: false,
+  inSettings: false,
 };
 
 const videoSlice = createSlice({
@@ -27,14 +31,20 @@ const videoSlice = createSlice({
     togglePause(state) {
       state.paused = !state.paused;
     },
-    setCurrentTime(state, action: PayloadAction<number>) {
+    setCurrentTime(state, action) {
       state.currentTime = action.payload;
     },
-    setDuration(state, action: PayloadAction<number>) {
+    setDuration(state, action) {
       state.duration = action.payload;
     },
+    toggleControls(state, action) {
+      state.controlsSown = action.payload;
+    },
+    toggleInSettings(state, action) {
+      state.inSettings = action.payload;
+    }
   },
 });
 
-export const { loadVideo, closeVideo, togglePause, setCurrentTime, setDuration } = videoSlice.actions;
+export const { loadVideo, closeVideo, togglePause, setCurrentTime, setDuration, toggleControls, toggleInSettings } = videoSlice.actions;
 export default videoSlice.reducer;

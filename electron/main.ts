@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, Rectangle, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
@@ -7,6 +7,25 @@ import { MPVController } from '../src/data/objects/MPVController';
 import propertiesReader from 'properties-reader';
 
 import { MovieDb } from 'moviedb-promise';
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
+
+//#region LOCALIZATION
+i18next
+  .use(Backend)
+  .init({
+    fallbackLng: 'en',
+    supportedLngs: ['en', 'es', 'de', 'fr', 'it'],
+    backend: {
+      loadPath: './src/locales/{{lng}}.json',
+    },
+});
+
+// Manejar solicitudes de traducción desde las ventanas renderizadas
+ipcMain.handle('translate', (_event, key) => {
+  return i18next.t(key);
+});
+//#endregion
 
 //#region PROPERTIES AND DATA READING
 
@@ -67,7 +86,7 @@ const saveData = (newData: any) => {
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   
-  const windowWidth = Math.floor(width * 0.8);
+  const windowWidth = Math.floor(width * 0.7);
   const windowHeight = Math.floor(height * 0.8);
 
   win = new BrowserWindow({
@@ -112,27 +131,6 @@ function createWindow() {
   })
 
   mpvController = new MPVController(win!);
-
-  /*const mpvPath = path.join(__dirname, '../src/mpv/win/test/mpv.exe');
-  const videoPath = path.join(__dirname, '../src/test.mkv');
-
-  console.log(mpvPath);
-
-  const mpv = new MPV({
-    "audio_only": false,
-    "verbose": true,
-  });
-
-  mpv.load(videoPath); // Reemplaza con la ruta a tu vídeo
-  mpv.play();
-
-  mpv.on('statuschange', (status) => {
-    console.log('Cambio de estado en MPV:', status);
-  });
-
-  mpv.on('error', (err) => {
-    console.error('Error en MPV:', err);
-  });*/
 }
 
 // Crear una ventana de controles
@@ -148,14 +146,15 @@ function createControlWindow() {
     transparent: true,
     frame: false,
     hasShadow: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true,
       nodeIntegration: true,
+      webSecurity: false,
       plugins: true
     }
   });
-
 
   if (VITE_DEV_SERVER_URL) {
     controlsWindow.loadURL(path.join(VITE_DEV_SERVER_URL, 'controls'))
@@ -163,18 +162,19 @@ function createControlWindow() {
     controlsWindow.loadFile(path.join(RENDERER_DIST, '../controls.html'))
   }  
 
-  // Keep window on top of main window and keep size
-  if (win) {
+  // Adjust the size of the two windows to be the same
+  if (win)
     controlsWindow.setBounds(win.getBounds());
-    controlsWindow.on('resize', () => {
-      if (controlsWindow)
-        win?.setBounds(controlsWindow.getBounds());
-    });
-    controlsWindow.on('move', () => {
-      if (controlsWindow)
-        win?.setBounds(controlsWindow.getBounds());
-    });
-  }
+
+  win?.on('resize', () => {
+    if (win)
+      controlsWindow?.setBounds(win.getBounds());
+  });
+
+  win?.on('move', () => {
+    if (win)
+      controlsWindow?.setBounds(win.getBounds());
+  });
 
   controlsWindow.on('enter-full-screen', () => {
     controlsWindow?.webContents.send('window-state-change', 'fullscreen');
@@ -212,9 +212,9 @@ ipcMain.on('send-data-controls', (_event, library, series, season, episode) => {
 ipcMain.on('stop-video', () => {
   if (mpvController) {
     mpvController.stop();
-    mpvController = null;
     controlsWindow?.close();
     controlsWindow = null;
+    win?.setResizable(true);
     win?.webContents.send('video-stopped');
   }
 });
@@ -225,6 +225,13 @@ ipcMain.on('mpv-command', (_event, args) => {
   }
 });
 
+ipcMain.on('show-controls', () => {
+  controlsWindow?.webContents.send('show-controls');
+});
+
+ipcMain.on('hide-controls', () => {
+  controlsWindow?.webContents.send('hide-controls');
+});
 //#endregion
 
 //#region LIBRARY DATA COMMUNICATION
@@ -253,10 +260,10 @@ ipcMain.on('maximize-window', () => {
 })
 
 ipcMain.on('fullscreen-controls', () => {
-  if (controlsWindow?.isMaximized()){
-    controlsWindow?.unmaximize();
+  if (win?.isSimpleFullScreen()){
+    win.setSimpleFullScreen(false);
   }else{
-    controlsWindow?.maximize();
+    win?.setSimpleFullScreen(true);
   }
 })
 

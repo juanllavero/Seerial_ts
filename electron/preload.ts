@@ -6,6 +6,7 @@ import { ipcRenderer, contextBridge } from 'electron'
 
 // Exponer la API de Electron a través del contexto seguro
 contextBridge.exposeInMainWorld('electronAPI', {
+  translate: (key: String) => ipcRenderer.invoke('translate', key),
   setFullscreenControls: () => ipcRenderer.send('fullscreen-controls'),
   minimizeWindow: () => ipcRenderer.send('minimize-window'),
   maximizeWindow: () => ipcRenderer.send('maximize-window'),
@@ -19,6 +20,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onWindowStateChange: (callback: (state: string) => void) => {
     ipcRenderer.on('window-state-change', (_, state) => callback(state));
   },
+  showControls: () => ipcRenderer.send('show-controls'),
+  hideControls: () => ipcRenderer.send('hide-controls'),
 })
 
 // Mantén las otras exposiciones si es necesario
