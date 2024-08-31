@@ -82,9 +82,6 @@ html, body {
 
 .controls {
     background-color: #101010;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
     padding: 20px 25px 20px 25px;
 }
 
@@ -96,22 +93,51 @@ html, body {
     margin-left: 10px;
     cursor: pointer;
 
+    border: 1px solid transparent;
+
     background-color: #00000003;
 
     border-radius: 50px;
     color:white;
-
-    opacity: 0.8;
+    
     transition: opacity 0.3s ease-in-out;
+
+    svg, img {
+        opacity: 0.7;
+    }
 }
 
-.controls-svg-button-desktop:hover{
-    opacity: 1;
+.controls-svg-button:hover{
+    svg, img {
+        opacity: 1;
+    }
 }
 
-.controls-svg-button-desktop svg{
-    width: 24px;
-    height: 24px;
+.button-active {
+    svg {
+        opacity: 1;
+
+        path {
+            fill: $app-color;
+        }
+    }
+}
+
+.controls-svg-button:focus {
+    border: 1px solid transparent;
+    outline: none;
+}
+
+.controls-svg-button svg{
+    width: 22px;
+    height: 22px;
+}
+
+.left-controls-section {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    width: calc(50% + 70px);
 }
 
 .left-controls {
@@ -119,38 +145,38 @@ html, body {
     flex-flow: column wrap;
     justify-content: center;
     text-align: left;
-    width: 350px;
 
     #title {
-        font-size: medium;
+        font-size: small;
         font-weight: bold;
         margin-bottom: 4px;
     }
 
     #subtitle {
-        font-size: medium;
-        margin-bottom: 4px;
+        font-size: small;
+        margin-bottom: 8px;
         font-weight: bold;
         color: $color-text-dark;
     }
 
     #time {
-        font-size: small;
-        font-weight: bold;
+        font-size: smaller;
         color: $color-text-dark;
     }
 }
 
 .center-controls {
+    background-color: transparent;
     display: flex;
     justify-content: center;
-    width: 350px;
+    left: 50%;
+    right: 50%;
+    width: 200px;
 }
 
 .right-controls {
     display: flex;
     justify-content: right;
-    width: 350px;
 }
 
 .slider {
@@ -181,48 +207,193 @@ html, body {
 }
 
 .settings-box {
-    background-color: #10101046;
+    background-color: #1d1d1de4;
     padding: 30px;
     display: flex;
     flex-flow: column wrap;
+
+    h1 {
+        margin-top: 0;
+        margin-bottom: 40px;
+        font-size: x-large;
+    }
+    
+    .settings-columns {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+    }
+    
+    .settings-text-box {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: right;
+        text-align: right;
+        margin-right: 50px;
+
+        span {
+            margin-bottom: 10px;
+            font-size: medium;
+            font-weight: bold;
+            color: $color-text-default;
+            height: 25px;
+            align-content: center;
+        }
+    }
+    
+    .settings-options-box {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: left;
+    }
 }
 
-.settings-box h1 {
-    margin-top: 0;
-    margin-bottom: 40px;
-    font-size: x-large;
-}
-
-.settings-columns {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-}
-
-.settings-text-box {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: right;
-    text-align: right;
-    margin-right: 50px;
-}
-
-.settings-options-box {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
-}
-
-.settings-text-box span {
+.dropdown {
+    min-width: min-content;
+    position: relative;
     margin-bottom: 10px;
-    font-size: medium;
-    font-weight: bold;
-    color: $color-text-default
+    height: 25px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .select-plain {
+        font-size: small;
+        padding: 0.4em;
+        color: $color-text-primary;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: fit-content;
+    }
+
+    .select {
+        font-size: small;
+        padding: 0.4em;
+        color: $app-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: color 0.3s;
+        width: fit-content;
+
+        .arrow {
+            margin-left: 0.8em;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid $app-color;
+            transition: 0.3s;
+        }
+    
+        .arrow-rotate {
+            transform: rotate(180deg);
+        }
+    }
+
+    .select:hover {
+        color: $color-text-primary;
+
+        .arrow {
+            border-top: 6px solid $color-text-primary;
+        }
+    }
+
+    .menu {
+        list-style: none;
+        padding: 0.5em 0em;
+        background: #101010;
+        box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.2);
+        color: $color-text-default;
+        position: absolute;
+        width: fit-content;
+        margin-top: 0.2em;
+        opacity: 0;
+        display: none;
+        transition: 0.2s;
+        border-radius: 5px;
+        z-index: 1;
+
+        li {
+            font-size: small;
+            background-color: transparent;
+            text-align: left;
+            padding: 0.3em 0.8em;
+            cursor: pointer;
+        }
+
+        li:hover {
+            background-color: #4e4e4e58;
+            color: $color-text-primary;
+        }
+
+        .active {
+            color: $app-color;
+        }
+    }
+
+    .menu-open {
+        display: block;
+        opacity: 1;
+    }
 }
 
-.settings-options-box select {
-    margin-bottom: 10px;
-    width: min-content;
+.chapters-container{
+    background-color: #1d1d1de4;
+    padding: 30px;
+    display: flex;
+    flex-flow: column wrap;
+
+    .chapters-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1em;
+
+        span {
+            font-size: medium;
+            font-weight: bold;
+        }
+    }
+
+    .chapters-box {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-around;
+        width: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+
+        div {
+            padding-right: 2em;
+            display: flex;
+            flex-flow: column wrap;
+        }
+
+        span {
+            font-size: small;
+            margin-bottom: 0.2em;
+        }
+
+        img {
+            width: 164px;
+            height: 92px;
+            margin-bottom: 0.5em;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        img:hover {
+            border: 2px solid $app-color-darken;
+        }
+
+        .chapter-selected {
+            border: 2px solid $app-color;
+        }
+    }
 }

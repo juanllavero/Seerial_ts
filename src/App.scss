@@ -55,6 +55,7 @@ html, body {
   z-index: 999;
   opacity: 0;
   transition: opacity 0.5s ease;
+  cursor: pointer;
 }
 
 .overlay.visible {

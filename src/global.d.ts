@@ -15,6 +15,7 @@ export interface ElectronAPI {
   stopMPV: () => void;
   sendCommand: (args: string[]) => void;
   sendData: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => void;
+  togglePause: () => void;
   onWindowStateChange: (callback: (state: string) => void) => void;
   showControls: () => void;
   hideControls: () => void;

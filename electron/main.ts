@@ -209,6 +209,10 @@ ipcMain.on('send-data-controls', (_event, library, series, season, episode) => {
   });
 });
 
+ipcMain.on('toggle-pause', () => {
+  controlsWindow?.webContents.send('toggle-pause');
+});
+
 ipcMain.on('stop-video', () => {
   if (mpvController) {
     mpvController.stop();
@@ -261,9 +265,13 @@ ipcMain.on('maximize-window', () => {
 
 ipcMain.on('fullscreen-controls', () => {
   if (win?.isSimpleFullScreen()){
+    controlsWindow?.setSimpleFullScreen(false);
     win.setSimpleFullScreen(false);
+
+    controlsWindow?.setBounds(win.getBounds());
   }else{
     win?.setSimpleFullScreen(true);
+    controlsWindow?.setSimpleFullScreen(true);
   }
 })
 

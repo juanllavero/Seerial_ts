@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePause, setCurrentTime, setDuration, toggleControls, toggleInSettings } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
@@ -8,6 +8,11 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
+import { AudioTrackData } from '@interfaces/AudioTrackData';
+import { closeAllMenus, toggleAudioMenu, toggleContextMenu, toggleSubsMenu, toggleSubsSizeMenu, toggleVideoMenu } from 'redux/slices/contextMenuSlice';
+import { SubtitleTrackData } from '@interfaces/SubtitleTrackData';
+import { VideoTrackData } from '@interfaces/VideoTrackData';
+import { ChapterData } from '@interfaces/ChapterData';
 
 function Controls() {
     const dispatch = useDispatch();
@@ -29,19 +34,15 @@ function Controls() {
     const [settingsText, setSettingsText] = useState<String>('');
 
     //#region TRACKS
-    const [selectedVideoTrack, setSelectedVideoTrack] = useState<string | undefined>(undefined);
-    const [selectedAudioTrack, setSelectedAudioTrack] = useState<string | undefined>(undefined);
-    const [selectedSubtitleTrack, setSelectedSubtitleTrack] = useState<string | undefined>(undefined);
+    const [selectedVideoTrack, setSelectedVideoTrack] = useState<VideoTrackData | undefined>(undefined);
+    const [selectedAudioTrack, setSelectedAudioTrack] = useState<AudioTrackData | undefined>(undefined);
+    const [selectedSubtitleTrack, setSelectedSubtitleTrack] = useState<SubtitleTrackData | undefined>(undefined);
+    const [selectedSubsSize, setSelectedSubsSize] = useState<string | undefined>(undefined);
 
-    const handleVideoTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedVideoTrack(event.target.value);
-    };
-    const handleAudioTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedAudioTrack(event.target.value);
-    };
-    const handleSubtitleTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedSubtitleTrack(event.target.value);
-    };
+    const videoMenuOpen = useSelector((state: RootState) => state.contextMenu.videoMenuOpen);
+    const audioMenuOpen = useSelector((state: RootState) => state.contextMenu.audioMenuOpen);
+    const subsMenuOpen = useSelector((state: RootState) => state.contextMenu.subtitleMenuOpen);
+    const subsSizeMenuOpen = useSelector((state: RootState) => state.contextMenu.subtitleSizeMenu);
     //#endregion
 
     useEffect(() => {
@@ -70,7 +71,7 @@ function Controls() {
 
     const hideControls = () => {
         if (!inSettings)
-            dispatch(toggleControls(false));
+            dispatch(toggleControls(true));
     }
 
     const showControls = () => {
@@ -89,6 +90,28 @@ function Controls() {
     };
     //#endregion
 
+    //#region CHAPTER SCROLL
+    const handleScroll = (direction: 'left' | 'right') => {
+        const scrollContainer = document.getElementById('chapterScroll');
+        
+        if (scrollContainer){
+            const chapterWidth = scrollContainer.firstElementChild?.clientWidth || 0;
+            const containerWidth = scrollContainer.clientWidth;
+            const chaptersVisible = Math.floor(containerWidth / chapterWidth);
+
+            const scrollAmount = chaptersVisible * chapterWidth;
+
+            console.log(scrollContainer);
+
+            if (direction === 'left') {
+                scrollContainer.scrollLeft -= scrollAmount;
+            } else if (direction === 'right') {
+                scrollContainer.scrollLeft += scrollAmount;
+            }
+        }
+    };
+    //#endregion
+
     useEffect(() => {
         window.ipcRenderer.on('data-to-controls', (_event, library, series, season, e) => {          
           setSelectedLibrary(library);
@@ -102,6 +125,11 @@ function Controls() {
             dispatch(setCurrentTime(0));
 
           dispatch(setDuration(e.runtimeInSeconds));
+
+          if (e.videoTracks.length > 0)
+            setSelectedVideoTrack(e.videoTracks[0]);
+
+
         });
 
         window.electronAPI.onWindowStateChange((state: string) => {
@@ -117,8 +145,6 @@ function Controls() {
         });
     }, []);
 
-    
-
     // Handle play/pause button click
     const handlePlayPause = () => {
         dispatch(togglePause());
@@ -128,29 +154,93 @@ function Controls() {
         }else{
             window.electronAPI.sendCommand(['set', 'pause', 'no']);
         }
-
-        console.log("Episode: " + episode?.name);
     };
 
     // Handle seek slider change
     const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newTime = parseFloat(event.target.value);
-        dispatch(setCurrentTime(newTime));
-        window.electronAPI.sendCommand(['seek', newTime.toString()]);
+        seekToTime(newTime);
     };
 
     const handleClose = () => {
         window.electronAPI.stopMPV();
     };
 
+    const seekToTime = (time: number) => {
+        dispatch(setCurrentTime(time));
+        window.electronAPI.sendCommand(['seek', time.toString(), 'absolute']);
+    }
+
+    const setVideoTrack = (index: number, track: VideoTrackData) => {
+        if (selectedVideoTrack)
+            selectedVideoTrack.selected = false;
+
+        track.selected = true;
+        setSelectedVideoTrack(track);
+        window.electronAPI.sendCommand(['set', 'vid', `${index}`]);
+    }
+
+    const setAudioTrack = (index: number, track: AudioTrackData) => {
+        if (selectedAudioTrack)
+            selectedAudioTrack.selected = false;
+
+        track.selected = true;
+        setSelectedAudioTrack(track);
+        window.electronAPI.sendCommand(['set', 'aid', `${index}`]);
+    }
+
+    const setSubtitleTrack = (index: number, track: SubtitleTrackData | undefined) => {
+        if (selectedSubtitleTrack)
+            selectedSubtitleTrack.selected = false;
+
+        if (track)
+            track.selected = true;
+
+        setSelectedSubtitleTrack(track);
+        window.electronAPI.sendCommand(['set', 'sid', `${index}`]);
+    }
+
+    const setSubtitleSize = (size: string) => {
+        window.electronAPI.sendCommand(['set', 'sub-scale', `${size}`]);
+    }
+
+    function formatTime(seconds: number): string {
+        const totalSeconds = Math.floor(seconds);
+
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+      
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = secs.toString().padStart(2, '0');
+      
+        if (hours > 0) {
+          return `${hours}:${formattedMinutes}:${formattedSeconds}`;
+        } else {
+          return `${formattedMinutes}:${formattedSeconds}`;
+        }
+    }
+
     return (
-        <div className="controls-container" onMouseMove={showControls}>
+        <div className="controls-container" onMouseMove={showControls} onClick={
+            (event) => {
+                const target = event.target as Element;
+
+                // Check if the click has been done in a "select" element
+                if (!target.closest('.select')) {
+                    dispatch(closeAllMenus());
+                }
+            }
+        }>
             <section className={`controls-bar controls-top-bar ${visible ? 'visible' : 'hidden-top'}`}>
-                <button className="controls-svg-button" onClick={handleClose}>Close</button>
+                <button className="controls-svg-button" onClick={handleClose}>
+                    <img src="./src/assets/svg/windowClose.svg" 
+                    style={{width: '22px', height: '24px', filter: 'drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))'}} />
+                </button>
                 <button className="controls-svg-button" onClick={() => window.electronAPI.setFullscreenControls()}>
                     {
                         isFullscreen ? (
-                            <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M30 6V3H45V18H42V8.121L29.121 21L27 18.873L39.879 6H30Z" fill="#FFFFFF"></path><path d="M18.888 27L21 29.124L8.121 42H18V45H3V30H6V39.879L18.888 27Z" fill="#FFFFFF"></path></svg>
+                            <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M30 6V3H45V18H42V8.121L29.121 21L27 18.873L39.879 6H30Z" fill="#FFFFFF" transform="rotate(179.902 36 12)"/><path d="M18.888 27L21 29.124L8.121 42H18V45H3V30H6V39.879L18.888 27Z" fill="#FFFFFF" transform="rotate(180 12 36)"/></svg>
                         ) : (
                             <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M30 6V3H45V18H42V8.121L29.121 21L27 18.873L39.879 6H30Z" fill="#FFFFFF"></path><path d="M18.888 27L21 29.124L8.121 42H18V45H3V30H6V39.879L18.888 27Z" fill="#FFFFFF"></path></svg>
                         )
@@ -170,111 +260,222 @@ function Controls() {
                                     <span>Tamaño de los subtítulos</span>
                                 </div>
                                 <div className="settings-options-box">
-                                    <select value={selectedVideoTrack} onChange={handleVideoTrackChange}>
-                                        <option value="">{selectedVideoTrack}</option>
-                                        {episode?.videoTracks.map((track: any, index: number) => (
-                                            <option key={track.id} value={track.displayTitle}>
-                                                {track.displayTitle}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="dropdown">
+                                        <div className={episode?.videoTracks && episode?.videoTracks.length > 1 ? 'select' : 'select-plain'} onClick={() => {
+                                            if (episode?.videoTracks && episode?.videoTracks.length > 1){
+                                                if (!videoMenuOpen)
+                                                    dispatch(closeAllMenus());
+                                                dispatch(toggleVideoMenu());
+                                            }
+                                        }} onAuxClick={() => {dispatch(closeAllMenus())}}>
+                                            <span className="selected">{selectedVideoTrack?.displayTitle}</span>
+                                            {
+                                                episode?.videoTracks && episode?.videoTracks.length > 1 ? (
+                                                    <div className={`arrow ${videoMenuOpen ? (' arrow-rotate'): ('')}`}></div>
+                                                ) : (<></>)
+                                            }
+                                        </div>
+                                        <ul className={`menu ${videoMenuOpen ? (' menu-open'): ('')}`}>
+                                            {episode?.videoTracks.map((track: any, index: number) => (
+                                                <li key={track.title} className={track == selectedVideoTrack ? ('active') : ('')} onClick={() => {
+                                                    setVideoTrack(index + 1, track);
+                                                    dispatch(toggleVideoMenu());
+                                                }}>
+                                                    {track.displayTitle}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
 
-                                    <select value={selectedAudioTrack} onChange={handleAudioTrackChange}>
-                                        <option value="">{selectedAudioTrack}</option>
-                                        {episode?.audioTracks.map((track: any, index: number) => (
-                                            <option key={track.id} value={track.displayTitle}>
-                                                {track.displayTitle}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="dropdown">
+                                        <div className="select" onClick={() => {
+                                            if (!audioMenuOpen)
+                                                dispatch(closeAllMenus());
+                                            dispatch(toggleAudioMenu());
+                                        }} onAuxClick={() => {dispatch(closeAllMenus())}}>
+                                            <span className="selected">{selectedAudioTrack?.displayTitle}</span>
+                                            <div className={`arrow ${audioMenuOpen ? (' arrow-rotate'): ('')}`}></div>
+                                        </div>
+                                        <ul className={`menu ${audioMenuOpen ? (' menu-open'): ('')}`}>
+                                            {episode?.audioTracks.map((track: any, index: number) => (
+                                                <li key={track.title} className={track == selectedAudioTrack ? ('active') : ('')} onClick={() => {
+                                                    setAudioTrack(index + 1, track);
+                                                    dispatch(toggleAudioMenu());
+                                                }}>
+                                                    {track.displayTitle}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
 
-                                    <select value={selectedSubtitleTrack} onChange={handleSubtitleTrackChange}>
-                                        <option value="">Ninguno</option>
-                                        {episode?.subtitleTracks.map((track: any, index: number) => (
-                                            <option key={track.id} value={track.displayTitle}>
-                                                {track.displayTitle}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    
-                                    <select value={selectedSubtitleTrack} onChange={handleSubtitleTrackChange}>
-                                        <option value="1">Tiny</option>
-                                        <option value="2">Small</option>
-                                        <option value="3">Normal</option>
-                                        <option value="4">Large</option>
-                                        <option value="5">Huge</option>
-                                    </select>
+                                    <div className="dropdown">
+                                        <div className="select" onClick={() => {
+                                            if (!subsMenuOpen)
+                                                dispatch(closeAllMenus());
+                                            dispatch(toggleSubsMenu());
+                                        }} onAuxClick={() => {dispatch(closeAllMenus())}}>
+                                            <span className="selected">{selectedSubtitleTrack ? selectedSubtitleTrack.displayTitle : 'Ninguno'}</span>
+                                            <div className={`arrow ${subsMenuOpen ? (' arrow-rotate'): ('')}`}></div>
+                                        </div>
+                                        <ul className={`menu ${subsMenuOpen ? (' menu-open'): ('')}`}>
+                                            <li key="0" className={!selectedSubtitleTrack ? ('active') : ('')} onClick={() => {
+                                                    setSubtitleTrack(0, undefined);
+                                                    dispatch(toggleSubsMenu());
+                                            }}>Ninguno</li>
+                                            {episode?.subtitleTracks.map((track: any, index: number) => (
+                                                <li key={track.title} className={track == selectedSubtitleTrack ? ('active') : ('')} onClick={() => {
+                                                    setSubtitleTrack(index + 1, track);
+                                                    dispatch(toggleSubsMenu());
+                                                }}>
+                                                    {track.displayTitle}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="dropdown">
+                                        <div className="select" onClick={() => {
+                                            if (!subsSizeMenuOpen)
+                                                dispatch(closeAllMenus());
+                                            dispatch(toggleSubsSizeMenu());
+                                        }} onAuxClick={() => {dispatch(closeAllMenus())}}>
+                                            <span className="selected">{selectedSubsSize}</span>
+                                            <div className={`arrow ${subsSizeMenuOpen ? (' arrow-rotate'): ('')}`}></div>
+                                        </div>
+                                        <ul className={`menu ${subsSizeMenuOpen ? (' menu-open'): ('')}`}>
+                                            <li key="0.3" className={"Tiny" == selectedSubsSize ? ('active') : ('')} onClick={() => {
+                                                setSelectedSubsSize("Tiny");
+                                                setSubtitleSize("0.3");
+                                                dispatch(toggleSubsSizeMenu());
+                                            }}>Tiny</li>
+                                            <li key="0.5" className={"Small" == selectedSubsSize ? ('active') : ('')} onClick={() => {
+                                                setSelectedSubsSize("Small");
+                                                setSubtitleSize("0.5");
+                                                dispatch(toggleSubsSizeMenu());
+                                            }}>Small</li>
+                                            <li key="0.75" className={"Normal" == selectedSubsSize ? ('active') : ('')} onClick={() => {
+                                                setSelectedSubsSize("Normal");
+                                                setSubtitleSize("0.75");
+                                                dispatch(toggleSubsSizeMenu());
+                                            }}>Normal</li>
+                                            <li key="1.0" className={"Large" == selectedSubsSize ? ('active') : ('')} onClick={() => {
+                                                setSelectedSubsSize("Large");
+                                                setSubtitleSize("1.0");
+                                                dispatch(toggleSubsSizeMenu());
+                                            }}>Large</li>
+                                            <li key="1.3" className={"Huge" == selectedSubsSize ? ('active') : ('')} onClick={() => {
+                                                setSelectedSubsSize("Huge");
+                                                setSubtitleSize("1.3");
+                                                dispatch(toggleSubsSizeMenu());
+                                            }}>Huge</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </section>
                         </section>
-                    ) : (
-                        <></>
-                    )
+                    ) : (<></>)
                 }
-                <div className="controls-slider-div"><input
+                {
+                    true ? (
+                        <section className="chapters-container">
+                            <section className="chapters-top">
+                                <span>Selección de capítulos</span>
+                                <div>
+                                    <button onClick={() => {handleScroll('left')}}>Izq</button>
+                                    <button onClick={() => {handleScroll('right')}}>Der</button>
+                                </div>
+                            </section>
+                            <section className="chapters-box" id="chapterScroll">
+                                {episode?.chapters.map((chapter: ChapterData, index: number) => (
+                                    <div key={chapter.title}>
+                                        <img src="./src/resources/img/black.png" alt="Chapter thumbnail" 
+                                            className={
+                                                chapter.time <= currentTime ? "chapter-selected" : ""
+                                            }
+                                            onClick={
+                                                () => {
+                                                    seekToTime(chapter.time / 1000);
+                                                }
+                                            }/>
+                                        <span>{index + 1}. {chapter.title}</span>
+                                        <span>{chapter.displayTime}</span>
+                                    </div>
+                                ))}
+                            </section>
+                        </section>
+                    ) : (<></>)
+                }
+                <div className="controls-slider-div">
+                    <input
                     type="range"
                     min="0"
                     max={duration}
                     value={currentTime}
                     onChange={handleSeek}
-                    className="slider"
-                /></div>
+                    className="slider"/>
+                </div>
                 <section className="controls">
-                    <div className="left-controls">
-                        <span id="title">
-                            {
-                                selectedLibrary?.type != "Shows" ? (
-                                    episode?.name
+                    <section className="left-controls-section">
+                        <div className="left-controls">
+                            <span id="title">
+                                {
+                                    selectedLibrary?.type != "Shows" ? (
+                                        episode?.name
+                                    ) : (
+                                        selectedSeries?.name
+                                    )
+                                }
+                            </span>
+                            <span id="subtitle">
+                                {
+                                    selectedLibrary?.type != "Shows" ? (
+                                        episode?.year
+                                    ) : (
+                                        `${seasonLetter}${episode?.seasonNumber?.toString() ?? ''} · ${episodeLetter}${episode?.episodeNumber ?? ''} — ${episode?.name ?? ''}`
+                                    )
+                                }
+                            </span>
+                            <span id="time">{formatTime(currentTime)} / {formatTime(duration - currentTime)}</span>
+                        </div>
+                        <div className="center-controls">
+                            <button className="controls-svg-button" 
+                                onClick={handlePlayPause}
+                                disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) > 0) ? (
+                                    false
                                 ) : (
-                                    selectedSeries?.name
-                                )
-                            }
-                        </span>
-                        <span id="subtitle">
-                            {
-                                selectedLibrary?.type != "Shows" ? (
-                                    episode?.year
+                                    true
+                                )}>
+                                <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H6V42H3V6Z" fill="#FFFFFF"></path><path d="M39.7485 41.7978C39.9768 41.9303 40.236 42.0001 40.5 42C40.8978 42 41.2794 41.842 41.5607 41.5607C41.842 41.2794 42 40.8978 42 40.5V7.50001C41.9998 7.23664 41.9303 6.97795 41.7985 6.74997C41.6666 6.52199 41.477 6.33274 41.2488 6.20126C41.0206 6.06978 40.7618 6.00071 40.4985 6.00098C40.2351 6.00125 39.9764 6.07086 39.7485 6.20281L11.2485 22.7028C11.0212 22.8347 10.8325 23.0239 10.7014 23.2516C10.5702 23.4793 10.5012 23.7375 10.5012 24.0003C10.5012 24.2631 10.5702 24.5213 10.7014 24.749C10.8325 24.9767 11.0212 25.1659 11.2485 25.2978L39.7485 41.7978Z" fill="#FFFFFF"></path></svg>
+                            </button>
+                            <button className="controls-svg-button" onClick={handlePlayPause}>
+                                {paused ? (
+                                    <svg aria-hidden="true" height="32" viewBox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
                                 ) : (
-                                    `${seasonLetter}${episode?.seasonNumber?.toString() ?? ''} · ${episodeLetter}${episode?.episodeNumber ?? ''} — ${episode?.name ?? ''}`
-                                )
-                            }
-                        </span>
-                        <span id="time">{currentTime} / {duration - currentTime}</span>
-                    </div>
-                    <div className="center-controls">
-                        <button className="controls-svg-button" 
-                            onClick={handlePlayPause}
-                            disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) > 0) ? (
-                                false
-                            ) : (
-                                true
-                            )}>
-                            <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H6V42H3V6Z" fill="#FFFFFF"></path><path d="M39.7485 41.7978C39.9768 41.9303 40.236 42.0001 40.5 42C40.8978 42 41.2794 41.842 41.5607 41.5607C41.842 41.2794 42 40.8978 42 40.5V7.50001C41.9998 7.23664 41.9303 6.97795 41.7985 6.74997C41.6666 6.52199 41.477 6.33274 41.2488 6.20126C41.0206 6.06978 40.7618 6.00071 40.4985 6.00098C40.2351 6.00125 39.9764 6.07086 39.7485 6.20281L11.2485 22.7028C11.0212 22.8347 10.8325 23.0239 10.7014 23.2516C10.5702 23.4793 10.5012 23.7375 10.5012 24.0003C10.5012 24.2631 10.5702 24.5213 10.7014 24.749C10.8325 24.9767 11.0212 25.1659 11.2485 25.2978L39.7485 41.7978Z" fill="#FFFFFF"></path></svg>
-                        </button>
-                        <button className="controls-svg-button" onClick={handlePlayPause}>
-                            {paused ? (
-                                <svg aria-hidden="true" height="32" viewBox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
-                            ) : (
-                                <svg aria-hidden="true" height="32" viewBox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M13 8C13 6.89543 13.8954 6 15 6H17C18.1046 6 19 6.89543 19 8V40C19 41.1046 18.1046 42 17 42H15C13.8954 42 13 41.1046 13 40V8Z" fill="#FFFFFF"></path><path d="M29 8C29 6.89543 29.8954 6 31 6H33C34.1046 6 35 6.89543 35 8V40C35 41.1046 34.1046 42 33 42H31C29.8954 42 29 41.1046 29 40V8Z" fill="#FFFFFF"></path></svg>
-                            )}
-                        </button>
-                        <button className="controls-svg-button" 
-                            onClick={handlePlayPause}
-                            disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) < currentSeason.episodes.length - 1) ? (
-                                false
-                            ) : (
-                                true
-                            )}>
-                            <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M42 6H45V42H42V6Z" fill="#FFFFFF"></path><path d="M6.43934 41.5607C6.72064 41.842 7.10218 42 7.5 42C7.764 41.9999 8.02328 41.9299 8.2515 41.7972L36.7515 25.2972C36.9788 25.1653 37.1675 24.9761 37.2986 24.7484C37.4298 24.5207 37.4988 24.2625 37.4988 23.9997C37.4988 23.7369 37.4298 23.4787 37.2986 23.251C37.1675 23.0233 36.9788 22.8341 36.7515 22.7022L8.2515 6.2022C8.02352 6.07022 7.76481 6.00061 7.50139 6.00037C7.23797 6.00012 6.97913 6.06925 6.75091 6.2008C6.52269 6.33235 6.33314 6.52168 6.20132 6.74975C6.0695 6.97782 6.00007 7.23658 6 7.5V40.5C6 40.8978 6.15804 41.2793 6.43934 41.5607Z" fill="#FFFFFF"></path></svg>
-                        </button>
-                    </div>
+                                    <svg aria-hidden="true" height="32" viewBox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M13 8C13 6.89543 13.8954 6 15 6H17C18.1046 6 19 6.89543 19 8V40C19 41.1046 18.1046 42 17 42H15C13.8954 42 13 41.1046 13 40V8Z" fill="#FFFFFF"></path><path d="M29 8C29 6.89543 29.8954 6 31 6H33C34.1046 6 35 6.89543 35 8V40C35 41.1046 34.1046 42 33 42H31C29.8954 42 29 41.1046 29 40V8Z" fill="#FFFFFF"></path></svg>
+                                )}
+                            </button>
+                            <button className="controls-svg-button" 
+                                onClick={handlePlayPause}
+                                disabled={episode && currentSeason && (currentSeason.episodes.indexOf(episode) < currentSeason.episodes.length - 1) ? (
+                                    false
+                                ) : (
+                                    true
+                                )}>
+                                <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M42 6H45V42H42V6Z" fill="#FFFFFF"></path><path d="M6.43934 41.5607C6.72064 41.842 7.10218 42 7.5 42C7.764 41.9999 8.02328 41.9299 8.2515 41.7972L36.7515 25.2972C36.9788 25.1653 37.1675 24.9761 37.2986 24.7484C37.4298 24.5207 37.4988 24.2625 37.4988 23.9997C37.4988 23.7369 37.4298 23.4787 37.2986 23.251C37.1675 23.0233 36.9788 22.8341 36.7515 22.7022L8.2515 6.2022C8.02352 6.07022 7.76481 6.00061 7.50139 6.00037C7.23797 6.00012 6.97913 6.06925 6.75091 6.2008C6.52269 6.33235 6.33314 6.52168 6.20132 6.74975C6.0695 6.97782 6.00007 7.23658 6 7.5V40.5C6 40.8978 6.15804 41.2793 6.43934 41.5607Z" fill="#FFFFFF"></path></svg>
+                            </button>
+                        </div>
+                    </section>
                     <div className="right-controls">
-                        <button className="controls-svg-button" onClick={() => {dispatch(toggleInSettings(!inSettings))}}>
+                        <button className={`controls-svg-button ${inSettings ? ' button-active' : ''}`} onClick={() => {dispatch(toggleInSettings(!inSettings))}}>
                             <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M38.85 12H45V15H38.85C38.1 18.45 35.1 21 31.5 21C27.9 21 24.9 18.45 24.15 15H3V12H24.15C24.9 8.55 27.9 6 31.5 6C35.1 6 38.1 8.55 38.85 12ZM27 13.5C27 16.05 28.95 18 31.5 18C34.05 18 36 16.05 36 13.5C36 10.95 34.05 9 31.5 9C28.95 9 27 10.95 27 13.5Z" fill="#FFFFFF" fillRule="evenodd"></path><path clipRule="evenodd" d="M9.15 36H3V33H9.15C9.9 29.55 12.9 27 16.5 27C20.1 27 23.1 29.55 23.85 33H45V36H23.85C23.1 39.45 20.1 42 16.5 42C12.9 42 9.9 39.45 9.15 36ZM21 34.5C21 31.95 19.05 30 16.5 30C13.95 30 12 31.95 12 34.5C12 37.05 13.95 39 16.5 39C19.05 39 21 37.05 21 34.5Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
                         </button>
-                        <button className="controls-svg-button" onClick={handlePlayPause}>
-                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M15 19V13C14.9991 12.2046 14.6827 11.4421 14.1203 10.8797C13.5579 10.3173 12.7954 10.0009 12 10H6C5.20463 10.0009 4.4421 10.3173 3.87969 10.8797C3.31728 11.4421 3.00091 12.2046 3 13V19C3.00091 19.7954 3.31728 20.5579 3.87969 21.1203C4.4421 21.6827 5.20463 21.9991 6 22H12C12.7954 21.9991 13.5579 21.6827 14.1203 21.1203C14.6827 20.5579 14.9991 19.7954 15 19Z" fill="#FFFFFF"></path><path d="M30 13V19C29.9989 19.7953 29.6825 20.5578 29.1201 21.1201C28.5578 21.6825 27.7953 21.9989 27 22H21C20.2046 21.9991 19.4421 21.6827 18.8797 21.1203C18.3173 20.5579 18.0009 19.7954 18 19V13C18.0009 12.2046 18.3173 11.4421 18.8797 10.8797C19.4421 10.3173 20.2046 10.0009 21 10H27C27.7953 10.0011 28.5578 10.3175 29.1201 10.8799C29.6825 11.4422 29.9989 12.2047 30 13Z" fill="#FFFFFF"></path><path d="M45 13V19C44.9989 19.7953 44.6825 20.5578 44.1201 21.1201C43.5578 21.6825 42.7953 21.9989 42 22H36C35.2047 21.9989 34.4422 21.6825 33.8799 21.1201C33.3175 20.5578 33.0011 19.7953 33 19V13C33.0011 12.2047 33.3175 11.4422 33.8799 10.8799C34.4422 10.3175 35.2047 10.0011 36 10H42C42.7953 10.0011 43.5578 10.3175 44.1201 10.8799C44.6825 11.4422 44.9989 12.2047 45 13Z" fill="#FFFFFF"></path><path d="M45 28V34C44.9989 34.7953 44.6825 35.5578 44.1201 36.1201C43.5578 36.6825 42.7953 36.9989 42 37H36C35.2047 36.9989 34.4422 36.6825 33.8799 36.1201C33.3175 35.5578 33.0011 34.7953 33 34V28C33.0011 27.2047 33.3175 26.4422 33.8799 25.8799C34.4422 25.3175 35.2047 25.0011 36 25H42C42.7953 25.0011 43.5578 25.3175 44.1201 25.8799C44.6825 26.4422 44.9989 27.2047 45 28Z" fill="#FFFFFF"></path><path d="M30 34V28C29.9989 27.2047 29.6825 26.4422 29.1201 25.8799C28.5578 25.3175 27.7953 25.0011 27 25H21C20.2046 25.0009 19.4421 25.3173 18.8797 25.8797C18.3173 26.4421 18.0009 27.2046 18 28V34C18.0009 34.7954 18.3173 35.5579 18.8797 36.1203C19.4421 36.6827 20.2046 36.9991 21 37H27C27.7953 36.9989 28.5578 36.6825 29.1201 36.1201C29.6825 35.5578 29.9989 34.7953 30 34Z" fill="#FFFFFF"></path><path d="M15 28V34C14.9991 34.7954 14.6827 35.5579 14.1203 36.1203C13.5579 36.6827 12.7954 36.9991 12 37H6C5.20463 36.9991 4.4421 36.6827 3.87969 36.1203C3.31728 35.5579 3.00091 34.7954 3 34V28C3.00091 27.2046 3.31728 26.4421 3.87969 25.8797C4.4421 25.3173 5.20463 25.0009 6 25H12C12.7954 25.0009 13.5579 25.3173 14.1203 25.8797C14.6827 26.4421 14.9991 27.2046 15 28Z" fill="#FFFFFF"></path></svg>
-                        </button>
+                        {
+                            !episode?.chapters || episode?.chapters.length > 0 ? (
+                                <button className={`controls-svg-button ${inSettings ? ' button-active' : ''}`} onClick={handlePlayPause}>
+                                    <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M15 19V13C14.9991 12.2046 14.6827 11.4421 14.1203 10.8797C13.5579 10.3173 12.7954 10.0009 12 10H6C5.20463 10.0009 4.4421 10.3173 3.87969 10.8797C3.31728 11.4421 3.00091 12.2046 3 13V19C3.00091 19.7954 3.31728 20.5579 3.87969 21.1203C4.4421 21.6827 5.20463 21.9991 6 22H12C12.7954 21.9991 13.5579 21.6827 14.1203 21.1203C14.6827 20.5579 14.9991 19.7954 15 19Z" fill="#FFFFFF"></path><path d="M30 13V19C29.9989 19.7953 29.6825 20.5578 29.1201 21.1201C28.5578 21.6825 27.7953 21.9989 27 22H21C20.2046 21.9991 19.4421 21.6827 18.8797 21.1203C18.3173 20.5579 18.0009 19.7954 18 19V13C18.0009 12.2046 18.3173 11.4421 18.8797 10.8797C19.4421 10.3173 20.2046 10.0009 21 10H27C27.7953 10.0011 28.5578 10.3175 29.1201 10.8799C29.6825 11.4422 29.9989 12.2047 30 13Z" fill="#FFFFFF"></path><path d="M45 13V19C44.9989 19.7953 44.6825 20.5578 44.1201 21.1201C43.5578 21.6825 42.7953 21.9989 42 22H36C35.2047 21.9989 34.4422 21.6825 33.8799 21.1201C33.3175 20.5578 33.0011 19.7953 33 19V13C33.0011 12.2047 33.3175 11.4422 33.8799 10.8799C34.4422 10.3175 35.2047 10.0011 36 10H42C42.7953 10.0011 43.5578 10.3175 44.1201 10.8799C44.6825 11.4422 44.9989 12.2047 45 13Z" fill="#FFFFFF"></path><path d="M45 28V34C44.9989 34.7953 44.6825 35.5578 44.1201 36.1201C43.5578 36.6825 42.7953 36.9989 42 37H36C35.2047 36.9989 34.4422 36.6825 33.8799 36.1201C33.3175 35.5578 33.0011 34.7953 33 34V28C33.0011 27.2047 33.3175 26.4422 33.8799 25.8799C34.4422 25.3175 35.2047 25.0011 36 25H42C42.7953 25.0011 43.5578 25.3175 44.1201 25.8799C44.6825 26.4422 44.9989 27.2047 45 28Z" fill="#FFFFFF"></path><path d="M30 34V28C29.9989 27.2047 29.6825 26.4422 29.1201 25.8799C28.5578 25.3175 27.7953 25.0011 27 25H21C20.2046 25.0009 19.4421 25.3173 18.8797 25.8797C18.3173 26.4421 18.0009 27.2046 18 28V34C18.0009 34.7954 18.3173 35.5579 18.8797 36.1203C19.4421 36.6827 20.2046 36.9991 21 37H27C27.7953 36.9989 28.5578 36.6825 29.1201 36.1201C29.6825 35.5578 29.9989 34.7953 30 34Z" fill="#FFFFFF"></path><path d="M15 28V34C14.9991 34.7954 14.6827 35.5579 14.1203 36.1203C13.5579 36.6827 12.7954 36.9991 12 37H6C5.20463 36.9991 4.4421 36.6827 3.87969 36.1203C3.31728 35.5579 3.00091 34.7954 3 34V28C3.00091 27.2046 3.31728 26.4421 3.87969 25.8797C4.4421 25.3173 5.20463 25.0009 6 25H12C12.7954 25.0009 13.5579 25.3173 14.1203 25.8797C14.6827 26.4421 14.9991 27.2046 15 28Z" fill="#FFFFFF"></path></svg>
+                                </button>
+                            ) : (<></>)
+                        }
                         <button className="controls-svg-button" onClick={handlePlayPause}>
                             {
                                 volume == 0 ? (

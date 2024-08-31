@@ -69,8 +69,9 @@ function App() {
         isVideoLoaded ? (
           <div className={`overlay ${isVideoLoaded ? 'visible' : ''}`}
           onMouseMove={showControls}
-          onMouseDown={hideControls}
-          onKeyDown={showControls}/>
+          onClick={hideControls}
+          onKeyDown={showControls}
+          onDoubleClick={() => {window.electronAPI.setFullscreenControls()}}/>
         ) : (
           <></>
         )
