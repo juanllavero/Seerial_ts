@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import '../../i18n';
 import { selectLibrary } from 'redux/slices/librarySlice';
 import ResolvedImage from '@components/Image';
+import { useEffect } from 'react';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -79,9 +80,12 @@ export const renderRightPanelContent = () => {
         dispatch(toggleContextMenu());
     };
 
-    const getExternalPath = async (path: string) => {
-      return window.electronAPI.getExternalPath(path);
-    }
+    useEffect(() => {
+      const scroll = document.getElementById('scroll');
+      if (scroll) {
+        scroll.scrollTop = 0;
+      }
+    }, [selectedSeries, selectedLibrary]);
     
     // Show no content view
     if (!selectedLibrary) {
@@ -103,7 +107,7 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && !selectedSeries) {
       return (
         <>
-          <div className="series-container scroll">
+          <div className="series-container scroll" id="scroll">
             {selectedLibrary.series.map((series: any, index: number) => (
               <div className="episode-box"
                 key={index}
@@ -172,7 +176,7 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedSeries && selectedSeason) {
       return (
         <>
-          <div className="season-episodes-container scroll">
+          <div className="season-episodes-container scroll" id="scroll">
             <div className="logo-container">
               {
                 selectedLibrary && selectedLibrary.type === "Shows" ? (

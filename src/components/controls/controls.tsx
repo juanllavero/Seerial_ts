@@ -156,7 +156,7 @@ function Controls() {
     }, []);
 
     const loadTracks = () => {
-        //let audioTrackLanguage = currentSeason?.audioTrackLanguage || new Intl.Locale(Configuration.loadConfig("preferAudioLan", "es-ES")).language;
+        //let audioTrackLanguage = currentSeason?.audioTrackLanguage || new Intl.Locale(await Configuration.loadConfig("preferAudioLan", "es-ES")).language;
         let selectedAudioTrack = currentSeason?.selectedAudioTrack;
 
         /*episode?.audioTracks.forEach(track => track.selected = false); // Desmarcar todas las pistas
