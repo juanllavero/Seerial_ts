@@ -60,10 +60,9 @@ export const renderRightPanelContent = () => {
     const handleEpisodeSelection = (episode: EpisodeData) => {
       dispatch(selectEpisode(episode));
       dispatch(loadVideo());
-      window.electronAPI.startMPV(episode.videoSrc);
 
       if (selectedLibrary && selectedSeries && selectedSeason && episode)
-        window.electronAPI.sendData(selectedLibrary, selectedSeries, selectedSeason, episode);
+        window.electronAPI.startMPV(selectedLibrary, selectedSeries, selectedSeason, episode);
     }
 
     const handleEpisodeMenu = (episode: EpisodeData, show: boolean) => {

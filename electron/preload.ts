@@ -13,10 +13,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeWindow: () => ipcRenderer.send('close-window'),
   getLibraryData: () => ipcRenderer.invoke('get-library-data'),
   saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData),
-  startMPV: (videoPath: string) => ipcRenderer.send('play-video', videoPath),
+  startMPV: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => ipcRenderer.send('play-video', library, series, season, episode),
   stopMPV: () => ipcRenderer.send('stop-video'),
   sendCommand: (args: string[] = []) => ipcRenderer.send('mpv-command', args),
-  sendData: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => ipcRenderer.send('send-data-controls', library, series, season, episode), 
   togglePause: () => ipcRenderer.send('toggle-pause'),
   onWindowStateChange: (callback: (state: string) => void) => {
     ipcRenderer.on('window-state-change', (_, state) => callback(state));

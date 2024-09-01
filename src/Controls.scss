@@ -381,7 +381,7 @@ html, body {
     .chapters-box {
         display: flex;
         flex-flow: row nowrap;
-        justify-content: space-around;
+        justify-content: left;
         width: 100%;
         overflow-x: hidden;
         scroll-behavior: smooth;

@@ -10,6 +10,10 @@ import { MovieDb } from 'moviedb-promise';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
 import Configuration from '../src/data/objects/Configuration';
+import { LibraryData } from '@interfaces/LibraryData';
+import { SeriesData } from '@interfaces/SeriesData';
+import { SeasonData } from '@interfaces/SeasonData';
+import { EpisodeData } from '@interfaces/EpisodeData';
 
 //#region EXTERNAL PATHS
 /**
@@ -167,7 +171,7 @@ function createWindow() {
 }
 
 // Crear una ventana de controles
-function createControlWindow() {
+function createControlWindow(library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) {
   controlsWindow = new BrowserWindow({
     parent: win!,
     width: win?.getBounds().width,
@@ -220,26 +224,24 @@ function createControlWindow() {
   controlsWindow.on('closed', () => {
     controlsWindow = null;
   });
+
+  controlsWindow.webContents.on('did-finish-load', () => {
+    controlsWindow?.webContents.send('data-to-controls', library, series, season, episode);
+  });
 }
 
 //#endregion
 
 //#region VIDEO PLAYER INTERACTION
-ipcMain.on('play-video', async (_event, videoSrc: string) => {
+ipcMain.on('play-video', async (_event, library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => {
   if (!controlsWindow){
     if (!mpvController)
       mpvController = new MPVController(win!);
 
-    mpvController.startMPV(videoSrc);
+    mpvController.startMPV(episode.videoSrc);
 
-    createControlWindow();
+    createControlWindow(library, series, season, episode);
   }
-});
-
-ipcMain.on('send-data-controls', (_event, library, series, season, episode) => {
-  controlsWindow?.webContents.on('did-finish-load', () => {
-    controlsWindow?.webContents.send('data-to-controls', library, series, season, episode);
-  });
 });
 
 ipcMain.on('toggle-pause', () => {
