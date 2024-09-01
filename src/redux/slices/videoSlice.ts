@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface VideoState {
   isLoaded: boolean;
@@ -7,6 +7,8 @@ interface VideoState {
   duration: number;
   controlsSown: boolean;
   inSettings: boolean;
+  inChapters: boolean;
+  volume: number;
 }
 
 const initialState: VideoState = {
@@ -16,6 +18,8 @@ const initialState: VideoState = {
   duration: 0,
   controlsSown: false,
   inSettings: false,
+  inChapters: false,
+  volume: 100,
 };
 
 const videoSlice = createSlice({
@@ -42,9 +46,16 @@ const videoSlice = createSlice({
     },
     toggleInSettings(state, action) {
       state.inSettings = action.payload;
+    },
+    toggleInChapters(state, action) {
+      state.inChapters = action.payload;
+    },
+    changeVolume(state, action: PayloadAction<number>) {
+      state.volume = action.payload;
     }
   },
 });
 
-export const { loadVideo, closeVideo, togglePause, setCurrentTime, setDuration, toggleControls, toggleInSettings } = videoSlice.actions;
+export const { loadVideo, closeVideo, togglePause, setCurrentTime, setDuration, 
+  toggleControls, toggleInSettings, toggleInChapters, changeVolume } = videoSlice.actions;
 export default videoSlice.reducer;

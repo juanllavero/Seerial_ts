@@ -13,6 +13,7 @@ import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
 import { selectLibrary } from 'redux/slices/librarySlice';
+import ResolvedImage from '@components/Image';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -77,6 +78,10 @@ export const renderRightPanelContent = () => {
     const toggleMenu = () => {
         dispatch(toggleContextMenu());
     };
+
+    const getExternalPath = async (path: string) => {
+      return window.electronAPI.getExternalPath(path);
+    }
     
     // Show no content view
     if (!selectedLibrary) {
@@ -127,14 +132,14 @@ export const renderRightPanelContent = () => {
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
-                          <LazyLoadImage src={"./src/" + series.coverSrc} alt="Poster"
+                          <ResolvedImage src={series.coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
                             e.target.src = "./src/resources/img/fileNotFound.png";
                           }}/>
                         ) : (
-                          <LazyLoadImage src="./src/resources/img/fileNotFound.png" alt="Poster"
+                          <ResolvedImage src="resources/img/fileNotFound.png" alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
                         )
                       }
@@ -172,7 +177,7 @@ export const renderRightPanelContent = () => {
               {
                 selectedLibrary && selectedLibrary.type === "Shows" ? (
                   selectedSeries.logoSrc != "" ? (
-                    <LazyLoadImage src={"./src/" + selectedSeries.logoSrc}
+                    <ResolvedImage src={selectedSeries.logoSrc}
                     onError={(e: any) => {
                       e.target.onerror = null; // To avoid infinite loop
                       e.target.src = "";
@@ -182,7 +187,7 @@ export const renderRightPanelContent = () => {
                   )
                 ) : (
                   selectedSeason.logoSrc != "" ? (
-                    <LazyLoadImage src={"./src/" + selectedSeason.logoSrc}
+                    <ResolvedImage src={selectedSeason.logoSrc}
                     onError={(e: any) => {
                       e.target.onerror = null; // To avoid infinite loop
                       e.target.src = "";
@@ -194,15 +199,15 @@ export const renderRightPanelContent = () => {
               }
             </div>
               {selectedSeason.backgroundSrc != "" ? (<div className="background-image">
-                  <LazyLoadImage src={"./src/resources/img/backgrounds/" + selectedSeason.id + "/transparencyEffect.png"} alt="Season Background"
-                  onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}></LazyLoadImage>
+                  <ResolvedImage src={"resources/img/backgrounds/" + selectedSeason.id + "/transparencyEffect.png"} alt="Season Background"
+                  onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}/>
               </div>) : (<div></div>)}
             <div className="info-container">
               <div className="poster-image">
                 {
                   selectedLibrary.type == "Shows" || showCollectionPoster ? (
                     selectedSeries.coverSrc != "" ? (
-                      <LazyLoadImage src={"./src/" + selectedSeries.coverSrc} alt="Poster"
+                      <ResolvedImage src={selectedSeries.coverSrc} alt="Poster"
                       onError={(e: any) => {
                         e.target.onerror = null; // To avoid infinite loop
                         e.target.src = "./src/resources/img/fileNotFound.png";
@@ -212,7 +217,7 @@ export const renderRightPanelContent = () => {
                     )
                   ) : (
                     selectedSeason.coverSrc != "" ? (
-                      <LazyLoadImage src={"./src/" + selectedSeason.coverSrc} alt="Poster"
+                      <ResolvedImage src={selectedSeason.coverSrc} alt="Poster"
                       onError={(e: any) => {
                         e.target.onerror = null; // To avoid infinite loop
                         e.target.src = "./src/resources/img/fileNotFound.png";
@@ -336,7 +341,7 @@ export const renderRightPanelContent = () => {
                     >
                       {
                         episode.imgSrc != "" ? (
-                          <LazyLoadImage src={"./src/" + episode.imgSrc}
+                          <ResolvedImage src={episode.imgSrc}
                             style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                             alt="Video Thumbnail"
                             onError={(e: any) => {

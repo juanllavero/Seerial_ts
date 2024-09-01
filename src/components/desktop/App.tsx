@@ -11,6 +11,7 @@ import '../../App.scss';
 import '../../i18n';
 import { toggleMaximize } from 'redux/slices/windowStateSlice';
 import { closeVideo } from 'redux/slices/videoSlice';
+import ResolvedImage from '@components/Image';
 
 function App() {
   const dispatch = useDispatch();
@@ -79,8 +80,8 @@ function App() {
       <section className="container blur-background-image">
         {renderMainBackgroundImage()}
         <div className="noise-background">
-          <img
-            src={`./src/resources/img/noise.png`}
+          <ResolvedImage
+            src="resources/img/noise.png"
             alt="Background noise"
           />
         </div>
@@ -88,10 +89,10 @@ function App() {
         <section className="left-panel">
           <div className="top-controls">
             <button className="svg-button-desktop-controls">
-              <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fill-opacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
+              <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fillOpacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
             </button>
             <button className="svg-add-library-btn">
-              <svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" stroke-miterlimit="1.414" stroke-linejoin="round" id="plex-icon-add-560" aria-hidden="true" width="48" height="48"><path d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0" fill="#FFFFFF"></path></svg>
+              <svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" strokeMiterlimit="1.414" strokeLinejoin="round" id="plex-icon-add-560" aria-hidden="true" width="48" height="48"><path d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0" fill="#FFFFFF"></path></svg>
               <span>{t('libraryWindowTitle')}</span>
             </button>
           </div>

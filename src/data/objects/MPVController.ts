@@ -82,11 +82,13 @@ export class MPVController {
 
     this.clientSocket.on('error', (err) => {
       console.error('Client socket error:', err);
+      this.mpvProcess?.kill();
     });
 
     this.clientSocket.on('end', () => {
       console.log('Disconnected from MPV pipe');
       this.clientSocket = null;
+      this.mpvProcess?.kill();
     });
   }
 

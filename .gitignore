@@ -27,6 +27,6 @@ release
 
 keys.properties
 
-*/resources
+resources
 *.exe
 *.mkv

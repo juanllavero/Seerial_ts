@@ -19,6 +19,7 @@ export interface ElectronAPI {
   onWindowStateChange: (callback: (state: string) => void) => void;
   showControls: () => void;
   hideControls: () => void;
+  getExternalPath: (relativePath: string) => string;
 }
   
 declare global {

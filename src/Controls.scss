@@ -206,8 +206,21 @@ html, body {
     cursor: pointer;
 }
 
+.vertical-slider {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 5px;
+    height: 60px;
+    vertical-align: bottom;
+}
+
+.vertical-slider::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+}
+
 .settings-box {
-    background-color: #1d1d1de4;
+    background-color: #1f1f1ffb;
     padding: 30px;
     display: flex;
     flex-flow: column wrap;
@@ -216,6 +229,7 @@ html, body {
         margin-top: 0;
         margin-bottom: 40px;
         font-size: x-large;
+        filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
     }
     
     .settings-columns {
@@ -239,6 +253,7 @@ html, body {
             color: $color-text-default;
             height: 25px;
             align-content: center;
+            filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
         }
     }
     
@@ -268,6 +283,7 @@ html, body {
         justify-content: space-between;
         align-items: center;
         width: fit-content;
+        filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
     }
 
     .select {
@@ -280,6 +296,7 @@ html, body {
         cursor: pointer;
         transition: color 0.3s;
         width: fit-content;
+        filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
 
         .arrow {
             margin-left: 0.8em;
@@ -344,7 +361,7 @@ html, body {
 }
 
 .chapters-container{
-    background-color: #1d1d1de4;
+    background-color: #1f1f1ffb;
     padding: 30px;
     display: flex;
     flex-flow: column wrap;
@@ -357,6 +374,7 @@ html, body {
         span {
             font-size: medium;
             font-weight: bold;
+            filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
         }
     }
 
@@ -377,6 +395,7 @@ html, body {
         span {
             font-size: small;
             margin-bottom: 0.2em;
+            filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
         }
 
         img {

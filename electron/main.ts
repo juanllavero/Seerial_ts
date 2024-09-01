@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Rectangle, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
@@ -9,6 +9,39 @@ import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
+import Configuration from '../src/data/objects/Configuration';
+
+//#region EXTERNAL PATHS
+/**
+ * Returns the absolute path to a relative external path by checking if the application is in development or production.
+ * @param relativePath Relative path to a file or folder outside the application
+ * @returns The absolute path to that file or folder
+ */
+const getExternalPath = (relativePath: string) => {
+  const basePath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
+  return path.join(basePath, relativePath);
+};
+
+ipcMain.handle('get-external-path', async (_event, relativePath: string) => {
+  try {
+    // Llama a la función para obtener la ruta absoluta
+    const absolutePath = getExternalPath(relativePath);
+
+    // Verifica que el path sea una cadena válida
+    if (typeof absolutePath !== 'string') {
+      throw new Error('Invalid path type');
+    }
+
+    return absolutePath;
+  } catch (error) {
+    console.error('Error in IPC handler for get-external-path:', error);
+    throw error; // Propagar el error para que pueda ser manejado en el renderer
+  }
+});
+
+// Set Configuration file path
+Configuration.setConfigFile(getExternalPath('resources/config/config.properties'));
+//#endregion
 
 //#region LOCALIZATION
 i18next
@@ -192,7 +225,7 @@ function createControlWindow() {
 //#endregion
 
 //#region VIDEO PLAYER INTERACTION
-ipcMain.on('play-video', async (_event, videoSrc) => {
+ipcMain.on('play-video', async (_event, videoSrc: string) => {
   if (!controlsWindow){
     if (!mpvController)
       mpvController = new MPVController(win!);
