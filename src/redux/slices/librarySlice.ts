@@ -4,12 +4,14 @@ import { LibraryData } from '@interfaces/LibraryData';
 interface LibraryState {
   libraries: LibraryData[];
   selectedLibrary: LibraryData | null;
+  libraryForMenu: LibraryData | null;
   showCollectionPoster: boolean;
 }
 
 const initialState: LibraryState = {
   libraries: [],
   selectedLibrary: null,
+  libraryForMenu: null,
   showCollectionPoster: false
 };
 
@@ -17,10 +19,10 @@ const librarySlice = createSlice({
   name: 'library',
   initialState,
   reducers: {
-    setLibraries: (state, action: PayloadAction<any[]>) => {
+    setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
     },
-    selectLibrary: (state, action: PayloadAction<any>) => {
+    selectLibrary: (state, action: PayloadAction<LibraryData>) => {
       state.selectedLibrary = action.payload;
     },
     clearLibrarySelection: (state) => {
@@ -28,9 +30,12 @@ const librarySlice = createSlice({
     },
     setShowPoster: (state, action: PayloadAction<boolean>) => {
       state.showCollectionPoster = action.payload;
+    },
+    setLibraryForMenu: (state, action: PayloadAction<LibraryData>) => {
+      state.libraryForMenu = action.payload;
     }
   }
 });
 
-export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster } = librarySlice.actions;
+export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster, setLibraryForMenu } = librarySlice.actions;
 export default librarySlice.reducer;

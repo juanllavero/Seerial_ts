@@ -92,6 +92,7 @@ html, body {
   border-color: transparent;
   border-radius: 5px;
   padding: 5px;
+  cursor: pointer;
 }
 
 .svg-button-desktop-controls:hover{
@@ -99,8 +100,8 @@ html, body {
 }
 
 .svg-button-desktop-controls svg{
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 
 .svg-add-library-btn {
@@ -112,6 +113,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  align-content: center;
+  cursor: pointer;
 }
 
 .svg-add-library-btn:hover{
@@ -139,48 +142,77 @@ html, body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-}
 
-.libraries-button {
-  background-color: transparent;
-  padding: 8px;
-  margin-bottom: 5px;
-  text-align: left;
-  border: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: left;
-}
+  .libraries-button {
+    background-color: transparent;
+    padding: 0.3em;
+    margin-bottom: 5px;
+    text-align: left;
+    border: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    cursor: pointer;
 
-.libraries-button.selected svg path {
-  fill: $app-color;
-}
+    #libraries-button-svg {
+      min-width: 30px;
+      min-width: 30px;
+      max-width: 30px;
+      max-height: 30px;
+      width: 30px;
+      height: 30px;
 
-.libraries-button .library-name {
-  color: $color-text-default;
-  margin-left: 10px;
-  transition: color 0.3s ease;
+      path {
+        fill: $color-text-default;
+        transition: fill 0.3s;
+      }
+    }
 
-  font-size: medium;
-  display: -webkit-box;
-  overflow: hidden;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
+    #libraryMenuButton {
+      display: none;
+    }
+  }
+  
+  .libraries-button.selected #libraries-button-svg path {
+    fill: $app-color;
+  }
+  
+  .library-name {
+    color: $color-text-default;
+    margin-left: 10px;
+    transition: color 0.3s ease;
 
-.libraries-button.selected .library-name {
-  color: $app-color;
-}
+    width: 100%;
+  
+    font-size: medium;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    white-space: nowrap !important;
+    max-width: 100%;
+  }
+  
+  .libraries-button.selected .library-name {
+    color: $app-color;
+  }
+  
+  .libraries-button:hover {
+    #libraryMenuButton {
+      display: block;
+    }
 
-.libraries-button:hover .library-name {
-  color: $color-text-primary;
-}
+    .library-name {
+      color: $color-text-primary;
+    }
 
-.libraries-button span:hover{
-  color: $color-text-primary;
+    #libraries-button-svg path{
+      fill: $color-text-primary;
+    }
+  }
+  
+  .libraries-button span:hover{
+    color: $color-text-primary;
+  }
 }
 
 /* RIGHT PANEL */
@@ -216,6 +248,7 @@ html, body {
   border: none;
   background-color: transparent;
   color: $color-text-default;
+  cursor: pointer;
 }
 
 .library-button:hover{
@@ -842,4 +875,151 @@ html, body {
   position: absolute;
   bottom: 5px;
   right: 5px;
+}
+
+.dropdown {
+  min-width: min-content;
+  position: relative;
+  margin-bottom: 10px;
+  height: 25px;
+
+  * {
+      box-sizing: border-box;
+  }
+
+  .select-plain {
+      font-size: small;
+      padding: 0.4em;
+      color: $color-text-primary;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: fit-content;
+      filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
+  }
+
+  .select {
+      font-size: small;
+      padding: 0.4em;
+      color: $app-color;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: color 0.3s;
+      width: fit-content;
+      filter: drop-shadow(2px 2px 2px rgb(0, 0, 0));
+
+      .arrow {
+          margin-left: 0.8em;
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 6px solid $app-color;
+          transition: 0.3s;
+      }
+  
+      .arrow-rotate {
+          transform: rotate(180deg);
+      }
+  }
+
+  .select:hover {
+      color: $color-text-primary;
+
+      .arrow {
+          border-top: 6px solid $color-text-primary;
+      }
+  }
+
+  .menu {
+    list-style: none;
+    padding: 0.5em 0em;
+    background: #101010;
+    box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.2);
+    color: $color-text-default;
+    position: absolute;
+    width: fit-content;
+    margin-top: 0.2em;
+    opacity: 0;
+    display: none;
+    transition: 0.2s;
+    border-radius: 5px;
+    z-index: 1;
+  
+    li {
+        font-size: small;
+        background-color: transparent;
+        text-align: left;
+        padding: 0.3em 0.8em;
+        cursor: pointer;
+    }
+  
+    li:hover {
+        background-color: #4e4e4e58;
+        color: $color-text-primary;
+    }
+  
+    .active {
+        color: $app-color;
+    }
+  }
+  
+  .menu-open {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.dropdown-menu {
+  list-style: none;
+  padding: 0.5em 0em;
+  background: #101010;
+  box-shadow: 0 0 8px 1px black;
+  color: $color-text-default;
+  position: absolute;
+  width: fit-content;
+  margin: 0;
+  opacity: 0;
+  display: none;
+  transition: 0.2s;
+  border-radius: 5px;
+  z-index: 1;
+
+  li {
+      font-size: small;
+      background-color: transparent;
+      text-align: left;
+      padding: 0.3em 0.8em;
+      cursor: pointer;
+
+      display: flex;
+
+      span {
+        margin-right: 1em;
+      }
+
+      svg {
+        margin-right: 1em;
+      }
+
+      img {
+        margin-right: 1em;
+      }
+  }
+
+  li:hover {
+      background-color: #4e4e4e58;
+      color: $color-text-primary;
+  }
+
+  .active {
+      color: $app-color;
+  }
+}
+
+.dropdown-menu-open {
+  display: block;
+  opacity: 1;
 }

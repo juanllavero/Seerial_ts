@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLibrary } from '../../redux/slices/librarySlice';
+import { selectLibrary, setLibraryForMenu } from '../../redux/slices/librarySlice';
 import { resetSelection } from '../../redux/slices/seriesSlice';
 import { removeTransparentImage } from '../../redux/slices/transparentImageLoadedSlice';
 import { RootState } from '../../redux/store';
+import { toggleLibraryMenu } from 'redux/slices/contextMenuSlice';
 
 export const renderLibrariesList = () => {
     const dispatch = useDispatch();
@@ -21,16 +22,15 @@ export const renderLibrariesList = () => {
                 <button 
                     key={library.id} 
                     className={`libraries-button ${library === selectedLibrary ? 'selected' : ''}`} 
-                    title={library.name} 
-                    onClick={() => handleSelectLibrary(library)}
+                    title={library.name}
                 >
                 {library.type === "Shows" ? (
-                    <svg 
+                    <svg onClick={() => handleSelectLibrary(library)}
                         id="libraries-button-svg" 
                         aria-hidden="true" 
-                        height="24" 
+                        height="28" 
                         viewBox="0 0 48 48" 
-                        width="24" 
+                        width="28" 
                         xmlns="http://www.w3.org/2000/svg">
                         <path 
                             clipRule="evenodd" 
@@ -41,13 +41,13 @@ export const renderLibrariesList = () => {
                         <path d="M36 43V40H12V43H36Z" fill="#FFFFFF"></path>
                     </svg>
                 ) : (
-                    <svg 
+                    <svg onClick={() => handleSelectLibrary(library)}
                         id="libraries-button-svg" 
                         aria-hidden="true" 
                         fill="currentColor" 
-                        height="24" 
+                        height="28" 
                         viewBox="0 0 48 48" 
-                        width="24" 
+                        width="28" 
                         xmlns="http://www.w3.org/2000/svg">
                         <path 
                             clipRule="evenodd" 
@@ -57,9 +57,15 @@ export const renderLibrariesList = () => {
                         </path>
                     </svg>
                 )}
-                <span className="library-name">
+                <span className="library-name" onClick={() => handleSelectLibrary(library)}>
                     {library.name}
                 </span>
+                <button className="svg-button-desktop-transparent select" id="libraryMenuButton" onClick={() => {
+                    dispatch(toggleLibraryMenu());
+                    dispatch(setLibraryForMenu(library));
+                }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
+                </button>
             </button>
             ))}
         </div>
