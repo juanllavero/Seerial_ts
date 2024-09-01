@@ -5,6 +5,7 @@ export class Library {
   name: string;
   language: string;
   type: string;
+  isCollection: boolean;
   order: number;
   folders: string[];
   showOnFullscreen: boolean;
@@ -13,7 +14,7 @@ export class Library {
   analyzedFolders: Map<string, string> = new Map();
   seasonFolders: Map<string, string> = new Map();
 
-  constructor(name: string, lang: string, type: string, order: number, folders: string[], showOnFullscreen: boolean) {
+  constructor(name: string, lang: string, type: string, order: number, folders: string[], showOnFullscreen: boolean, isCollection: boolean) {
     this.id = crypto.randomUUID();
     this.name = name;
     this.language = lang;
@@ -21,6 +22,7 @@ export class Library {
     this.order = order;
     this.folders = folders;
     this.showOnFullscreen = showOnFullscreen;
+    this.isCollection = isCollection;
   }
 
   // Convertir Library a JSON
@@ -48,7 +50,8 @@ export class Library {
       jsonData.type,
       jsonData.order,
       jsonData.folders,
-      jsonData.showOnFullscreen
+      jsonData.showOnFullscreen,
+      jsonData.isCollection ? jsonData.isCollection : false,
     );
 
     library.id = jsonData.id;

@@ -5,6 +5,7 @@ export interface LibraryData {
     name: string;
     language: string;
     type: string;
+    isCollection: boolean;
     order: number;
     folders: string[];
     showOnFullscreen: boolean;
