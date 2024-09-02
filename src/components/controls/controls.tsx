@@ -18,6 +18,7 @@ function Controls() {
     const dispatch = useDispatch();
     const paused = useSelector((state: RootState) => state.video.paused);
     const currentTime = useSelector((state: RootState) => state.video.currentTime);
+    const [time, setTime] = useState(0);
     const duration = useSelector((state: RootState) => state.video.duration);
     const volume = useSelector((state: RootState) => state.video.volume);
     
@@ -65,15 +66,26 @@ function Controls() {
     fetchTranslations();
     }, []);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!paused)
+                setTime((prevValue) => prevValue + 1); // Actualiza el slider cada segundo
+        }, 1000);
+    
+        // Cleanup del interval al desmontar el componente
+        return () => clearInterval(interval);
+    }, [paused]);
+
     //#region SHOW/HIDE CONTROLS
     const visible = useSelector((state: RootState) => state.video.controlsSown);
     const inSettings = useSelector((state: RootState) => state.video.inSettings);
     const inChapters = useSelector((state: RootState) => state.video.inChapters);
+    const [mouseOnUI, setMouseOnUi] = useState(false);
     let timeout: NodeJS.Timeout;
 
     const hideControls = () => {
-        if (!inSettings)
-            dispatch(toggleControls(true));
+        console.log(inSettings);
+        dispatch(toggleControls(!inSettings && !mouseOnUI && !paused));
     }
 
     const showControls = () => {
@@ -86,8 +98,9 @@ function Controls() {
         }
         // Set a timeout to hide controls after a period of inactivity
         timeout = setTimeout(() => {
-            if (!inSettings)
-                hideControls();
+            
+
+            hideControls();
         }, 3000); // 3 seconds of inactivity
     };
     //#endregion
@@ -138,14 +151,6 @@ function Controls() {
             dispatch(toggleMaximize(state === 'fullscreen'));
         });
 
-        window.ipcRenderer.on('show-controls', (_event) => {
-            showControls();
-        });
-
-        window.ipcRenderer.on('hide-controls', (_event) => {
-            hideControls();
-        });
-
         // Añadir el listener de eventos cuando el componente se monta
         window.addEventListener('keydown', handleKeyDown);
 
@@ -155,9 +160,22 @@ function Controls() {
         };
     }, []);
 
+    useEffect(() => {
+        window.ipcRenderer.on('show-controls', (_event) => {
+            showControls();
+        });
+
+        window.ipcRenderer.on('hide-controls', (_event) => {
+            hideControls();
+        });
+    }, [paused, mouseOnUI]);
+
     const loadTracks = () => {
         //let audioTrackLanguage = currentSeason?.audioTrackLanguage || new Intl.Locale(await Configuration.loadConfig("preferAudioLan", "es-ES")).language;
         let selectedAudioTrack = currentSeason?.selectedAudioTrack;
+
+        setSelectedAudioTrack(episode?.audioTracks[0]);
+        setSelectedSubtitleTrack(episode?.subtitleTracks[0]);
 
         /*episode?.audioTracks.forEach(track => track.selected = false); // Desmarcar todas las pistas
 
@@ -223,6 +241,9 @@ function Controls() {
                 break;
             case 'ArrowRight':
                 seekToTime(currentTime);
+                break;
+            case ' ':
+                handlePlayPause();
                 break;
         }
     };
@@ -365,7 +386,9 @@ function Controls() {
                     }
                 </button>
             </section>
-            <section className={`controls-bar controls-bottom-bar ${visible ? 'visible' : 'hidden-bottom'}`}>
+            <section className={`controls-bar controls-bottom-bar ${visible ? 'visible' : 'hidden-bottom'}`} 
+            onMouseEnter={() => setMouseOnUi(true)}
+            onMouseLeave={() => setMouseOnUi(false)}>
                 {
                     inSettings ? (
                         <section className="settings-box">
@@ -532,8 +555,12 @@ function Controls() {
                     type="range"
                     min="0"
                     max={duration}
-                    value={currentTime}
-                    onChange={handleSeek}
+                    value={time}
+                    step="1"
+                    onChange={(e) => {
+                        handleSeek(e);
+                        setTime(Number(e.target.value));
+                    }}
                     className="slider"/>
                 </div>
                 <section className="controls">
@@ -557,7 +584,7 @@ function Controls() {
                                     )
                                 }
                             </span>
-                            <span id="time">{formatTime(currentTime)} / {formatTime(duration - currentTime)}</span>
+                            <span id="time">{formatTime(time)} / {formatTime(duration - time)}</span>
                         </div>
                         <div className="center-controls">
                             <button className="controls-svg-button" 

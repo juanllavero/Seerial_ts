@@ -229,10 +229,10 @@ html, body {
 /* LIBRARY AND SLICER BAR */
 .library-slicer-bar{
   background-color: #0000009a;
-  z-index: 20;
+  z-index: 1;
   position: fixed;
   padding: 10px;
-  margin-top: 90px;
+  margin-top: 80px;
   margin-left: 50px;
   margin-bottom: 40px;
 
@@ -363,7 +363,7 @@ html, body {
   padding: 220px 20px 20px 10px;
   overflow-y: auto;
   position: relative;
-  z-index: 1;
+  z-index: 0;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -980,12 +980,12 @@ html, body {
   color: $color-text-default;
   position: fixed;
   width: fit-content;
-  margin: 0;
+  margin: 1em 0;
   opacity: 0;
   display: none;
   transition: 0.2s;
   border-radius: 5px;
-  z-index: 100;
+  z-index: 10;
 
   li {
       font-size: small;

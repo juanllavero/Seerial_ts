@@ -323,7 +323,7 @@ export const renderRightPanelContent = () => {
                     {
                       showButtonMenu && episode == selectedEpisode ? (
                         <>
-                          <div key={index} className="video-button-hover"
+                          <div key={episode.id + "btnHover"} className="video-button-hover"
                             style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                             >
                               <button className="play-button-episode center-align" onClick={() => handleEpisodeSelection(episode)}>
@@ -339,7 +339,7 @@ export const renderRightPanelContent = () => {
                       </>
                       ) : (<></>)
                     }
-                    <div key={index} className="video-button"
+                    <div key={episode.id + "btn"} className="video-button"
                     style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                     >
                       {
