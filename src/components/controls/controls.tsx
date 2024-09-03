@@ -557,6 +557,7 @@ function Controls() {
                     max={duration}
                     value={time}
                     step="1"
+                    style={{'background': `linear-gradient(to right, #8EDCE6 ${time * 100 / (duration)}%, #646464 0px`}}
                     onChange={(e) => {
                         handleSeek(e);
                         setTime(Number(e.target.value));
@@ -652,6 +653,7 @@ function Controls() {
                         max={100}
                         value={volume}
                         onChange={handleVolumeChange}
+                        style={{'background': `linear-gradient(to top, #8EDCE6 ${volume}%, #646464 0px`}}
                         className="slider vertical-slider"/>
                     </div>
                 </section>

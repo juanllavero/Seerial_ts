@@ -19,6 +19,7 @@ export interface ElectronAPI {
   showControls: () => void;
   hideControls: () => void;
   getExternalPath: (relativePath: string) => string;
+  openFolderDialog: () => Promise<string[]>,
 }
   
 declare global {

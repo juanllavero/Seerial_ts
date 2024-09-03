@@ -6,13 +6,15 @@ interface LibraryState {
   selectedLibrary: LibraryData | null;
   libraryForMenu: LibraryData | null;
   showCollectionPoster: boolean;
+  libraryEditWindow: boolean;
 }
 
 const initialState: LibraryState = {
   libraries: [],
   selectedLibrary: null,
   libraryForMenu: null,
-  showCollectionPoster: false
+  showCollectionPoster: false,
+  libraryEditWindow: false,
 };
 
 const librarySlice = createSlice({
@@ -31,11 +33,14 @@ const librarySlice = createSlice({
     setShowPoster: (state, action: PayloadAction<boolean>) => {
       state.showCollectionPoster = action.payload;
     },
-    setLibraryForMenu: (state, action: PayloadAction<LibraryData>) => {
+    setLibraryForMenu: (state, action) => {
       state.libraryForMenu = action.payload;
+    },
+    toggleLibraryEditWindow: (state) => {
+      state.libraryEditWindow = !state.libraryEditWindow;
     }
   }
 });
 
-export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster, setLibraryForMenu } = librarySlice.actions;
+export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster, setLibraryForMenu, toggleLibraryEditWindow } = librarySlice.actions;
 export default librarySlice.reducer;

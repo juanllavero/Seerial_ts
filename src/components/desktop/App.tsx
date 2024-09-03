@@ -5,7 +5,7 @@ import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
-import { setLibraries } from 'redux/slices/librarySlice';
+import { setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/librarySlice';
 import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
@@ -13,6 +13,7 @@ import { toggleMaximize } from 'redux/slices/windowStateSlice';
 import { closeVideo } from 'redux/slices/videoSlice';
 import ResolvedImage from '@components/Image';
 import { closeAllMenus, toggleMainMenu } from 'redux/slices/contextMenuSlice';
+import renderLibraryWindow from './libraryWindow';
 
 function App() {
   const dispatch = useDispatch();
@@ -78,6 +79,7 @@ function App() {
           <></>
         )
       }
+      {renderLibraryWindow()}
       <section className="container blur-background-image" onClick={
           (event) => {
               const target = event.target as Element;
@@ -99,7 +101,7 @@ function App() {
         {/* Left Panel */}
         <section className="left-panel">
           <div className="top-controls">
-            <div>
+            <div className="dropdown" style={{marginBottom: "0.9em"}}>
               <button className="svg-button-desktop-controls select"
               onClick={() => {
                     if (!mainMenuOpen)
@@ -108,7 +110,7 @@ function App() {
                 }}>
                 <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fillOpacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
               </button>
-              <ul className={`dropdown-menu ${mainMenuOpen ? (' dropdown-menu-open'): ('')}`}>
+              <ul className={`menu ${mainMenuOpen ? (' menu-open'): ('')}`}>
                     <li key="settings"
                       onClick={() => {
                       dispatch(toggleMainMenu());
@@ -134,7 +136,10 @@ function App() {
                     </li>
               </ul>
             </div>
-            <button className="svg-add-library-btn select">
+            <button className="svg-add-library-btn select" onClick={() => {
+              dispatch(setLibraryForMenu(undefined));
+              dispatch(toggleLibraryEditWindow())
+            }}>
               <svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" strokeMiterlimit="1.414" strokeLinejoin="round" id="plex-icon-add-560" aria-hidden="true" width="48" height="48"><path d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0" fill="#FFFFFF"></path></svg>
               <span>{t('libraryWindowTitle')}</span>
             </button>

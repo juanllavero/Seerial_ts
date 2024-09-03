@@ -1,8 +1,16 @@
 $app-color: #8EDCE6;
-$app-color-darken: #86ccd5;
+$app-color-darken: #80c4cd;
+$app-color-darker: #71aeb6;
 $color-text-primary: #ffffff;
-$color-text-default: #ffffffcc;
+$color-text-default: #d2d2d2e6;
 $color-text-dark: #d0d0d0cc;
+$color-darker: #101010;
+$color-dark: #222222;
+$color-default: #282828;
+$color-light: #323232;
+$color-lighter: #5e5e5e;
+$color-more-lighter: #707070;
+$color-bright: #EDF2F4;
 
 #root {
   margin: 0 auto;
@@ -169,8 +177,12 @@ html, body {
       }
     }
 
-    #libraryMenuButton {
+    .inactive-btn {
       display: none;
+    }
+  
+    .active-btn {
+      display: block;
     }
   }
   
@@ -197,7 +209,7 @@ html, body {
   }
   
   .libraries-button:hover {
-    #libraryMenuButton {
+    a {
       display: block;
     }
 
@@ -249,6 +261,10 @@ html, body {
   background-color: transparent;
   color: $color-text-default;
   cursor: pointer;
+
+  span {
+    transition: 0.3s ease;
+  }
 }
 
 .library-button:hover{
@@ -258,14 +274,26 @@ html, body {
 .svg-button-desktop-transparent{
   background-color: transparent;
   border: none;
+
+  path{
+    opacity: 0.8;
+    transition: opacity .15s ease;
+  }
+
+  img {
+    opacity: 0.8;
+    transition: opacity .15s ease;
+  }
 }
 
-.svg-button-desktop-transparent path{
-  opacity: 0.8;
-}
+.svg-button-desktop-transparent:hover{
+  path{
+    opacity: 1;
+  }
 
-.svg-button-desktop-transparent:hover path{
-  opacity: 1;
+  img {
+    opacity: 1;
+  }
 }
 
 .svg-button-desktop-transparent:hover {
@@ -553,18 +581,9 @@ html, body {
 }
 
 /* SEASON SELECTOR */
-.season-selector-container {
-  position: relative;
-}
-
 .season-selector {
-  display: flex;
-  flex-flow: row nowrap;
-  margin-left: 30px;
-  background-color: transparent;
-  border: none;
-  color: $color-text-default;
   font-size: medium;
+  color: &$color-text-primary;
   border-bottom: 1px solid $color-text-default;
 }
 
@@ -576,35 +595,6 @@ html, body {
 #triangle{
   margin-left: 5px;
   transform: scale(0.9, 0.6);
-}
-
-.dropdown-menu {
-  margin-left: 50px;
-  margin-top: 10px;
-  position: absolute;
-  background-color: #191a1c;
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, .35);
-  font-size: 13px;
-  padding: 8px 0;
-  transform-origin: center top;
-
-  .dropdown-element {
-    align-items: center;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    word-wrap: break-word;
-    display: block;
-    font-size: small;
-    padding: 4px 20px;
-    text-align: left;
-  }
-  
-  .dropdown-element:hover {
-    color: $app-color;
-  }
 }
 
 /* EPISODES CONTAINER */
@@ -882,6 +872,7 @@ html, body {
   position: relative;
   margin-bottom: 10px;
   height: 25px;
+  width: fit-content;
 
   * {
       box-sizing: border-box;
@@ -901,7 +892,7 @@ html, body {
   .select {
       font-size: small;
       padding: 0.4em;
-      color: $app-color;
+      color: $color-text-default;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -916,7 +907,7 @@ html, body {
           height: 0;
           border-left: 5px solid transparent;
           border-right: 5px solid transparent;
-          border-top: 6px solid $app-color;
+          border-top: 6px solid $color-text-default;
           transition: 0.3s;
       }
   
@@ -937,64 +928,24 @@ html, body {
     list-style: none;
     padding: 0.5em 0em;
     background: #101010;
-    box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 8px 1px black;
     color: $color-text-default;
-    position: absolute;
-    width: fit-content;
-    margin-top: 0.2em;
+    position: fixed;
+    width: max-content;
+    margin-top: 0.5em;
     opacity: 0;
-    display: none;
-    transition: 0.2s;
+    pointer-events: none;
+    transition: opacity .15s linear;
     border-radius: 5px;
-    z-index: 1;
+    z-index: 10;
   
     li {
-        font-size: small;
-        background-color: transparent;
-        text-align: left;
-        padding: 0.3em 0.8em;
-        cursor: pointer;
-    }
-  
-    li:hover {
-        background-color: #4e4e4e58;
-        color: $color-text-primary;
-    }
-  
-    .active {
-        color: $app-color;
-    }
-  }
-  
-  .menu-open {
-    display: block;
-    opacity: 1;
-  }
-}
-
-.dropdown-menu {
-  list-style: none;
-  padding: 0.5em 0em;
-  background: #101010;
-  box-shadow: 0 0 8px 1px black;
-  color: $color-text-default;
-  position: fixed;
-  width: fit-content;
-  margin: 1em 0;
-  opacity: 0;
-  display: none;
-  transition: 0.2s;
-  border-radius: 5px;
-  z-index: 10;
-
-  li {
+      display: flex;
       font-size: small;
       background-color: transparent;
       text-align: left;
       padding: 0.3em 0.8em;
       cursor: pointer;
-
-      display: flex;
 
       span {
         margin-right: 1em;
@@ -1003,23 +954,424 @@ html, body {
       svg {
         margin-right: 1em;
       }
-
+  
       img {
         margin-right: 1em;
       }
+    }
+  
+    li:hover {
+      background-color: #4e4e4e58;
+      color: $color-text-primary;
+    }
+  
+    .active {
+      color: $app-color;
+    }
+  }
+  
+  .menu-open {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+
+.dropdown-menu {
+  list-style: none;
+  background: #101010;
+  box-shadow: 0 0 8px 1px black;
+  width: fit-content;
+  margin: 1.3em 0;
+  opacity: 1;
+  transition: opacity .15s linear;
+  border-radius: 5px;
+  z-index: 10;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0.5em 0;
+  }
+
+  li {
+    font-size: small;
+    background-color: transparent;
+    text-align: left;
+    padding: 0.3em 0.8em;
+    cursor: pointer;
+
+    svg {
+      margin-right: 1em;
+    }
+
+    img {
+      margin-right: 1em;
+    }
+
+    a {
+      appearance: none;
+      color: $color-text-default;
+      text-decoration: none;
+    }
   }
 
   li:hover {
       background-color: #4e4e4e58;
-      color: $color-text-primary;
+      
+      a {
+        color: $color-text-primary;
+      }
   }
 
   .active {
+    a {
       color: $app-color;
+    }
   }
 }
 
 .dropdown-menu-open {
-  display: block;
   opacity: 1;
+}
+
+.slider {
+  width: 100%;
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  height: 4px;
+  border-radius: 25px;
+  background-color: #646464;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .3s;
+  transition: background-color .3s;
+
+  .slider:hover {
+    background-color: #dedede;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    background: $color-text-primary;
+    cursor: pointer;
+  }
+
+  .hide-slider-thumb::-webkit-slider-thumb {
+    display: none;
+  }
+}
+
+.dialog {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s linear;
+
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+
+  .dialog-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #00000077;
+    z-index: 0;
+  }
+
+  .dialog-box {
+    z-index: 1;
+
+    border-radius: 5px;
+    box-shadow: 0 0 8px 1px black;
+
+    background-color: $color-darker;
+
+    .dialog-top {
+      background-color: $color-default;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      padding: 0.8em;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+
+      span {
+        margin-left: 0.5em;
+        font-size: x-large;
+      }
+    }
+    
+    .dialog-center {
+      display: flex;
+      flex-flow: row nowrap;
+
+      .dialog-center-left {
+        display: flex;
+        flex-flow: column nowrap;
+      }
+
+      .dialog-center-right {
+        background-color: $color-dark;
+        padding: 1em 2em 2em 2em;
+
+        height: 350px;
+        width: 650px;
+
+        display: flex;
+        flex-flow: column nowrap;
+        overflow-y: auto;
+
+        text-align: left;
+
+        .dialog-library-type-box{
+          display: flex;
+
+          .dialog-library-btn {
+            background-color: transparent;
+            border: none;
+
+            cursor: pointer;
+  
+            padding: 1em 2.5em 1em 2.5em;
+            border-radius: 3px;
+  
+            display: flex;
+            flex-flow: column wrap;
+            align-items: center;
+
+            transition: background-color .15s ease;
+  
+            span {
+              color:$color-text-default;
+              padding-top: 0.8em;
+              font-size: small;
+              font-weight: bold;
+            }
+  
+            svg {
+              width: 4em;
+              height: 4em;
+
+              path {
+                fill:$color-text-default;
+              }
+            }
+          }
+  
+          .dialog-library-btn:hover {
+            background-color: $color-light;
+
+            span {
+              color:$color-text-primary;
+            }
+
+            svg path {
+              fill:$color-text-primary;
+            }
+          }
+
+          .dialog-library-btn-active {
+            pointer-events: none;
+            span {
+              color:$app-color;
+            }
+  
+            svg path {
+              fill:$app-color;
+            }
+          }
+
+          .dialog-library-btn-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+          }
+        }
+
+        .dialog-horizontal-box{
+          display: flex;
+          flex-flow: row nowrap;
+        }
+
+        .dialog-horizontal-box > * {
+          margin-right: 1em;
+        }
+
+        .dialog-input-box {
+          display: flex;
+          flex-flow: column wrap;
+
+          span {
+            font-size: small;
+            margin-bottom: 0.6em;
+          }
+
+          input {
+            padding: 0.6em 1em 0.6em 1em;
+            background-color: $color-lighter;
+            border: none;
+            outline: none;
+            border-radius: 3px;
+            
+            min-width: 300px;
+
+            color: $color-text-primary;
+
+            transition: background-color .15s ease;
+          }
+
+          input:focus {
+            background-color: $color-bright;
+            color: black;
+          }
+
+          .dialog-input-lock {
+            display: flex;
+          }
+        }
+
+        .add-folder-btn {
+          width: fit-content;
+          align-self: center;
+        }
+
+        .folder-list {
+          list-style-type: none;
+          li {
+            background-color: $color-lighter;
+            padding: 0.6em 1.3em 0.6em 1.3em;
+
+            margin-bottom: 0.8em;
+            border-radius: 5px;
+            color: $color-text-primary;
+
+            display: flex;
+            justify-content: space-between;
+          }
+
+          li:hover {
+            background-color: $color-lighter;
+          }
+        }
+      }
+
+      .dialog-center-right > * {
+        margin: 0.5em 0;
+      }
+    }
+
+    .dialog-bottom {
+      background-color: $color-default;
+      padding: 1em;
+
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      
+      padding-right: 0.6em;
+      border-top: 1px solid rgba(0, 0, 0, 0.45);
+    }
+  }
+
+  .desktop-dialog-side-btn {
+    font-size: medium;
+    color: $color-text-default;
+    background-color: transparent;
+    border: none;
+
+    text-align: left;
+    transition: background-color .15s ease;
+
+    padding: 0.8em 1em 0.8em 1em;
+
+    cursor: pointer;
+  }
+
+  .desktop-dialog-side-btn:hover {
+    color: $color-text-primary;
+    background-color: $color-default;
+  }
+
+  .desktop-dialog-side-btn-active {
+    font-size: medium;
+    color: $app-color;
+
+    cursor: pointer;
+  }
+  
+  .desktop-dialog-side-btn-active:hover {
+    color: $color-text-primary;
+  }
+
+  .desktop-dialog-btn {
+    margin-right: 0.6em;
+
+    padding: 1em 1.3em 1em 1.3em;
+
+    border: none;
+    border-radius: 3px;
+
+    transition: background-color .3s ease;
+
+    font-size: small;
+    font-weight: bold;
+    color:$color-text-primary;
+    background-color: $color-lighter;
+
+    cursor: pointer;
+  }
+
+  .desktop-dialog-btn:hover {
+    background-color: $color-more-lighter;
+  }
+
+  .btn-app-color {
+    margin-right: 0.6em;
+
+    padding: 1em 1.3em 1em 1.3em;
+
+    border: none;
+    border-radius: 3px;
+
+    transition: background-color .3s ease;
+
+    font-size: small;
+    font-weight: bold;
+    color:$color-text-primary;
+    background-color: $app-color-darker;
+
+    cursor: pointer;
+  }
+
+  .btn-app-color:hover {
+    background-color: $app-color;
+    color: $color-dark;
+  }
+
+  .close-window-btn {
+    background-color: transparent;
+    border: none;
+    opacity: 0.8;
+    transition: opacity .15s ease;
+    cursor: pointer;
+  }
+
+  .close-window-btn:hover {
+    opacity: 1;
+  }
+}
+
+.dialog-active {
+  opacity: 1;
+  pointer-events: auto;
 }

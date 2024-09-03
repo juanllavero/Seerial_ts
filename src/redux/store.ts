@@ -1,4 +1,4 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import librarySlice from './slices/librarySlice';
 import seriesSlice from './slices/seriesSlice';
 import seasonSlice from './slices/seasonSlice';
@@ -10,6 +10,7 @@ import imageLoadedSlice from "./slices/imageLoadedSlice";
 import transparentImageLoadedSlice from "./slices/transparentImageLoadedSlice"
 import videoSlice from "./slices/videoSlice"
 import windowStateSlice from "./slices/windowStateSlice";
+import menuSectionsSlice from "./slices/menuSectionsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     transparentImageLoaded: transparentImageLoadedSlice,
     video: videoSlice,
     windowState: windowStateSlice,
+    sectionState: menuSectionsSlice,
   }
 })
 

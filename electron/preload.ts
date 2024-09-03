@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showControls: () => ipcRenderer.send('show-controls'),
   hideControls: () => ipcRenderer.send('hide-controls'),
   getExternalPath: (relativePath: string) => ipcRenderer.invoke('get-external-path', relativePath),
+  openFolderDialog: () => ipcRenderer.invoke('dialog:openFolder'),
 })
 
 // Mantén las otras exposiciones si es necesario

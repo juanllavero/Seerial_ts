@@ -20,4 +20,5 @@ export interface SeriesData{
     analyzingFiles: boolean;
     currentlyWatchingSeason: number;
     productionStudios: string;
+    isCollection: boolean;
 }

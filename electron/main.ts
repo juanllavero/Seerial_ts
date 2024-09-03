@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
@@ -273,8 +273,16 @@ ipcMain.on('hide-controls', () => {
 });
 //#endregion
 
-//#region LIBRARY DATA COMMUNICATION
+//#region FOLDER AND FILES SELECTION
+ipcMain.handle('dialog:openFolder', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+  return result.filePaths;
+});
+//#endregion
 
+//#region LIBRARY DATA COMMUNICATION
 ipcMain.handle('get-library-data', async () => {
   return loadData();
 });

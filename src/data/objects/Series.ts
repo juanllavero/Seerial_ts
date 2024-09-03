@@ -20,6 +20,7 @@ export class Series {
   analyzingFiles: boolean;
   currentlyWatchingSeason: number;
   productionStudios: string;
+  isCollection: boolean;
 
   constructor(order: number) {
     this.id = crypto.randomUUID();
@@ -39,6 +40,7 @@ export class Series {
     this.analyzingFiles = false;
     this.currentlyWatchingSeason = -1;
     this.productionStudios = '';
+    this.isCollection = false;
   }
 
   toJSON(): any {
@@ -61,7 +63,8 @@ export class Series {
       playSameMusic: this.playSameMusic,
       analyzingFiles: this.analyzingFiles,
       currentlyWatchingSeason: this.currentlyWatchingSeason,
-      productionStudios: this.productionStudios
+      productionStudios: this.productionStudios,
+      isCollection: this.isCollection
     };
   }
 
@@ -85,6 +88,7 @@ export class Series {
     series.analyzingFiles = jsonData.analyzingFiles;
     series.currentlyWatchingSeason = jsonData.currentlyWatchingSeason;
     series.productionStudios = jsonData.productionStudios;
+    series.isCollection = jsonData.isCollection;
 
     return series;
   }
