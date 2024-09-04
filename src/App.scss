@@ -1216,14 +1216,15 @@ html, body {
             margin-bottom: 0.6em;
           }
 
-          input {
-            padding: 0.6em 1em 0.6em 1em;
+          input, textarea {
+            padding: 1em 1.3em 1em 1.3em;
             background-color: $color-lighter;
             border: none;
             outline: none;
             border-radius: 3px;
-            
-            min-width: 300px;
+
+            font-size: small;
+            font-family: sans-serif;
 
             color: $color-text-primary;
 
@@ -1235,8 +1236,58 @@ html, body {
             color: black;
           }
 
+          textarea:focus {
+            background-color: $color-bright;
+            color: black;
+          }
+
           .dialog-input-lock {
             display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+
+            a {
+              height: 100%;
+              width: 2.5em;
+              background-color: $color-light;
+
+              border-radius: 5px 0 0 5px;
+              
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              svg {
+                width: 20px;
+                height: 20px;
+
+                path {
+                  fill: $color-darker;
+                  transition: fill .15s ease;
+                }
+              }
+            }
+
+            a:hover {
+              svg path{
+                fill: $color-text-default;
+              }
+            }
+
+            input, textarea {
+              border-radius: 0 5px 5px 0;
+              width: 100%;
+            }
+          }
+
+          .dialog-input-lock.locked {
+            a {
+              background-color: $app-color;
+
+              svg path{
+                fill: $color-darker;
+              }
+            }
           }
         }
 
@@ -1263,10 +1314,15 @@ html, body {
             background-color: $color-lighter;
           }
         }
+
+        .dialog-images-scroll {
+          display: flex;
+          flex-flow: row wrap;
+        }
       }
 
       .dialog-center-right > * {
-        margin: 0.5em 0;
+        margin: 0.7em 0;
       }
     }
 

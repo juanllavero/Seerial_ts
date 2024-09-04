@@ -2,7 +2,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShowPoster } from 'redux/slices/librarySlice';
 import { selectSeries, selectSeason, showSeriesMenu } from '../../redux/slices/seriesSlice';
-import { selectEpisode, showMenu } from '../../redux/slices/episodeSlice';
+import { selectEpisode, showMenu, toggleEpisodeWindow } from '../../redux/slices/episodeSlice';
 import { RootState } from '../../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
@@ -176,27 +176,27 @@ export const renderRightPanelContent = () => {
                 <ContextMenu 
                   model={[
                     {
-                      label: 'Editar',
+                      label: t('editButton'),
                       command: () => dispatch(toggleSeriesMenu())
                     },
                     {
-                      label: 'Marcar como visto',
+                      label: t('markWatched'),
                       command: () => dispatch(toggleSeriesMenu())
                     },
                     {
-                      label: 'Marcar como no visto',
+                      label: t('markUnwatched'),
                       command: () => dispatch(toggleSeriesMenu())
                     },
                     ...(selectedLibrary?.type === "Shows" || !series?.isCollection ? [{
-                      label: 'Corregir identificación',
+                      label: t('correctIdentification'),
                       command: () => dispatch(toggleSeriesMenu())
                       }] : []),
                     ...(selectedLibrary?.type === "Shows" ? [{
-                      label: 'Cambiar grupo de episodios',
+                      label: t('changeEpisodesGroup'),
                       command: () => dispatch(toggleSeriesMenu())
                       }] : []),
                     {
-                      label: 'Eliminar',
+                      label: t('removeButton'),
                       command: () => dispatch(toggleSeriesMenu())
                     }
                 ]}
@@ -270,7 +270,7 @@ export const renderRightPanelContent = () => {
                 {
                   selectedLibrary.type == "Shows" ? (
                     <div className="continue-watching-info">
-                      <span>En progreso — T1 · E3</span>
+                      <span>{t('inProgress')} — {t('seasonLetter')}1 · {t('episodeLetter')}3</span>
                     </div>
                   ) : selectedSeries.seasons.length > 1 ? (
                     <button className="show-poster-button"
@@ -302,7 +302,7 @@ export const renderRightPanelContent = () => {
                 <section className="season-info-buttons-container">
                 <button className="play-button-desktop">
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
-                  <span id="playText">Reproducir</span>
+                  <span id="playText">{t('playButton')}</span>
                 </button>
                 <button className="svg-button-desktop" title="Mark as watched">
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
@@ -319,19 +319,19 @@ export const renderRightPanelContent = () => {
                 <ContextMenu 
                   model={[
                     {
-                      label: 'Editar',
+                      label: t('editButton'),
                       command: () => dispatch(toggleSeriesMenu())
                     },
                     ...(selectedLibrary?.type !== "Shows" ? [{
-                      label: 'Corregir identificación',
+                      label: t('correctIdentification'),
                       command: () => dispatch(toggleSeriesMenu())
                       }] : []),
                     {
-                      label: 'Actualizar metadatos',
+                      label: t('updateMetadata'),
                       command: () => dispatch(toggleSeriesMenu())
                     },
                     {
-                      label: 'Eliminar',
+                      label: t('removeButton'),
                       command: () => dispatch(toggleSeriesMenu())
                     }
                 ]}
@@ -379,20 +379,23 @@ export const renderRightPanelContent = () => {
                   <ContextMenu 
                   model={[
                     {
-                      label: 'Editar',
-                      command: () => dispatch(toggleSeriesMenu())
+                      label: t('editButton'),
+                      command: () => {
+                        dispatch(toggleEpisodeMenu());
+                        dispatch(toggleEpisodeWindow());
+                      }
                     },
                     {
-                      label: 'Marcar como visto',
-                      command: () => dispatch(toggleSeriesMenu())
+                      label: t('markWatched'),
+                      command: () => dispatch(toggleEpisodeMenu())
                     },
                     {
-                      label: 'Marcar como no visto',
-                      command: () => dispatch(toggleSeriesMenu())
+                      label: t('markUnwatched'),
+                      command: () => dispatch(toggleEpisodeMenu())
                     },
                     {
-                      label: 'Eliminar',
-                      command: () => dispatch(toggleSeriesMenu())
+                      label: t('removeButton'),
+                      command: () => dispatch(toggleEpisodeMenu())
                     }
                   ]}
                   ref={cm2} className="dropdown-menu"/>

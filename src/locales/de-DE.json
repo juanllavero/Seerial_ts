@@ -9,7 +9,7 @@
     "generalButton": "Allgemein",
     "ok": "OK",
     "switchToDesktop": "Zum Desktop-Modus wechseln",
-    "switchToFullscreen": "In den Vollbildmodus wechseln  F11",
+    "switchToFullscreen": "In den Vollbildmodus wechseln",
     "exitFullscreen": "Vollbild beenden",
     "loadButton": "Laden",
     "settings": "Einstellungen",
@@ -34,7 +34,7 @@
     "normal": "Normal",
     "large": "Groß",
     "none": "Keiner",
-    "addFolder": "Ordner hinzufügen",
+    "addFolder": "Ordner Hinzufügen",
     "folders": "Ordner",
     "logosButton": "Logos",
     "postersButton": "Poster",
@@ -74,7 +74,7 @@
     "backgroundVideo": "Hintergrundvideo",
     "backgroundMusic": "Hintergrundmusik",
     "episodeWindowTitleEdit": "Disketten/Episoden bearbeiten",
-    "type": "Art",
+    "type": "Art der Bibliothek",
     "episode": "Episode",
     "emptyName": "Name darf nicht leer sein",
     "libraryExists": "Die Kategorie existiert bereits",
@@ -181,5 +181,8 @@
     "downloadingImages": "Bilder werden heruntergeladen",
     "highSettingsPlayer": "Höchste videoqualität",
     "noLibraryFound": "Keine Bibliothek verfügbar",
-    "addLibraryMessage": "Fügen Sie eine mit der Schaltfläche \"Bibliothek hinzufügen\" hinzu"
+    "addLibraryMessage": "Fügen Sie eine mit der Schaltfläche \"Bibliothek hinzufügen\" hinzu",
+    "addFolderText": "Fügen Sie Teppiche zu Ihrer Bibliothek hinzu",
+    "updateMetadata": "Aktualisieren von Metadaten",
+    "inProgress": "Im Gange"
 }  

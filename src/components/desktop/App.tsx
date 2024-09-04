@@ -14,6 +14,7 @@ import { closeVideo } from 'redux/slices/videoSlice';
 import ResolvedImage from '@components/Image';
 import { closeAllMenus, toggleMainMenu } from 'redux/slices/contextMenuSlice';
 import renderLibraryWindow from './libraryWindow';
+import renderEpisodeWindow from './episodeWindow';
 
 function App() {
   const dispatch = useDispatch();
@@ -79,7 +80,12 @@ function App() {
           <></>
         )
       }
-      {renderLibraryWindow()}
+      {
+        <>
+          {renderLibraryWindow()}
+          {renderEpisodeWindow()}
+        </>
+      }
       <section className="container blur-background-image" onClick={
           (event) => {
               const target = event.target as Element;
@@ -116,14 +122,14 @@ function App() {
                       dispatch(toggleMainMenu());
                       }}>
                         <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M38.85 12H45V15H38.85C38.1 18.45 35.1 21 31.5 21C27.9 21 24.9 18.45 24.15 15H3V12H24.15C24.9 8.55 27.9 6 31.5 6C35.1 6 38.1 8.55 38.85 12ZM27 13.5C27 16.05 28.95 18 31.5 18C34.05 18 36 16.05 36 13.5C36 10.95 34.05 9 31.5 9C28.95 9 27 10.95 27 13.5Z" fill="#FFFFFF" fillRule="evenodd"></path><path clipRule="evenodd" d="M9.15 36H3V33H9.15C9.9 29.55 12.9 27 16.5 27C20.1 27 23.1 29.55 23.85 33H45V36H23.85C23.1 39.45 20.1 42 16.5 42C12.9 42 9.9 39.45 9.15 36ZM21 34.5C21 31.95 19.05 30 16.5 30C13.95 30 12 31.95 12 34.5C12 37.05 13.95 39 16.5 39C19.05 39 21 37.05 21 34.5Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
-                        <span>Settings</span>
+                        <span>{t('settings')}</span>
                     </li>
                     <li key="changeFullscreen"
                       onClick={() => {
                       dispatch(toggleMainMenu());
                       }}>
                         <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M6 5H42C42.7957 5 43.5587 5.31607 44.1213 5.87868C44.6839 6.44129 45 7.20435 45 8V34C45 34.7957 44.6839 35.5587 44.1213 36.1213C43.5587 36.6839 42.7957 37 42 37H6C5.20435 37 4.44129 36.6839 3.87868 36.1213C3.31607 35.5587 3 34.7957 3 34V8C3 7.20435 3.31607 6.44129 3.87868 5.87868C4.44129 5.31607 5.20435 5 6 5ZM6 34H42V8H6V34Z" fill="#FFFFFF"></path><path d="M36 43V40H12V43H36Z" fill="#FFFFFF"></path></svg>
-                        <span>Cambiar a modo Pantalla Completa</span>
+                        <span>{t('switchToFullscreen')}</span>
                         <a>F11</a>
                     </li>
                     <li key="ExitApp"
@@ -132,7 +138,7 @@ function App() {
                       }}>
                         <img src="./src/assets/svg/exitApp.svg" 
                           style={{width: '18px', height: '18px'}} />
-                        <span>Salir</span>
+                        <span>{t('exitFullscreen')}</span>
                     </li>
               </ul>
             </div>

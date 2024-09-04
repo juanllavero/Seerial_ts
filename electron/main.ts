@@ -51,8 +51,8 @@ Configuration.setConfigFile(getExternalPath('resources/config/config.properties'
 i18next
   .use(Backend)
   .init({
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'es', 'de', 'fr', 'it'],
+    fallbackLng: 'en-US',
+    supportedLngs: ['en-US', 'es-ES', 'de-DE', 'fr-FR', 'it-IT'],
     backend: {
       loadPath: './src/locales/{{lng}}.json',
     },
@@ -61,6 +61,16 @@ i18next
 // Manejar solicitudes de traducción desde las ventanas renderizadas
 ipcMain.handle('translate', (_event, key) => {
   return i18next.t(key);
+});
+//#endregion
+
+//#region GET FILES
+ipcMain.handle('get-images', async (_event, dirPath) => {
+  const files = fs.readdirSync(dirPath);
+  const images = files.filter((file) =>
+    ['.png', '.jpg', '.jpeg', '.gif'].includes(path.extname(file).toLowerCase())
+  );
+  return images.map((image) => path.join(dirPath, image));
 });
 //#endregion
 

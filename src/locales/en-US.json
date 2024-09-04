@@ -9,7 +9,7 @@
     "generalButton": "General",
     "ok": "OK",
     "switchToDesktop": "Switch to Desktop Mode",
-    "switchToFullscreen": "Switch to Fullscreen Mode  F11",
+    "switchToFullscreen": "Switch to Fullscreen Mode",
     "exitFullscreen": "Exit",
     "loadButton": "Load",
     "settings": "Settings",
@@ -34,7 +34,7 @@
     "normal": "Normal",
     "large": "Large",
     "none": "None",
-    "addFolder": "Add folder",
+    "addFolder": "Add Folder",
     "folders": "Folders",
     "logosButton": "Logos",
     "postersButton": "Posters",
@@ -74,7 +74,7 @@
     "backgroundVideo": "Background Video",
     "backgroundMusic": "Background Music",
     "episodeWindowTitleEdit": "Edit Disc/Episode",
-    "type": "Type",
+    "type": "Type of library",
     "episode": "Episode",
     "emptyName": "Name cannot be empty",
     "libraryExists": "The library already exists",
@@ -181,5 +181,8 @@
     "downloadingImages": "Downloading images",
     "highSettingsPlayer": "Highest video quality",
     "noLibraryFound": "No library available",
-    "addLibraryMessage": "Add one with the \"Add library\" button"
+    "addLibraryMessage": "Add one with the \"Add library\" button",
+    "addFolderText": "Add folders to your library",
+    "updateMetadata": "Update metadata",
+    "inProgress": "In progress"
   }

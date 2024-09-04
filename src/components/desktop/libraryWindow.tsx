@@ -1,20 +1,46 @@
 import { Section } from "data/enums/Section";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
 import { toggleLibraryEditWindow } from "redux/slices/librarySlice";
+import { useTranslation } from "react-i18next";
 
 const renderLibraryWindow = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation();
+    const { i18n } = useTranslation();
     const [folders, setFolders] = useState<string[]>([]);
+    const [language, setLanguage] = useState<string>(i18n.language);
 
     const [selectedLibraryType, setSelectedLibraryType] = useState<string>("Movies");
 
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
     const libraryMenuOpen = useSelector((state: RootState) => state.library.libraryEditWindow);
     const selectedLibrary = useSelector((state: RootState) => state.library.libraryForMenu);
+
+    const supportedLanguages = Array.isArray(i18n.options?.supportedLngs)
+    ? i18n.options.supportedLngs.filter(lng => lng !== 'cimode')
+    : [];
+
+    const getLanguageName = (lang: string) => {
+        try {
+            let langCode = lang.split('-')[0];
+            if (!langCode){
+               langCode = lang; 
+            }
+
+            const languageNames = new Intl.DisplayNames([langCode], { type: 'language', languageDisplay: 'standard' });
+            const languageName = languageNames.of(lang);
+
+            if (languageName)
+                return languageName.charAt(0).toUpperCase() + languageName.slice(1);
+          } catch (error) {
+            console.error('Error retrieving language and country name:', error);
+            return lang;
+          }
+      };
 
     const handleSelectFolder = async () => {
         const result = await window.electronAPI.openFolderDialog();
@@ -30,6 +56,19 @@ const renderLibraryWindow = () => {
         setFolders((prevFolders) => prevFolders.filter((folder) => folder !== folderToRemove));
     };
 
+    const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedLanguage = event.target.value;
+        setLanguage(selectedLanguage);
+        //i18n.changeLanguage(selectedLanguage);  // Cambia el idioma en i18next
+    };
+
+    useEffect(() => {
+        if (selectedLibrary)
+            setLanguage(selectedLibrary.language);
+        else
+            setLanguage(i18n.language);
+    }, [libraryMenuOpen]);
+
     return (
         <>
             <section className={`dialog ${libraryMenuOpen ? ' dialog-active' : ''}`}>
@@ -38,9 +77,9 @@ const renderLibraryWindow = () => {
                 <section className="dialog-top">
                     {
                         selectedLibrary ? (
-                            <span>Editar biblioteca</span>
+                            <span>{t('libraryWindowTitleEdit')}</span>
                         ) : (
-                            <span>Añadir biblioteca</span>
+                            <span>{t('libraryWindowTitle')}</span>
                         )
                     }
                     <button className="close-window-btn" onClick={() => dispatch(toggleLibraryEditWindow())}>
@@ -51,15 +90,15 @@ const renderLibraryWindow = () => {
                 <section className="dialog-center">
                     <div className="dialog-center-left">
                     <button className={`desktop-dialog-side-btn ${menuSection === Section.General ? ' desktop-dialog-side-btn-active' : ''}`}
-                    onClick={() => dispatch(changeMenuSection(Section.General))}>General</button>
+                    onClick={() => dispatch(changeMenuSection(Section.General))}>{t('generalButton')}</button>
                     <button className={`desktop-dialog-side-btn ${menuSection === Section.Folders ? ' desktop-dialog-side-btn-active' : ''}`}
-                    onClick={() => dispatch(changeMenuSection(Section.Folders))}>Folders</button>
+                    onClick={() => dispatch(changeMenuSection(Section.Folders))}>{t('folders')}</button>
                     </div>
                     <div className="dialog-center-right scroll">
                     {
                         menuSection == Section.General ? (
                         <>
-                            <span>Tipo de biblioteca</span>
+                            <span>{t('type')}</span>
                             <div className="dialog-library-type-box">
                             <button className={`dialog-library-btn ${
                                 selectedLibrary ? (
@@ -83,7 +122,7 @@ const renderLibraryWindow = () => {
                                     fillRule="evenodd">
                                 </path>
                                 </svg>
-                                <span>Películas</span>
+                                <span>{t('movies')}</span>
                             </button>
                             <button className={`dialog-library-btn ${
                                 selectedLibrary ? (
@@ -107,12 +146,12 @@ const renderLibraryWindow = () => {
                                 </path>
                                 <path d="M36 43V40H12V43H36Z" fill="#FFFFFF"></path>
                                 </svg>
-                                <span>Series</span>
+                                <span>{t('shows')}</span>
                             </button>
                             </div>
                             <section className="dialog-horizontal-box">
                             <div className="dialog-input-box">
-                                <span>Nombre</span>
+                                <span>{t('name')}</span>
                                 <input type="text" value=
                                     {
                                         selectedLibrary ? selectedLibrary.name 
@@ -121,17 +160,20 @@ const renderLibraryWindow = () => {
                                 />
                             </div>
                             <div className="dialog-input-box">
-                                <span>Idioma</span>
-                                <select name="" id="">
-                                    <option value="0">Español (España)</option>
-                                    <option value="1">Inglés (Estados Unidos)</option>
+                                <span>{t('languageText')}</span>
+                                <select value={language} onChange={handleLanguageChange}>
+                                {supportedLanguages.map((lng: string) => (
+                                    <option key={lng} value={lng}>
+                                    {getLanguageName(lng) || lng}
+                                    </option>
+                                ))}
                                 </select>
                             </div>
                             </section>
                         </>
                         ) : menuSection == Section.Folders ? (
                         <>
-                            <span>Añade carpetas a tu biblioteca</span>
+                            <span>{t('addFolderText')}</span>
                             <ul className="folder-list">
                                 {folders.map((folder, index) => (
                                 <li key={index}>
@@ -144,7 +186,7 @@ const renderLibraryWindow = () => {
                                 ))}
                             </ul>
                             <button className="desktop-dialog-btn add-folder-btn" onClick={handleSelectFolder}>
-                                Añadir Carpeta
+                                {t('addFolder')}
                             </button>
                             
                         </>
@@ -153,8 +195,8 @@ const renderLibraryWindow = () => {
                     </div>
                 </section>
                 <section className="dialog-bottom">
-                    <button className="desktop-dialog-btn" onClick={() => dispatch(toggleLibraryEditWindow())}>Cancelar</button>
-                    <button className="btn-app-color">Guardar</button>
+                    <button className="desktop-dialog-btn" onClick={() => dispatch(toggleLibraryEditWindow())}>{t('cancelButton')}</button>
+                    <button className="btn-app-color">{t('saveButton')}</button>
                 </section>
                 </div>
             </section>

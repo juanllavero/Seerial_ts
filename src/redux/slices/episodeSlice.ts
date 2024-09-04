@@ -5,12 +5,14 @@ interface EpisodeState {
   episodes: EpisodeData[];
   selectedEpisode: EpisodeData | null;
   showEpisodeMenu: boolean;
+  episodeWindowOpen: boolean;
 }
 
 const initialState: EpisodeState = {
   episodes: [],
   selectedEpisode: null,
-  showEpisodeMenu: false
+  showEpisodeMenu: false,
+  episodeWindowOpen: false,
 };
 
 const episodeSlice = createSlice({
@@ -28,9 +30,12 @@ const episodeSlice = createSlice({
     },
     showMenu: (state, action) => {
       state.showEpisodeMenu = action.payload;
+    },
+    toggleEpisodeWindow: (state) => {
+      state.episodeWindowOpen = !state.episodeWindowOpen;
     }
   }
 });
 
-export const { setEpisodes, clearEpisodes, selectEpisode, showMenu } = episodeSlice.actions;
+export const { setEpisodes, clearEpisodes, selectEpisode, showMenu, toggleEpisodeWindow } = episodeSlice.actions;
 export default episodeSlice.reducer;

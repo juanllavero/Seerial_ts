@@ -9,7 +9,7 @@
     "generalButton": "Général",
     "ok": "D'accord",
     "switchToDesktop": "Passer en Mode Bureau",
-    "switchToFullscreen": "Passer en Mode Plein Écran  F11",
+    "switchToFullscreen": "Passer en Mode Plein Écran",
     "exitFullscreen": "Quitter",
     "loadButton": "Charger",
     "settings": "Paramètres",
@@ -34,7 +34,7 @@
     "normal": "Normal",
     "large": "Grand",
     "none": "Aucun",
-    "addFolder": "Ajouter un dossier",
+    "addFolder": "Ajouter un Dossier",
     "folders": "Dossiers",
     "logosButton": "Logos",
     "postersButton": "Affiches",
@@ -74,7 +74,7 @@
     "backgroundVideo": "Vidéo de fond",
     "backgroundMusic": "Musique de fond",
     "episodeWindowTitleEdit": "Modifier Disques/Épisodes",
-    "type": "Type",
+    "type": "Type de bibliothèque",
     "episode": "Épisode",
     "emptyName": "Le nom ne peut pas être vide",
     "libraryExists": "La bibliothèque existe déjà",
@@ -181,5 +181,8 @@
     "downloadingImages": "Téléchargement des images",
     "highSettingsPlayer": "Qualité vidéo maximale",
     "noLibraryFound": "Aucune bibliothèque disponible",
-    "addLibraryMessage": "Ajoutez-en une avec le bouton \"Ajouter une bibliothèque\""
+    "addLibraryMessage": "Ajoutez-en une avec le bouton \"Ajouter une bibliothèque\"",
+    "addFolderText": "Ajouter des tapis à votre bibliothèque",
+    "updateMetadata": "Mettre à jour les métadonnées",
+    "inProgress": "En cours"
   }  

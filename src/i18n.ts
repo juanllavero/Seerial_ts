@@ -9,8 +9,8 @@ i18n
   .use(LanguageDetector) // Detect browser language
   .use(initReactI18next) // React integration
   .init({
-    fallbackLng: 'en', // Default language
-    supportedLngs: ['en', 'es', 'de', 'fr', 'it'], // Supported languages
+    fallbackLng: 'en-US', // Default language
+    supportedLngs: ['en-US', 'es-ES', 'de-DE', 'fr-FR', 'it-IT'], // Supported languages
     debug: true,
     interpolation: {
       escapeValue: false,

@@ -8,8 +8,10 @@ import { RootState } from '../../redux/store';
 import { ContextMenu } from 'primereact/contextmenu';
 import { useRef } from 'react';
 import { closeAllMenus, toggleLibraryMenuSecondary } from 'redux/slices/contextMenuSlice';
+import { useTranslation } from 'react-i18next';
 
 export const renderLibraryAndSlider = () => {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
     const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
@@ -79,26 +81,26 @@ export const renderLibraryAndSlider = () => {
                 <ContextMenu model={
                     [
                         {
-                            label: 'Editar',
+                            label: t('editButton'),
                             command: () => {
                                 dispatch(toggleLibraryMenuSecondary());
                                 dispatch(toggleLibraryEditWindow());
                             }
                         },
                         {
-                            label: 'Buscar archivos en la biblioteca',
+                            label: t('searchFiles'),
                             command: () => {
                                 dispatch(toggleLibraryMenuSecondary());
                             }
                         },
                         {
-                            label: 'Actualizar metadatos',
+                            label: t('updateMetadata'),
                             command: () => {
                                 dispatch(toggleLibraryMenuSecondary());
                             }
                         },
                         {
-                            label: 'Eliminar',
+                            label: t('removeButton'),
                             command: () => {
                                 dispatch(toggleLibraryMenuSecondary());
                             }
