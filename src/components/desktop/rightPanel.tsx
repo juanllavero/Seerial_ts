@@ -46,6 +46,49 @@ export const renderRightPanelContent = () => {
     const cm = useRef<ContextMenu | null>(null);
     const cm2 = useRef<ContextMenu | null>(null);
 
+    //#region TEXT CLAMP
+    const clampTextRef = useRef<HTMLDivElement[]>([]);
+    const clampActionRef = useRef<HTMLButtonElement[]>([]);
+
+    /* check if the item is clamped or not */
+    const showReadMoreButton = (element: HTMLElement) => {
+      if (
+        element.offsetHeight < element.scrollHeight ||
+        element.offsetWidth < element.scrollWidth
+      ) {
+        element.classList.add('clamped');
+      }
+    };
+
+    useEffect(() => {
+      // Query the elements and set references
+      const clampTextElements = Array.from(document.querySelectorAll<HTMLDivElement>('.clamp-text'));
+      clampTextRef.current = clampTextElements;
+  
+      clampTextRef.current.forEach((el) => showReadMoreButton(el));
+  
+      const clampActionElements = Array.from(document.querySelectorAll<HTMLButtonElement>('.clamp-text-action'));
+      clampActionRef.current = clampActionElements;
+  
+      clampActionRef.current.forEach((el) => {
+        let isOpen = false;
+        el.addEventListener('click', () => {
+          const clampedEl = el.previousElementSibling as HTMLElement;
+  
+          isOpen = !isOpen;
+  
+          if (isOpen) {
+            clampedEl.classList.add('open');
+            el.classList.add('open');
+          } else {
+            clampedEl.classList.remove('open');
+            el.classList.remove('open');
+          }
+        });
+      });
+    }, [selectedSeason]);
+    //#endregion
+
     const changePoster = () => {
       dispatch(setShowPoster(!showCollectionPoster));
     }
@@ -337,12 +380,23 @@ export const renderRightPanelContent = () => {
                 ]}
                 ref={cm} className="dropdown-menu"/>
               </section>
-                <div className="overview-container">
-                  <p>{selectedSeason.overview || selectedSeries.overview || t("defaultOverview")}</p>
-                  <input type="checkbox" className="expand-btn"
-                    style={{color: `white`}}></input>
-                  <svg className="expand-svg" aria-hidden="true" height="15" viewBox="0 0 48 48" width="15" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path></svg>
+                <div className="overview-container clamp-text">
+                  <span>{selectedSeason.overview || selectedSeries.overview || t("defaultOverview")}</span>
                 </div>
+                <button className="clamp-text-action">
+                  <div aria-hidden="true" className="clamp-text-more">
+                    <span>
+                      {t('moreButton')}
+                      <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path></svg>
+                    </span>
+                  </div>
+                  <div aria-hidden="true" className="clamp-text-less">
+                    <span >
+                    {t('lessButton')}
+                      <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z" transform="rotate(180, 24, 24)"></path></svg>
+                    </span>
+                  </div>
+                </button>
               </section>
             </div>
             {

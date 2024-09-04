@@ -499,41 +499,8 @@ html, body {
 
 .overview-container{
   max-width: 700px;
-}
 
-.expand-btn{
-  appearance: none;
-  background-color: transparent;
-  border-color: white;
-}
-
-.expand-btn::before{
-  content: "Expand";
-}
-
-.expand-btn:checked::before{
-  content: "Collapse";
-}
-
-.expand-svg{
-  fill: white;
-}
-
-.expand-btn:checked::before .expand-svg{
-  transform: rotate(180);
-}
-
-.overview-container p{
-  color: $color-text-primary;
-  display: -webkit-box;
-  overflow: hidden;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
-.overview-container p:has(+ .expand-btn:checked){
-  display: block;
+  margin-top: 1em;
 }
 
 /* SEASON INFO BUTTONS */
@@ -1094,6 +1061,9 @@ html, body {
     border-radius: 5px;
     box-shadow: 0 0 8px 1px black;
 
+    width: 820px;
+    max-width: 820px;
+
     background-color: $color-darker;
 
     .dialog-top {
@@ -1108,7 +1078,13 @@ html, body {
 
       span {
         margin-left: 0.5em;
+        margin-right: 1em;
         font-size: x-large;
+
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+        white-space: nowrap !important;
+        width: 90%;
       }
     }
     
@@ -1125,12 +1101,12 @@ html, body {
         background-color: $color-dark;
         padding: 1em 2em 2em 2em;
 
-        height: 350px;
-        width: 650px;
-
         display: flex;
         flex-flow: column nowrap;
         overflow-y: auto;
+
+        width: 100%;
+        height: 450px;
 
         text-align: left;
 
@@ -1503,4 +1479,83 @@ html, body {
 
 .horizontal-center-align {
   justify-content: center;
+}
+
+/* Text Clamp */
+.clamp-text {
+  box-sizing: border-box;
+
+  --line-clamp-amount: 3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  line-clamp: var(--line-clamp-amount);
+  -webkit-line-clamp: var(--line-clamp-amount);
+
+  transition: max-height .4s ease;
+  max-height: calc(2.5em * var(--line-clamp-amount));
+}
+
+.clamp-text.open {
+  line-clamp: initial;
+  -webkit-line-clamp: initial;
+  max-height: 100%;
+}
+
+.clamp-text-action,
+.clamp-text-less,
+.clamp-text-action.open .clamp-text-more {
+  display: none;
+  transition: .4s ease;
+
+  margin-top: 0.5em;
+  padding: 0;
+
+  width: fit-content;
+
+  background-color: transparent;
+  border: none;
+  color:$app-color;
+  cursor: pointer;
+
+  font-size: small;
+  font-weight: bold;
+
+  span {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  svg {
+    margin-left: 0.2em;
+  }
+
+  svg path{
+    fill: $app-color;
+  }
+}
+
+.clamp-text-action:hover {
+  color: $color-text-primary;
+
+  svg path{
+    fill: $color-text-primary;
+  }
+}
+
+.clamp-text-less:hover {
+  color: $color-text-primary;
+
+  svg path{
+    fill: $color-text-primary;
+  }
+}
+
+.clamped + .clamp-text-action {
+  display: inline-block;
+}
+
+.clamp-text-action.open .clamp-text-less {
+  display: inline;
 }
