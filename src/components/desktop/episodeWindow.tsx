@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
-import { toggleLibraryEditWindow } from "redux/slices/librarySlice";
 import { useTranslation } from "react-i18next";
 import { toggleEpisodeWindow } from "redux/slices/episodeSlice";
+import { VideoTrackData } from "@interfaces/VideoTrackData";
+import { AudioTrackData } from "@interfaces/AudioTrackData";
+import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
 
 const renderEpisodeWindow = () => {
     const dispatch = useDispatch();
@@ -14,11 +16,11 @@ const renderEpisodeWindow = () => {
 
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
     const episodeMenuOpen = useSelector((state: RootState) => state.episodes.episodeWindowOpen);
-    const selectedLibrary = useSelector((state: RootState) => state.library.libraryForMenu);
     const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
     const selectedEpisode = useSelector((state: RootState) => state.episodes.selectedEpisode);
 
     const [images, setImages] = useState<string[]>([]);
+    const [selectedImage, selectImage] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const getImages = async () => {
@@ -26,13 +28,105 @@ const renderEpisodeWindow = () => {
             if (path) {
                 const images = await window.electronAPI.getImages(path);
                 setImages(images);
+
+                console.log(images);
             }
         }
 
-        if (menuSection === Section.Thumbnails)
+        if (menuSection === Section.Thumbnails){
             getImages();
 
+            if (selectedEpisode?.imgSrc)
+                selectImage(selectedEpisode?.imgSrc.split('/').pop())
+        }
     }, [menuSection]);
+
+    const getVideoInfo = (track: VideoTrackData) => {
+        const mediaInfoFieldsVideo = [
+            { key: 'Codec', value: track.codec },
+            { key: 'Codec Extended', value: track.codecExt },
+            { key: 'Bitrate', value: track.bitrate },
+            { key: 'Frame Rate', value: track.framerate },
+            { key: 'Coded Height', value: track.codedHeight },
+            { key: 'Coded Width', value: track.codedWidth },
+            { key: 'Chroma Location', value: track.chromaLocation },
+            { key: 'Color Space', value: track.colorSpace },
+            { key: 'Aspect Ratio', value: track.aspectRatio },
+            { key: 'Profile', value: track.profile },
+            { key: 'Ref Frames', value: track.refFrames },
+            { key: 'Color Range', value: track.colorRange },
+            { key: 'Display Title', value: track.displayTitle }
+        ];
+
+        return (
+            <>
+                {mediaInfoFieldsVideo.map(
+                    (field, index) =>
+                        field.value && (
+                            <div key={index}>
+                                <span id="media-info-key">{field.key}</span>
+                                <span id="media-info-value">{field.value}</span>
+                            </div>
+                        )
+                )}
+            </>
+        );
+    };
+
+    const getAudioInfo = (track: AudioTrackData) => {
+        const mediaInfoFieldsAudio = [
+            { key: "Codec", value: track.codec },
+            { key: "Codec Extended", value: track.codecExt },
+            { key: "Channels", value: track.channels },
+            { key: "Channel Layout", value: track.channelLayout },
+            { key: "Bitrate", value: track.bitrate },
+            { key: "Language", value: track.language },
+            { key: "Language tag", value: track.languageTag },
+            { key: "Bit Depth", value: track.bitDepth },
+            { key: "Profile", value: track.profile },
+            { key: "Sampling Rate", value: track.samplingRate },
+            { key: "Display Title", value: track.displayTitle }
+        ];
+
+        return (
+            <>
+                {mediaInfoFieldsAudio.map(
+                    (field, index) =>
+                        field.value && (
+                            <div key={index}>
+                                <span id="media-info-key">{field.key}</span>
+                                <span id="media-info-value">{field.value}</span>
+                            </div>
+                        )
+                )}
+            </>
+        );
+    };
+
+    const getSubtitleInfo = (track: SubtitleTrackData) => {
+        const mediaInfoFieldsSubs = [
+            { key: "Codec", value: track.codec },
+            { key: "Codec Extended", value: track.codecExt },
+            { key: "Language", value: track.language },
+            { key: "Language tag", value: track.languageTag },
+            { key: "Title", value: track.title },
+            { key: "Display Title", value: track.displayTitle }
+        ];
+
+        return (
+            <>
+                {mediaInfoFieldsSubs.map(
+                    (field, index) =>
+                        field.value && (
+                            <div key={index}>
+                                <span id="media-info-key">{field.key}</span>
+                                <span id="media-info-value">{field.value}</span>
+                            </div>
+                        )
+                )}
+            </>
+        );
+    };
 
     return (
         <>
@@ -138,14 +232,23 @@ const renderEpisodeWindow = () => {
                         </>
                         ) : menuSection == Section.Thumbnails ? (
                         <>
-                            <div className="dialog-horizontal-box">
+                            <div className="dialog-horizontal-box horizontal-center-align">
                                 <button className="desktop-dialog-btn">Subir imagen</button>
                                 <button className="desktop-dialog-btn">Pegar enlace</button>
                             </div>
                             <div className="dialog-images-scroll">
                             {images.map((image, index) => (
-                                <div key={image + index} style={{ margin: 10 }}>
+                                <div key={image + index} className={`dialog-image-btn ${image.split('\\').pop() === selectedImage ? ' dialog-image-btn-active' : ''}`}
+                                onClick={() => selectImage(image.split('\\').pop())}>
                                     <img src={`file://${image}`} alt={`img-${index}`} style={{ width: 290 }} />
+                                    {
+                                        image.split('\\').pop() === selectedImage ? (
+                                            <>
+                                                <div className="triangle-tick"></div>
+                                                <svg aria-hidden="true" height="24" viewBox="0 0 48 48" width="24" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M4 24.7518L18.6461 39.4008L44 14.0497L38.9502 9L18.6461 29.3069L9.04416 19.7076L4 24.7518Z" fill="#EEEEEE" fillRule="evenodd"></path></svg>
+                                            </>
+                                        ) : (null)
+                                    }
                                 </div>
                             ))}
                             </div>
@@ -205,32 +308,26 @@ const renderEpisodeWindow = () => {
                                         </div>
                                     </section>
                                     <section className="right-media-info">
-                                        {selectedEpisode?.videoTracks.map((track, index) => (
+                                        {selectedEpisode?.videoTracks.map((track: VideoTrackData, index: number) => (
                                             <>
                                                 <span id="media-info-title">Video</span>
-                                                <div>
-                                                    <span id="media-info-key">
-                                                        Codec
-                                                    </span>
-                                                    <span id="media-info-value">
-                                                        {track.codec}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span id="media-info-key">
-                                                        Codec Extended
-                                                    </span>
-                                                    <span id="media-info-value">
-                                                        {track.codecExt}
-                                                    </span>
-                                                </div>
+                                                {getVideoInfo(track)}
+                                                <div className="separator"></div>
                                             </>
                                         ))}
-                                        {selectedEpisode?.audioTracks.map((track, index) => (
-                                            <span id="media-info-title">Audio</span>
+                                        {selectedEpisode?.audioTracks.map((audioTrack: AudioTrackData, index: number) => (
+                                            <>
+                                                <span id="media-info-title">Audio</span>
+                                                {getAudioInfo(audioTrack)}
+                                                <div className="separator"></div>
+                                            </>
                                         ))}
-                                        {selectedEpisode?.subtitleTracks.map((track, index) => (
-                                            <span id="media-info-title">Subtitle</span>
+                                        {selectedEpisode?.subtitleTracks.map((track: SubtitleTrackData, index:number) => (
+                                            <>
+                                                <span id="media-info-title">Subtitle</span>
+                                                {getSubtitleInfo(track)}
+                                                <div className="separator"></div>
+                                            </>
                                         ))}
                                     </section>
                                 </div>
