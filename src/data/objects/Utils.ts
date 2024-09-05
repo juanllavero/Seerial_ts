@@ -35,8 +35,6 @@ export class Utils {
                     console.error('Error obtaining video metadata:', err);
                     return reject(err);
                 }
-
-                
     
                 const format = data.format;
                 const streams = data.streams;
@@ -92,16 +90,6 @@ export class Utils {
                         Utils.processSubtitleData(stream, episode);
                     }
                 });
-    
-                // Capítulos
-                /*if (data.chapters) {
-                    episode.chapters = data.chapters.map((chapter) => ({
-                        title: chapter.tags?.title || '',
-                        time: chapter.start_time || 0,
-                        displayTime: Utils.convertTime(chapter.start_time || 0),
-                        thumbnailSrc: ""
-                    }));
-                }*/
 
                 episode.chapters = await this.getChapters(episode);
 
@@ -349,7 +337,6 @@ export class Utils {
                 return chaptersArray;
             });
           } else {
-            console.log('No se encontraron capítulos en los metadatos.');
             return chaptersArray;
           }
         } catch (error) {

@@ -152,7 +152,7 @@ const renderLibraryWindow = () => {
                             <section className="dialog-horizontal-box">
                             <div className="dialog-input-box">
                                 <span>{t('name')}</span>
-                                <input type="text" value=
+                                <input type="text" defaultValue=
                                     {
                                         selectedLibrary ? selectedLibrary.name 
                                         : selectedLibraryType === "Shows" ? "Shows" : "Movies" 

@@ -5,10 +5,11 @@ import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
 import { useTranslation } from "react-i18next";
-import { toggleEpisodeWindow } from "redux/slices/episodeSlice";
+import { toggleEpisodeWindow, updateEpisode, updateMediaInfo } from "redux/slices/episodeSlice";
 import { VideoTrackData } from "@interfaces/VideoTrackData";
 import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
+import { EpisodeData } from "@interfaces/EpisodeData";
 
 const renderEpisodeWindow = () => {
     const dispatch = useDispatch();
@@ -60,19 +61,10 @@ const renderEpisodeWindow = () => {
             // @ts-ignore
             window.electronAPI.getMediaInfo(selectedEpisode).then((data) => {
                 if (data){
-                    selectedEpisode.mediaInfo = data.mediaInfo;
-                    selectedEpisode.videoTracks = data.videoTracks;
-                    selectedEpisode.audioTracks = data.audioTracks;
-                    selectedEpisode.subtitleTracks = data.subtitleTracks;
-                    selectedEpisode.chapters = data.chapters;
-                    selectedEpisode.runtimeInSeconds = data.runtimeInSeconds;
+                    dispatch(updateMediaInfo(data));
                 }
             });
-        }
-    }, [episodeMenuOpen]);
 
-    useEffect(() => {
-        if (selectedEpisode){
             setName(selectedEpisode.name);
             setYear(selectedEpisode.year);
             setOrder(selectedEpisode.order);
@@ -87,9 +79,7 @@ const renderEpisodeWindow = () => {
             setDirectedLock(selectedEpisode.directedLock);
             setWrittenLock(selectedEpisode.writtenLock);
         }
-
-
-    }, [selectedEpisode]);
+    }, [episodeMenuOpen]);
 
     const getVideoInfo = (track: VideoTrackData) => {
         const mediaInfoFieldsVideo = [
@@ -180,23 +170,38 @@ const renderEpisodeWindow = () => {
 
     const handleSavingChanges = () => {
         if (selectedEpisode) {
-            selectedEpisode.name = name;
-            selectedEpisode.year = year;
-            selectedEpisode.order = order;
-            selectedEpisode.overview = overview;
-            selectedEpisode.directedBy = directedBy;
-            selectedEpisode.writtenBy = writtenBy;
+            let newData: EpisodeData = {
+                id: "",
+                name: name,
+                overview: overview,
+                year: year,
+                order: order,
+                score: 0,
+                imdbScore: 0,
+                runtime: 0,
+                runtimeInSeconds: 0,
+                episodeNumber: 0,
+                seasonNumber: 0,
+                videoSrc: "",
+                imgSrc: selectedImage ? ("resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage) : "",
+                seasonID: "",
+                watched: false,
+                timeWatched: 0,
+                chapters: [],
+                videoTracks: [],
+                audioTracks: [],
+                subtitleTracks: [],
+                directedBy: directedBy,
+                writtenBy: writtenBy,
+                nameLock: nameLock,
+                yearLock: yearLock,
+                orderLock: orderLock,
+                overviewLock: overviewLock,
+                directedLock: directedLock,
+                writtenLock: writtenLock
+            };
 
-            selectedEpisode.nameLock = nameLock;
-            selectedEpisode.yearLock = yearLock;
-            selectedEpisode.orderLock = orderLock;
-            selectedEpisode.overviewLock = overviewLock;
-            selectedEpisode.directedLock = directedLock;
-            selectedEpisode.writtenLock = writtenLock;
-
-            if (selectedImage){
-                selectedEpisode.imgSrc = "resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage;
-            }
+            dispatch(updateEpisode(newData));
         }
 
         dispatch(toggleEpisodeWindow());
@@ -313,7 +318,7 @@ const renderEpisodeWindow = () => {
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" value={writtenBy} onChange={() => {
+                                            <input type="text" defaultValue={writtenBy} onChange={() => {
                                                 setWrittenLock(true);
                                                 setWrittenBy(writtenBy);
                                             }}/>

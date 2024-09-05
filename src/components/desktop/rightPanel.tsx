@@ -2,7 +2,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShowPoster } from 'redux/slices/librarySlice';
 import { selectSeries, selectSeason, showSeriesMenu } from '../../redux/slices/seriesSlice';
-import { selectEpisode, showMenu, toggleEpisodeWindow } from '../../redux/slices/episodeSlice';
+import { selectEpisode, setEpisodes, showMenu, toggleEpisodeWindow } from '../../redux/slices/episodeSlice';
 import { RootState } from '../../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
@@ -28,6 +28,7 @@ export const renderRightPanelContent = () => {
     const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
     const selectedSeason = useSelector((state: RootState) => state.series.selectedSeason);
     const selectedEpisode = useSelector((state: RootState) => state.episodes.selectedEpisode);
+    const episodes = useSelector((state: RootState) => state.episodes.episodes);
 
     const seriesMenu = useSelector((state: RootState) => state.series.seriesMenu);
     const seriesMenuOpen = useSelector((state: RootState) => state.contextMenu.seriesMenu);
@@ -99,10 +100,12 @@ export const renderRightPanelContent = () => {
 
     const handleSeriesSelection = (series: SeriesData) => {
       dispatch(selectSeries(series));
+      handleSeasonSelection(series.seasons[0]);
     };
 
     const handleSeasonSelection = (season: SeasonData) => {
       dispatch(selectSeason(season));
+      dispatch(setEpisodes(season.episodes));
       dispatch(closeContextMenu());
     };
 
@@ -427,8 +430,8 @@ export const renderRightPanelContent = () => {
               )
             }
             <div className="episodes-container">
-              {selectedSeason.episodes.map((episode: any, index: number) => (
-                <div className="episode-box" 
+              {episodes.map((episode: any, index: number) => (
+                <div key={episode.id + "div"} className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <ContextMenu 
                   model={[

@@ -130,39 +130,7 @@ const saveData = (newData: any) => {
 
 //#endregion
 
-let episode: EpisodeData | undefined = {
-  id: '',
-  name: '',
-  overview: '',
-  year: '',
-  order: 0,
-  score: 0,
-  imdbScore: 0,
-  runtime: 0,
-  runtimeInSeconds: 0,
-  episodeNumber: 0,
-  seasonNumber: 0,
-  videoSrc: '',
-  imgSrc: '',
-  seasonID: '',
-  watched: false,
-  timeWatched: 0,
-  chapters: [],
-  videoTracks: [],
-  audioTracks: [],
-  subtitleTracks: [],
-  directedBy: '',
-  writtenBy: '',
-  nameLock: false,
-  yearLock: false,
-  orderLock: false,
-  overviewLock: false,
-  directedLock: false,
-  writtenLock: false
-};
-
-episode.videoSrc = "F:\\UHD\\2001 Una Odisea en el Espacio\\2001 Una Odisea en el Espacio (1968).mkv";
-
+//#region MEDIA INFO
 const getMediaInfo = async (episode: EpisodeData) => {
   return await Utils.getMediaInfo(episode);
 };
@@ -170,6 +138,7 @@ const getMediaInfo = async (episode: EpisodeData) => {
 ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
   return getMediaInfo(episode);
 });
+//#endregion
 
 //#region WINDOWS CREATION
 function createWindow() {
