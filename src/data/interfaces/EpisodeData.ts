@@ -28,4 +28,10 @@ export interface EpisodeData{
     subtitleTracks: SubtitleTrackData[];
     directedBy: string;
     writtenBy: string;
+    nameLock: boolean;
+    yearLock: boolean;
+    orderLock: boolean;
+    overviewLock: boolean;
+    directedLock: boolean;
+    writtenLock: boolean;
 }

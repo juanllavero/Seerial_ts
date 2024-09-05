@@ -22,14 +22,26 @@ const renderEpisodeWindow = () => {
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, selectImage] = useState<string | undefined>(undefined);
 
+    const [nameLock, setNameLock] = useState<boolean>(false);
+    const [yearLock, setYearLock] = useState<boolean>(false);
+    const [orderLock, setOrderLock] = useState<boolean>(false);
+    const [overviewLock, setOverviewLock] = useState<boolean>(false);
+    const [directedLock, setDirectedLock] = useState<boolean>(false);
+    const [writtenLock, setWrittenLock] = useState<boolean>(false);
+
+    const [name, setName] = useState<string>("");
+    const [year, setYear] = useState<string>("");
+    const [order, setOrder] = useState<number>(0);
+    const [overview, setOverview] = useState<string>("");
+    const [directedBy, setDirectedBy] = useState<string>("");
+    const [writtenBy, setWrittenBy] = useState<string>("");
+
     useEffect(() => {
         const getImages = async () => {
             const path = await window.electronAPI.getExternalPath("resources/img/discCovers/" + selectedEpisode?.id + "/");
             if (path) {
                 const images = await window.electronAPI.getImages(path);
                 setImages(images);
-
-                console.log(images);
             }
         }
 
@@ -40,6 +52,44 @@ const renderEpisodeWindow = () => {
                 selectImage(selectedEpisode?.imgSrc.split('/').pop())
         }
     }, [menuSection]);
+
+    useEffect(() => {
+        if (episodeMenuOpen && selectedEpisode) {
+            dispatch(changeMenuSection(Section.General));
+
+            // @ts-ignore
+            window.electronAPI.getMediaInfo(selectedEpisode).then((data) => {
+                if (data){
+                    selectedEpisode.mediaInfo = data.mediaInfo;
+                    selectedEpisode.videoTracks = data.videoTracks;
+                    selectedEpisode.audioTracks = data.audioTracks;
+                    selectedEpisode.subtitleTracks = data.subtitleTracks;
+                    selectedEpisode.chapters = data.chapters;
+                    selectedEpisode.runtimeInSeconds = data.runtimeInSeconds;
+                }
+            });
+        }
+    }, [episodeMenuOpen]);
+
+    useEffect(() => {
+        if (selectedEpisode){
+            setName(selectedEpisode.name);
+            setYear(selectedEpisode.year);
+            setOrder(selectedEpisode.order);
+            setOverview(selectedEpisode.overview);
+            setDirectedBy(selectedEpisode.directedBy);
+            setWrittenBy(selectedEpisode.writtenBy);
+
+            setNameLock(selectedEpisode.nameLock);
+            setYearLock(selectedEpisode.yearLock);
+            setOrderLock(selectedEpisode.orderLock);
+            setOverviewLock(selectedEpisode.overviewLock);
+            setDirectedLock(selectedEpisode.directedLock);
+            setWrittenLock(selectedEpisode.writtenLock);
+        }
+
+
+    }, [selectedEpisode]);
 
     const getVideoInfo = (track: VideoTrackData) => {
         const mediaInfoFieldsVideo = [
@@ -128,6 +178,30 @@ const renderEpisodeWindow = () => {
         );
     };
 
+    const handleSavingChanges = () => {
+        if (selectedEpisode) {
+            selectedEpisode.name = name;
+            selectedEpisode.year = year;
+            selectedEpisode.order = order;
+            selectedEpisode.overview = overview;
+            selectedEpisode.directedBy = directedBy;
+            selectedEpisode.writtenBy = writtenBy;
+
+            selectedEpisode.nameLock = nameLock;
+            selectedEpisode.yearLock = yearLock;
+            selectedEpisode.orderLock = orderLock;
+            selectedEpisode.overviewLock = overviewLock;
+            selectedEpisode.directedLock = directedLock;
+            selectedEpisode.writtenLock = writtenLock;
+
+            if (selectedImage){
+                selectedEpisode.imgSrc = "resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage;
+            }
+        }
+
+        dispatch(toggleEpisodeWindow());
+    };
+
     return (
         <>
             <section className={`dialog ${episodeMenuOpen ? ' dialog-active' : ''}`}>
@@ -155,61 +229,76 @@ const renderEpisodeWindow = () => {
                         <>
                             <div className="dialog-input-box">
                                 <span>{t('name')}</span>
-                                <div className="dialog-input-lock locked">
-                                    <a href="#">
+                                <div className={`dialog-input-lock ${nameLock ? ' locked' : ''}`}>
+                                    <a href="#" onClick={() => setNameLock(!nameLock)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                             <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                         </svg>
                                     </a>
-                                    <input type="text" value={selectedEpisode?.name}/>
+                                    <input type="text" defaultValue={name} onChange={() => {
+                                        setNameLock(true);
+                                        setName(name);
+                                    }}/>
                                 </div>
                             </div>
                             <section className="dialog-horizontal-box">
                                 <div className="dialog-input-box">
                                     <span>{t('year')}</span>
-                                    <div className="dialog-input-lock">
-                                        <a href="#">
+                                    <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setYearLock(!yearLock)}>
                                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                                 <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                             </svg>
                                         </a>
-                                        <input type="text" value={selectedEpisode?.year}/>
+                                        <input type="text" defaultValue={year} onChange={() => {
+                                            setYearLock(true);
+                                            setYear(year);
+                                        }}/>
                                     </div>
                                 </div>
                                 <div className="dialog-input-box">
                                     <span>{t('order')}</span>
-                                    <div className="dialog-input-lock">
-                                        <a href="#">
+                                    <div className={`dialog-input-lock ${orderLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setOrderLock(!orderLock)}>
                                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                                 <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                             </svg>
                                         </a>
-                                        <input type="text" value={selectedEpisode?.order}/>
+                                        <input type="number" defaultValue={order} onChange={() => {
+                                            setOrderLock(true);
+                                            setOrder(order);
+                                        }}/>
                                     </div>
                                 </div>
                             </section>
                             <div className="dialog-input-box">
                                 <span>{t('overview')}</span>
-                                <div className="dialog-input-lock">
-                                    <a href="#">
+                                <div className={`dialog-input-lock ${overviewLock ? ' locked' : ''}`}>
+                                    <a href="#" onClick={() => setOverviewLock(!overviewLock)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                             <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                         </svg>
                                     </a>
-                                    <textarea rows={5} value={selectedEpisode?.overview}/>
+                                    <textarea rows={5} defaultValue={overview} onChange={() => {
+                                        setOverviewLock(true);
+                                        setOverview(overview);
+                                    }}/>
                                 </div>
                             </div>
                             {
                                 selectedEpisode && selectedEpisode.directedBy !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('directedBy')}</span>
-                                        <div className="dialog-input-lock">
-                                            <a href="#">
+                                        <div className={`dialog-input-lock ${directedLock ? ' locked' : ''}`}>
+                                            <a href="#" onClick={() => setDirectedLock(!directedLock)}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" value={selectedEpisode?.directedBy}/>
+                                            <input type="text" defaultValue={directedBy} onChange={() => {
+                                                setDirectedLock(true);
+                                                setDirectedBy(directedBy);
+                                            }}/>
                                         </div>
                                     </div>
                                 ) : (<></>)
@@ -218,13 +307,16 @@ const renderEpisodeWindow = () => {
                                 selectedEpisode && selectedEpisode.writtenBy !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('writtenBy')}</span>
-                                        <div className="dialog-input-lock">
-                                            <a href="#">
+                                        <div className={`dialog-input-lock ${writtenLock ? ' locked' : ''}`}>
+                                            <a href="#" onClick={() => setWrittenLock(!writtenLock)}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" value={selectedEpisode?.writtenBy}/>
+                                            <input type="text" value={writtenBy} onChange={() => {
+                                                setWrittenLock(true);
+                                                setWrittenBy(writtenBy);
+                                            }}/>
                                         </div>
                                     </div>
                                 ) : (<></>)
@@ -338,7 +430,7 @@ const renderEpisodeWindow = () => {
                 </section>
                 <section className="dialog-bottom">
                     <button className="desktop-dialog-btn" onClick={() => dispatch(toggleEpisodeWindow())}>{t('cancelButton')}</button>
-                    <button className="btn-app-color">{t('saveButton')}</button>
+                    <button className="btn-app-color" onClick={() => handleSavingChanges()}>{t('saveButton')}</button>
                 </section>
                 </div>
             </section>

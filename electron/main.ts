@@ -14,6 +14,7 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
+import { Utils } from '../src/data/objects/Utils';
 
 //#region EXTERNAL PATHS
 /**
@@ -21,15 +22,11 @@ import { EpisodeData } from '@interfaces/EpisodeData';
  * @param relativePath Relative path to a file or folder outside the application
  * @returns The absolute path to that file or folder
  */
-const getExternalPath = (relativePath: string) => {
-  const basePath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
-  return path.join(basePath, relativePath);
-};
 
 ipcMain.handle('get-external-path', async (_event, relativePath: string) => {
   try {
     // Llama a la función para obtener la ruta absoluta
-    const absolutePath = getExternalPath(relativePath);
+    const absolutePath = Utils.getExternalPath(relativePath);
 
     // Verifica que el path sea una cadena válida
     if (typeof absolutePath !== 'string') {
@@ -44,7 +41,7 @@ ipcMain.handle('get-external-path', async (_event, relativePath: string) => {
 });
 
 // Set Configuration file path
-Configuration.setConfigFile(getExternalPath('resources/config/config.properties'));
+Configuration.setConfigFile(Utils.getExternalPath('resources/config/config.properties'));
 //#endregion
 
 //#region LOCALIZATION
@@ -72,6 +69,10 @@ ipcMain.handle('get-images', async (_event, dirPath) => {
   );
   return images.map((image) => path.join(dirPath, image));
 });
+//#endregion
+
+//#region MEDIA INFO
+
 //#endregion
 
 //#region PROPERTIES AND DATA READING
@@ -129,6 +130,47 @@ const saveData = (newData: any) => {
 
 //#endregion
 
+let episode: EpisodeData | undefined = {
+  id: '',
+  name: '',
+  overview: '',
+  year: '',
+  order: 0,
+  score: 0,
+  imdbScore: 0,
+  runtime: 0,
+  runtimeInSeconds: 0,
+  episodeNumber: 0,
+  seasonNumber: 0,
+  videoSrc: '',
+  imgSrc: '',
+  seasonID: '',
+  watched: false,
+  timeWatched: 0,
+  chapters: [],
+  videoTracks: [],
+  audioTracks: [],
+  subtitleTracks: [],
+  directedBy: '',
+  writtenBy: '',
+  nameLock: false,
+  yearLock: false,
+  orderLock: false,
+  overviewLock: false,
+  directedLock: false,
+  writtenLock: false
+};
+
+episode.videoSrc = "F:\\UHD\\2001 Una Odisea en el Espacio\\2001 Una Odisea en el Espacio (1968).mkv";
+
+const getMediaInfo = async (episode: EpisodeData) => {
+  return await Utils.getMediaInfo(episode);
+};
+
+ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
+  return getMediaInfo(episode);
+});
+
 //#region WINDOWS CREATION
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -150,6 +192,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
       sandbox: true,
       contextIsolation: true,
+      nodeIntegration: true,
       webSecurity: false,
       plugins: true
     },

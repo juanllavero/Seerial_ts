@@ -28,6 +28,12 @@ export class Episode {
     subtitleTracks: SubtitleTrack[];
     directedBy: string;
     writtenBy: string;
+    nameLock: boolean;
+    yearLock: boolean;
+    orderLock: boolean;
+    overviewLock: boolean;
+    directedLock: boolean;
+    writtenLock: boolean;
   
     constructor() {
       this.id = crypto.randomUUID();
@@ -53,6 +59,12 @@ export class Episode {
       this.subtitleTracks = [];
       this.directedBy = '';
       this.writtenBy = '';
+      this.nameLock = false;
+      this.yearLock = false;
+      this.orderLock = false;
+      this.overviewLock = false;
+      this.directedLock = false;
+      this.writtenLock = false;
     }
   
     static fromJSON(json: any): Episode {
@@ -73,13 +85,19 @@ export class Episode {
       episode.seasonID = json.seasonID;
       episode.watched = json.watched;
       episode.timeWatched = json.timeWatched;
-      episode.chapters = json.chapters; // Ajustar si tienes una clase Chapter
-      episode.mediaInfo = json.mediaInfo; // Ajustar si tienes una clase MediaInfo
-      episode.videoTracks = json.videoTracks; // Ajustar si tienes una clase VideoTrack
-      episode.audioTracks = json.audioTracks; // Ajustar si tienes una clase AudioTrack
-      episode.subtitleTracks = json.subtitleTracks; // Ajustar si tienes una clase SubtitleTrack
+      episode.chapters = json.chapters;
+      episode.mediaInfo = json.mediaInfo;
+      episode.videoTracks = json.videoTracks;
+      episode.audioTracks = json.audioTracks;
+      episode.subtitleTracks = json.subtitleTracks;
       episode.directedBy = json.directedBy;
       episode.writtenBy = json.writtenBy;
+      episode.nameLock = json.nameLock;
+      episode.yearLock = json.yearLock;
+      episode.orderLock = json.orderLock;
+      episode.overviewLock = json.overviewLock;
+      episode.directedLock = json.directedLock;
+      episode.writtenLock = json.writtenLock;
       return episode;
     }
   
@@ -107,7 +125,13 @@ export class Episode {
         audioTracks: this.audioTracks, // Ajustar si tienes una clase AudioTrack
         subtitleTracks: this.subtitleTracks, // Ajustar si tienes una clase SubtitleTrack
         directedBy: this.directedBy,
-        writtenBy: this.writtenBy
+        writtenBy: this.writtenBy,
+        nameLock: this.nameLock,
+        yearLock: this.yearLock,
+        orderLock: this.orderLock,
+        overviewLock: this.overviewLock,
+        directedLock: this.directedLock,
+        writtenLock: this.writtenLock,
       };
     }
 

@@ -19,8 +19,9 @@ export interface ElectronAPI {
   showControls: () => void;
   hideControls: () => void;
   getExternalPath: (relativePath: string) => string;
-  openFolderDialog: () => Promise<string[]>,
-  getImages: (dirPath) => Promise<string[]>,
+  openFolderDialog: () => Promise<string[]>;
+  getImages: (dirPath) => Promise<string[]>;
+  getMediaInfo: (episode: EpisodeData) => EpisodeData;
 }
   
 declare global {
