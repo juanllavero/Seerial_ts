@@ -185,5 +185,8 @@
     "addLibraryMessage": "Aggiungine una con il pulsante \"Aggiungi biblioteca\"",
     "addFolderText": "Aggiungi un tappeto alla tua biblioteca",
     "updateMetadata": "Aggiorna i metadati",
-    "inProgress": "In corso"
+    "inProgress": "In corso",
+    "media": "Media",
+    "orderByTitle": "Ordina per titolo",
+    "tagline": "Slogan"
 }  

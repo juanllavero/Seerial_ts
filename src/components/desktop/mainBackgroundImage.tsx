@@ -6,7 +6,7 @@ import ResolvedImage from '@components/Image';
 // Componente definido sin React.FC
 export function renderMainBackgroundImage() {
     const dispatch = useDispatch();
-    const selectedSeason = useSelector((state: RootState) => state.series.selectedSeason);
+    const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
     const imageLoaded = useSelector((state: RootState) => state.imageLoaded.isImageLoaded);
 
     const handleImageLoad = () => {

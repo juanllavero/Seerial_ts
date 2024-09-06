@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
-import { toggleLibraryEditWindow } from "redux/slices/librarySlice";
+import { toggleLibraryEditWindow } from "redux/slices/dataSlice";
 import { useTranslation } from "react-i18next";
 
 const renderLibraryWindow = () => {
@@ -17,8 +17,8 @@ const renderLibraryWindow = () => {
     const [selectedLibraryType, setSelectedLibraryType] = useState<string>("Movies");
 
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
-    const libraryMenuOpen = useSelector((state: RootState) => state.library.libraryEditWindow);
-    const selectedLibrary = useSelector((state: RootState) => state.library.libraryForMenu);
+    const libraryMenuOpen = useSelector((state: RootState) => state.data.libraryEditWindow);
+    const selectedLibrary = useSelector((state: RootState) => state.data.libraryForMenu);
 
     const supportedLanguages = Array.isArray(i18n.options?.supportedLngs)
     ? i18n.options.supportedLngs.filter(lng => lng !== 'cimode')

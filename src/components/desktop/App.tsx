@@ -5,7 +5,7 @@ import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
-import { setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/librarySlice';
+import { setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/dataSlice';
 import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
@@ -15,6 +15,7 @@ import ResolvedImage from '@components/Image';
 import { closeAllMenus, toggleMainMenu } from 'redux/slices/contextMenuSlice';
 import renderLibraryWindow from './libraryWindow';
 import renderEpisodeWindow from './episodeWindow';
+import renderSeasonWindow from './seasonWindow';
 
 function App() {
   const dispatch = useDispatch();
@@ -83,6 +84,7 @@ function App() {
       {
         <>
           {renderLibraryWindow()}
+          {renderSeasonWindow()}
           {renderEpisodeWindow()}
         </>
       }

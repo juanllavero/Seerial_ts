@@ -9,10 +9,10 @@ name: 'transparentImage',
 initialState,
 reducers: {
     loadTransparentImage: (state) => {
-    state.isTransparentImageLoaded = true;
+        state.isTransparentImageLoaded = true;
     },
     removeTransparentImage: (state) => {
-    state.isTransparentImageLoaded = false;
+        state.isTransparentImageLoaded = false;
     },
 },
 });

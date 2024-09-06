@@ -185,5 +185,8 @@
     "addLibraryMessage": "Fügen Sie eine mit der Schaltfläche \"Bibliothek hinzufügen\" hinzu",
     "addFolderText": "Fügen Sie Teppiche zu Ihrer Bibliothek hinzu",
     "updateMetadata": "Aktualisieren von Metadaten",
-    "inProgress": "Im Gange"
+    "inProgress": "Im Gange",
+    "media": "Medien",
+    "orderByTitle": "Nach Titel sortieren",
+    "tagline": "Slogan"
 }  

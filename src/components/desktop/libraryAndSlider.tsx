@@ -1,9 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { resetSelection } from '../../redux/slices/seriesSlice';
 import { increaseEpisodeImageSize, reduceEpisodeImageSize } from '../../redux/slices/episodeImageSlice';
 import { increaseSeriesImageSize, reduceSeriesImageSize } from '../../redux/slices/seriesImageSlice';
 import { removeTransparentImage } from '../../redux/slices/transparentImageLoadedSlice';
-import { selectLibrary, setLibraryForMenu, toggleLibraryEditWindow } from '../../redux/slices/librarySlice';
+import { selectLibrary, setLibraryForMenu, toggleLibraryEditWindow, resetSelection } from '../../redux/slices/dataSlice';
 import { RootState } from '../../redux/store';
 import { ContextMenu } from 'primereact/contextmenu';
 import { useRef } from 'react';
@@ -13,8 +12,8 @@ import { useTranslation } from 'react-i18next';
 export const renderLibraryAndSlider = () => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
-    const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
+    const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
     const librarySecondaryMenuOpen = useSelector((state: RootState) => state.contextMenu.libraryMenuSecondary);
 
     //Reducers for images size

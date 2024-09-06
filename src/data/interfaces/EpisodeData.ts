@@ -6,12 +6,24 @@ import {VideoTrackData} from "@interfaces/VideoTrackData"
 
 export interface EpisodeData{
     id: string;
+
+    //Common data
     name: string;
     overview: string;
     year: string;
-    order: number;
+    nameLock: boolean;
+    yearLock: boolean;
+    overviewLock: boolean;
+
+    //Show
     score: number;
     imdbScore: number;
+    directedBy: string[];
+    writtenBy: string[];
+    directedLock: boolean;
+    writtenLock: boolean;
+
+    order: number;
     runtime: number;
     runtimeInSeconds: number;
     episodeNumber: number;
@@ -26,12 +38,4 @@ export interface EpisodeData{
     videoTracks: VideoTrackData[];
     audioTracks: AudioTrackData[];
     subtitleTracks: SubtitleTrackData[];
-    directedBy: string;
-    writtenBy: string;
-    nameLock: boolean;
-    yearLock: boolean;
-    orderLock: boolean;
-    overviewLock: boolean;
-    directedLock: boolean;
-    writtenLock: boolean;
 }

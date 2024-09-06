@@ -185,5 +185,8 @@
     "addLibraryMessage": "Add one with the \"Add library\" button",
     "addFolderText": "Add folders to your library",
     "updateMetadata": "Update metadata",
-    "inProgress": "In progress"
+    "inProgress": "In progress",
+    "media": "Media",
+    "orderByTitle": "Order by title",
+    "tagline": "Tagline"
   }

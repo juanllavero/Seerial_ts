@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLibrary, setLibraryForMenu, toggleLibraryEditWindow } from '../../redux/slices/librarySlice';
-import { resetSelection } from '../../redux/slices/seriesSlice';
+import { selectLibrary, setLibraryForMenu, toggleLibraryEditWindow, resetSelection } from '../../redux/slices/dataSlice';
 import { removeTransparentImage } from '../../redux/slices/transparentImageLoadedSlice';
 import { RootState } from '../../redux/store';
 import { closeAllMenus, toggleLibraryMenu } from 'redux/slices/contextMenuSlice';
@@ -11,11 +10,11 @@ import { useTranslation } from 'react-i18next';
 export const renderLibrariesList = () => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const libraries = useSelector((state: RootState) => state.library.libraries);
-    const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
+    const libraries = useSelector((state: RootState) => state.data.libraries);
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
 
     const libraryMenuOpen = useSelector((state: RootState) => state.contextMenu.libraryMenu);
-    const libraryForMenu = useSelector((state: RootState) => state.library.libraryForMenu);
+    const libraryForMenu = useSelector((state: RootState) => state.data.libraryForMenu);
 
     const cm = useRef<ContextMenu | null>(null);
 

@@ -2,9 +2,9 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
 export const renderLogoOrText = () => {
-    const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
-    const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
-    const selectedSeason = useSelector((state: RootState) => state.series.selectedSeason);
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
+    const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
+    const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
 
     if (selectedLibrary && selectedLibrary.type == "Shows"){
         if (selectedSeries && selectedSeries.logoSrc != ""){

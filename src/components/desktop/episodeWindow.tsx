@@ -5,81 +5,125 @@ import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
 import { useTranslation } from "react-i18next";
-import { toggleEpisodeWindow, updateEpisode, updateMediaInfo } from "redux/slices/episodeSlice";
+import { toggleEpisodeWindow, updateEpisode } from "redux/slices/dataSlice";
 import { VideoTrackData } from "@interfaces/VideoTrackData";
 import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
-import { EpisodeData } from "@interfaces/EpisodeData";
 
 const renderEpisodeWindow = () => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
-    const episodeMenuOpen = useSelector((state: RootState) => state.episodes.episodeWindowOpen);
-    const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
-    const selectedEpisode = useSelector((state: RootState) => state.episodes.selectedEpisode);
+    const episodeMenuOpen = useSelector((state: RootState) => state.data.episodeWindowOpen);
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
+    const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
+    const selectedEpisode = useSelector((state: RootState) => state.data.selectedEpisode);
+
+    const [pasteUrl, setPasteUrl] = useState<boolean>(false);
+    const [imageUrl, setImageUrl] = useState<string>('');
+    const [imageDownloaded, setImageDownloaded] = useState<boolean>(false);
 
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, selectImage] = useState<string | undefined>(undefined);
 
     const [nameLock, setNameLock] = useState<boolean>(false);
     const [yearLock, setYearLock] = useState<boolean>(false);
-    const [orderLock, setOrderLock] = useState<boolean>(false);
     const [overviewLock, setOverviewLock] = useState<boolean>(false);
     const [directedLock, setDirectedLock] = useState<boolean>(false);
     const [writtenLock, setWrittenLock] = useState<boolean>(false);
 
     const [name, setName] = useState<string>("");
     const [year, setYear] = useState<string>("");
-    const [order, setOrder] = useState<number>(0);
     const [overview, setOverview] = useState<string>("");
     const [directedBy, setDirectedBy] = useState<string>("");
     const [writtenBy, setWrittenBy] = useState<string>("");
 
     useEffect(() => {
-        const getImages = async () => {
+        const fetchImages = async () => {
+            setPasteUrl(false);
+            
             const path = await window.electronAPI.getExternalPath("resources/img/discCovers/" + selectedEpisode?.id + "/");
             if (path) {
                 const images = await window.electronAPI.getImages(path);
                 setImages(images);
             }
+
+            if (selectedEpisode?.imgSrc)
+                selectImage(selectedEpisode?.imgSrc.split('/').pop());
         }
 
         if (menuSection === Section.Thumbnails){
-            getImages();
-
-            if (selectedEpisode?.imgSrc)
-                selectImage(selectedEpisode?.imgSrc.split('/').pop())
+            fetchImages().then(() => setImageDownloaded(false));
         }
-    }, [menuSection]);
+    }, [menuSection, imageDownloaded]);
 
     useEffect(() => {
         if (episodeMenuOpen && selectedEpisode) {
+            let noImages: string[] = [];
+            setImages(noImages);
             dispatch(changeMenuSection(Section.General));
 
             // @ts-ignore
             window.electronAPI.getMediaInfo(selectedEpisode).then((data) => {
                 if (data){
-                    dispatch(updateMediaInfo(data));
+                    //dispatch(updateMediaInfo(data));
+                    dispatch(updateEpisode({
+                        mediaInfo: data.mediaInfo,
+                        videoTracks: data.videoTracks,
+                        audioTracks: data.audioTracks,
+                        subtitleTracks: data.subtitleTracks,
+                        chapters: data.chapters,
+                        id: selectedEpisode.id,
+                        name: selectedEpisode.name,
+                        overview: selectedEpisode.overview,
+                        year: selectedEpisode.year,
+                        order: selectedEpisode.order,
+                        score: selectedEpisode.score,
+                        imdbScore: selectedEpisode.imdbScore,
+                        runtime: selectedEpisode.runtime,
+                        runtimeInSeconds: selectedEpisode.runtimeInSeconds,
+                        episodeNumber: selectedEpisode.episodeNumber,
+                        seasonNumber: selectedEpisode.seasonNumber,
+                        videoSrc: selectedEpisode.videoSrc,
+                        imgSrc: selectedEpisode.imgSrc,
+                        seasonID: selectedEpisode.seasonID,
+                        watched: selectedEpisode.watched,
+                        timeWatched: selectedEpisode.timeWatched,
+                        directedBy: selectedEpisode.directedBy,
+                        writtenBy: selectedEpisode.writtenBy,
+                        nameLock: selectedEpisode.nameLock,
+                        yearLock: selectedEpisode.yearLock,
+                        overviewLock: selectedEpisode.overviewLock,
+                        directedLock: selectedEpisode.directedLock,
+                        writtenLock: selectedEpisode.writtenLock
+                    }))
                 }
             });
 
             setName(selectedEpisode.name);
             setYear(selectedEpisode.year);
-            setOrder(selectedEpisode.order);
             setOverview(selectedEpisode.overview);
             setDirectedBy(selectedEpisode.directedBy);
             setWrittenBy(selectedEpisode.writtenBy);
 
             setNameLock(selectedEpisode.nameLock);
             setYearLock(selectedEpisode.yearLock);
-            setOrderLock(selectedEpisode.orderLock);
             setOverviewLock(selectedEpisode.overviewLock);
             setDirectedLock(selectedEpisode.directedLock);
             setWrittenLock(selectedEpisode.writtenLock);
         }
     }, [episodeMenuOpen]);
+
+    useEffect(() => {
+        window.ipcRenderer.on('download-complete', (_event, _message) => {
+            setImageDownloaded(true);
+        });
+
+        window.ipcRenderer.on('download-error', (_event, message) => {
+            alert(`Error: ${message}`);
+        });
+    }, []);
 
     const getVideoInfo = (track: VideoTrackData) => {
         const mediaInfoFieldsVideo = [
@@ -103,7 +147,7 @@ const renderEpisodeWindow = () => {
                 {mediaInfoFieldsVideo.map(
                     (field, index) =>
                         field.value && (
-                            <div key={index}>
+                            <div key={index + "video-media"}>
                                 <span id="media-info-key">{field.key}</span>
                                 <span id="media-info-value">{field.value}</span>
                             </div>
@@ -133,7 +177,7 @@ const renderEpisodeWindow = () => {
                 {mediaInfoFieldsAudio.map(
                     (field, index) =>
                         field.value && (
-                            <div key={index}>
+                            <div key={index + "audio-media"}>
                                 <span id="media-info-key">{field.key}</span>
                                 <span id="media-info-value">{field.value}</span>
                             </div>
@@ -158,7 +202,7 @@ const renderEpisodeWindow = () => {
                 {mediaInfoFieldsSubs.map(
                     (field, index) =>
                         field.value && (
-                            <div key={index}>
+                            <div key={index + "subs-media"}>
                                 <span id="media-info-key">{field.key}</span>
                                 <span id="media-info-value">{field.value}</span>
                             </div>
@@ -170,41 +214,43 @@ const renderEpisodeWindow = () => {
 
     const handleSavingChanges = () => {
         if (selectedEpisode) {
-            let newData: EpisodeData = {
-                id: "",
+            dispatch(updateEpisode({
                 name: name,
                 overview: overview,
                 year: year,
-                order: order,
-                score: 0,
-                imdbScore: 0,
-                runtime: 0,
-                runtimeInSeconds: 0,
-                episodeNumber: 0,
-                seasonNumber: 0,
-                videoSrc: "",
-                imgSrc: selectedImage ? ("resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage) : "",
-                seasonID: "",
-                watched: false,
-                timeWatched: 0,
-                chapters: [],
-                videoTracks: [],
-                audioTracks: [],
-                subtitleTracks: [],
+                order: selectedEpisode.order,
+                imgSrc: selectedImage ? ("resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
                 directedBy: directedBy,
                 writtenBy: writtenBy,
                 nameLock: nameLock,
                 yearLock: yearLock,
-                orderLock: orderLock,
                 overviewLock: overviewLock,
                 directedLock: directedLock,
-                writtenLock: writtenLock
-            };
-
-            dispatch(updateEpisode(newData));
+                writtenLock: writtenLock,
+                id: selectedEpisode.id,
+                score: selectedEpisode.score,
+                imdbScore: selectedEpisode.imdbScore,
+                runtime: selectedEpisode.runtime,
+                runtimeInSeconds: selectedEpisode.runtimeInSeconds,
+                episodeNumber: selectedEpisode.episodeNumber,
+                seasonNumber: selectedEpisode.seasonNumber,
+                videoSrc: selectedEpisode.videoSrc,
+                seasonID: selectedEpisode.seasonID,
+                watched: selectedEpisode.watched,
+                timeWatched: selectedEpisode.timeWatched,
+                chapters: selectedEpisode.chapters,
+                videoTracks: selectedEpisode.videoTracks,
+                audioTracks: selectedEpisode.audioTracks,
+                subtitleTracks: selectedEpisode.subtitleTracks
+            }));
         }
 
         dispatch(toggleEpisodeWindow());
+    };
+
+    const handleDownload = () => {
+        setPasteUrl(false);
+        window.ipcRenderer.send('download-image-url', imageUrl, "resources/img/discCovers/" + selectedEpisode?.id + "/");
     };
 
     return (
@@ -240,42 +286,26 @@ const renderEpisodeWindow = () => {
                                             <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                         </svg>
                                     </a>
-                                    <input type="text" defaultValue={name} onChange={() => {
+                                    <input type="text" value={name} onChange={(e) => {
                                         setNameLock(true);
-                                        setName(name);
+                                        setName(e.target.value);
                                     }}/>
                                 </div>
                             </div>
-                            <section className="dialog-horizontal-box">
-                                <div className="dialog-input-box">
-                                    <span>{t('year')}</span>
-                                    <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
-                                        <a href="#" onClick={() => setYearLock(!yearLock)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                            </svg>
-                                        </a>
-                                        <input type="text" defaultValue={year} onChange={() => {
-                                            setYearLock(true);
-                                            setYear(year);
-                                        }}/>
-                                    </div>
+                            <div className="dialog-input-box">
+                                <span>{t('year')}</span>
+                                <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
+                                    <a href="#" onClick={() => setYearLock(!yearLock)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                            <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                        </svg>
+                                    </a>
+                                    <input type="text" value={year} onChange={(e) => {
+                                        setYearLock(true);
+                                        setYear(e.target.value);
+                                    }}/>
                                 </div>
-                                <div className="dialog-input-box">
-                                    <span>{t('order')}</span>
-                                    <div className={`dialog-input-lock ${orderLock ? ' locked' : ''}`}>
-                                        <a href="#" onClick={() => setOrderLock(!orderLock)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                            </svg>
-                                        </a>
-                                        <input type="number" defaultValue={order} onChange={() => {
-                                            setOrderLock(true);
-                                            setOrder(order);
-                                        }}/>
-                                    </div>
-                                </div>
-                            </section>
+                            </div>
                             <div className="dialog-input-box">
                                 <span>{t('overview')}</span>
                                 <div className={`dialog-input-lock ${overviewLock ? ' locked' : ''}`}>
@@ -284,14 +314,14 @@ const renderEpisodeWindow = () => {
                                             <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                         </svg>
                                     </a>
-                                    <textarea rows={5} defaultValue={overview} onChange={() => {
+                                    <textarea rows={5} value={overview} onChange={(e) => {
                                         setOverviewLock(true);
-                                        setOverview(overview);
+                                        setOverview(e.target.value);
                                     }}/>
                                 </div>
                             </div>
                             {
-                                selectedEpisode && selectedEpisode.directedBy !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.directedBy !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('directedBy')}</span>
                                         <div className={`dialog-input-lock ${directedLock ? ' locked' : ''}`}>
@@ -300,16 +330,16 @@ const renderEpisodeWindow = () => {
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" defaultValue={directedBy} onChange={() => {
+                                            <input type="text" value={directedBy} onChange={(e) => {
                                                 setDirectedLock(true);
-                                                setDirectedBy(directedBy);
+                                                setDirectedBy(e.target.value);
                                             }}/>
                                         </div>
                                     </div>
                                 ) : (<></>)
                             }
                             {
-                                selectedEpisode && selectedEpisode.writtenBy !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.writtenBy !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('writtenBy')}</span>
                                         <div className={`dialog-input-lock ${writtenLock ? ' locked' : ''}`}>
@@ -318,9 +348,9 @@ const renderEpisodeWindow = () => {
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" defaultValue={writtenBy} onChange={() => {
+                                            <input type="text" value={writtenBy} onChange={(e) => {
                                                 setWrittenLock(true);
-                                                setWrittenBy(writtenBy);
+                                                setWrittenBy(e.target.value);
                                             }}/>
                                         </div>
                                     </div>
@@ -329,13 +359,40 @@ const renderEpisodeWindow = () => {
                         </>
                         ) : menuSection == Section.Thumbnails ? (
                         <>
-                            <div className="dialog-horizontal-box horizontal-center-align">
-                                <button className="desktop-dialog-btn">Subir imagen</button>
-                                <button className="desktop-dialog-btn">Pegar enlace</button>
-                            </div>
+                            {
+                                pasteUrl ? (
+                                    <div className="horizontal-center-align">
+                                        <div className="dialog-input-box">
+                                            <input type="text" placeholder={t('urlText')} onChange={(e) => {
+                                                setImageUrl(e.target.value)
+                                            }}/>
+                                        </div>
+                                        <button className="desktop-dialog-btn"
+                                        onClick={() => setPasteUrl(false)}>
+                                                {t('cancelButton')}
+                                        </button>
+                                        <button className="desktop-dialog-btn"
+                                        onClick={handleDownload}>
+                                            {t('loadButton')}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="horizontal-center-align">
+                                        <button className="desktop-dialog-btn"
+                                        onClick={() => setPasteUrl(false)}>
+                                            {t('selectImage')}
+                                        </button>
+                                        <button className="desktop-dialog-btn"
+                                        onClick={() => setPasteUrl(true)}>
+                                            {t('fromURLButton')}
+                                        </button>
+                                    </div>
+                                )
+                            }
+                            
                             <div className="dialog-images-scroll">
                             {images.map((image, index) => (
-                                <div key={image + index} className={`dialog-image-btn ${image.split('\\').pop() === selectedImage ? ' dialog-image-btn-active' : ''}`}
+                                <div key={image} className={`dialog-image-btn ${image.split('\\').pop() === selectedImage ? ' dialog-image-btn-active' : ''}`}
                                 onClick={() => selectImage(image.split('\\').pop())}>
                                     <img src={`file://${image}`} alt={`img-${index}`} style={{ width: 290 }} />
                                     {
@@ -406,25 +463,25 @@ const renderEpisodeWindow = () => {
                                     </section>
                                     <section className="right-media-info">
                                         {selectedEpisode?.videoTracks.map((track: VideoTrackData, index: number) => (
-                                            <>
+                                            <div key={track.id + "-video"}>
                                                 <span id="media-info-title">Video</span>
                                                 {getVideoInfo(track)}
                                                 <div className="separator"></div>
-                                            </>
+                                            </div>
                                         ))}
                                         {selectedEpisode?.audioTracks.map((audioTrack: AudioTrackData, index: number) => (
-                                            <>
+                                            <div key={index + "-audio"}>
                                                 <span id="media-info-title">Audio</span>
                                                 {getAudioInfo(audioTrack)}
                                                 <div className="separator"></div>
-                                            </>
+                                            </div>
                                         ))}
                                         {selectedEpisode?.subtitleTracks.map((track: SubtitleTrackData, index:number) => (
-                                            <>
+                                            <div key={index + "-subs"}>
                                                 <span id="media-info-title">Subtitle</span>
                                                 {getSubtitleInfo(track)}
                                                 <div className="separator"></div>
-                                            </>
+                                            </div>
                                         ))}
                                     </section>
                                 </div>

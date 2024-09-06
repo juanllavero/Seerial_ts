@@ -11,7 +11,7 @@
     "switchToDesktop": "Cambiar al Modo Escritorio",
     "switchToFullscreen": "Cambiar a Pantalla Completa",
     "exitFullscreen": "Salir",
-    "loadButton": "Cargar",
+    "loadButton": "Subir",
     "settings": "Preferencias",
     "exitButton": "Salir",
     "downloadButton": "Descargar",
@@ -95,7 +95,7 @@
     "allAudios": "Todos los archivos de audio",
     "croppedImage": "Imagen Recortada",
     "imageCropper": "Recortador de Imagen",
-    "urlText": "Pega una url",
+    "urlText": "Introduce una URL",
     "imageDownloaderTitle": "Imágenes descargadas",
     "correctIdentification": "Corregir identificación",
     "transparentCheck": "Transparente",
@@ -185,5 +185,8 @@
     "addLibraryMessage": "Añade una con el botón \"Añadir biblioteca\"",
     "addFolderText": "Añade carpetas a tu biblioteca",
     "updateMetadata": "Actualizar metadatos",
-    "inProgress": "En progreso"
+    "inProgress": "En progreso",
+    "media": "Medios",
+    "orderByTitle": "Ordenar por título",
+    "tagline": "Eslogan"
   }

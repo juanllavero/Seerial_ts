@@ -3,11 +3,30 @@ import { Cast } from './Cast';
 
 export class Season {
   id: string;
+
+  //Common data
   name: string;
-  overview: string;
   year: string;
-  order: number;
+  overview: string;
+  nameLock: boolean;
+  yearLock: boolean;
+  overviewLock: boolean;
+
+  //Moviecreator:
   score: number;
+  tagline: string;
+  creator: string[];
+  genres: string[];
+  cast: Cast[];
+  musicComposer: string[];
+  productionStudios: string[];
+  directedBy: string[];
+  writtenBy: string[];
+  studioLock: boolean;
+  taglineLock: boolean;
+  
+  //Other
+  order: number;
   seasonNumber: number;
   logoSrc: string;
   coverSrc: string;
@@ -25,14 +44,7 @@ export class Season {
   subtitleTrackLanguage: string;
   selectedSubtitleTrack: number;
   episodes: Episode[];
-  genres: string[];
   currentlyWatchingEpisode: number;
-  cast: Cast[];
-  creator: string;
-  musicComposer: string;
-  directedBy: string;
-  writtenBy: string;
-  productionStudios: string;
 
   constructor() {
     this.id = crypto.randomUUID();
@@ -61,11 +73,17 @@ export class Season {
     this.genres = [];
     this.currentlyWatchingEpisode = -1;
     this.cast = [];
-    this.creator = '';
-    this.musicComposer = '';
-    this.directedBy = '';
-    this.writtenBy = '';
-    this.productionStudios = '';
+    this.creator = [];
+    this.musicComposer = [];
+    this.directedBy = [];
+    this.writtenBy = [];
+    this.productionStudios = [];
+    this.tagline = '';
+    this.nameLock = false;
+    this.yearLock = false;
+    this.overviewLock = false;
+    this.studioLock = false;
+    this.taglineLock = false;
   }
 
   static fromJSON(json: any): Season {
@@ -101,6 +119,12 @@ export class Season {
     season.directedBy = json.directedBy;
     season.writtenBy = json.writtenBy;
     season.productionStudios = json.productionStudios;
+    season.tagline = json.tagline;
+    season.nameLock = json.nameLock;
+    season.yearLock = json.yearLock;
+    season.overviewLock = json.overviewLock;
+    season.studioLock = json.studioLock;
+    season.taglineLock = json.taglineLock;
     return season;
   }
 
@@ -136,7 +160,13 @@ export class Season {
       musicComposer: this.musicComposer,
       directedBy: this.directedBy,
       writtenBy: this.writtenBy,
-      productionStudios: this.productionStudios
+      productionStudios: this.productionStudios,
+      tagline: this.tagline,
+      nameLock: this.nameLock,
+      yearLock: this.yearLock,
+      overviewLock: this.overviewLock,
+      studioLock: this.studioLock,
+      taglineLock: this.taglineLock,
     };
   }
 
@@ -355,35 +385,35 @@ export class Season {
     this.cast = cast;
   }
 
-  getCreator(): string {
+  getCreator(): string[] {
     return this.creator;
   }
 
-  setCreator(creator: string): void {
+  setCreator(creator: string[]): void {
     this.creator = creator;
   }
 
-  getMusicComposer(): string {
+  getMusicComposer(): string[] {
     return this.musicComposer;
   }
 
-  setMusicComposer(musicComposer: string): void {
+  setMusicComposer(musicComposer: string[]): void {
     this.musicComposer = musicComposer;
   }
 
-  getDirectedBy(): string {
+  getDirectedBy(): string[] {
     return this.directedBy;
   }
 
-  setDirectedBy(directedBy: string): void {
+  setDirectedBy(directedBy: string[]): void {
     this.directedBy = directedBy;
   }
 
-  getWrittenBy(): string {
+  getWrittenBy(): string[] {
     return this.writtenBy;
   }
 
-  setWrittenBy(writtenBy: string): void {
+  setWrittenBy(writtenBy: string[]): void {
     this.writtenBy = writtenBy;
   }
 

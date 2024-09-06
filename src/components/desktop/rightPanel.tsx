@@ -1,20 +1,21 @@
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
-import { setShowPoster } from 'redux/slices/librarySlice';
-import { selectSeries, selectSeason, showSeriesMenu } from '../../redux/slices/seriesSlice';
-import { selectEpisode, setEpisodes, showMenu, toggleEpisodeWindow } from '../../redux/slices/episodeSlice';
+import { selectEpisode, showMenu, toggleEpisodeWindow, 
+  selectSeries, selectSeason, showSeriesMenu, setShowPoster,
+  selectLibrary, 
+  toggleSeasonWindow,
+  toggleSeriesWindow} from '../../redux/slices/dataSlice';
 import { RootState } from '../../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
-import { closeAllMenus, closeContextMenu, toggleContextMenu, toggleEpisodeMenu, toggleSeriesMenu } from 'redux/slices/contextMenuSlice';
+import { closeAllMenus, closeContextMenu, toggleContextMenu, toggleEpisodeMenu, toggleSeasonMenu, toggleSeriesMenu } from 'redux/slices/contextMenuSlice';
 import { loadTransparentImage } from 'redux/slices/transparentImageLoadedSlice';
 import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
-import { selectLibrary } from 'redux/slices/librarySlice';
 import ResolvedImage from '@components/Image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
 
 export const renderRightPanelContent = () => {
@@ -23,14 +24,13 @@ export const renderRightPanelContent = () => {
 
     const isContextMenuShown = useSelector((state: RootState) => state.contextMenu.isContextShown);
 
-    const libraries = useSelector((state: RootState) => state.library.libraries);
-    const selectedLibrary = useSelector((state: RootState) => state.library.selectedLibrary);
-    const selectedSeries = useSelector((state: RootState) => state.series.selectedSeries);
-    const selectedSeason = useSelector((state: RootState) => state.series.selectedSeason);
-    const selectedEpisode = useSelector((state: RootState) => state.episodes.selectedEpisode);
-    const episodes = useSelector((state: RootState) => state.episodes.episodes);
+    const libraries = useSelector((state: RootState) => state.data.libraries);
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
+    const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
+    const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
+    const selectedEpisode = useSelector((state: RootState) => state.data.selectedEpisode);
 
-    const seriesMenu = useSelector((state: RootState) => state.series.seriesMenu);
+    const seriesMenu = useSelector((state: RootState) => state.data.seriesMenu);
     const seriesMenuOpen = useSelector((state: RootState) => state.contextMenu.seriesMenu);
     const episodeMenuOpen = useSelector((state: RootState) => state.contextMenu.episodeMenu);
 
@@ -41,8 +41,8 @@ export const renderRightPanelContent = () => {
     const episodeImageHeight = useSelector((state: RootState) => state.episodeImage.height);
 
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
-    const showCollectionPoster = useSelector((state: RootState) => state.library.showCollectionPoster);
-    const showButtonMenu = useSelector((state: RootState) => state.episodes.showEpisodeMenu);
+    const showCollectionPoster = useSelector((state: RootState) => state.data.showCollectionPoster);
+    const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
 
     const cm = useRef<ContextMenu | null>(null);
     const cm2 = useRef<ContextMenu | null>(null);
@@ -105,7 +105,6 @@ export const renderRightPanelContent = () => {
 
     const handleSeasonSelection = (season: SeasonData) => {
       dispatch(selectSeason(season));
-      dispatch(setEpisodes(season.episodes));
       dispatch(closeContextMenu());
     };
 
@@ -159,9 +158,8 @@ export const renderRightPanelContent = () => {
       return (
         <>
           <div className="series-container scroll" id="scroll">
-            {selectedLibrary.series.map((series: any, index: number) => (
-              <div className="episode-box"
-                key={index}
+            {selectedLibrary.series.map((series: SeriesData) => (
+              <div className="episode-box" key={series.id}
                 style={{ maxWidth: `${seriesImageWidth}px`}}>
                   <div style={{cursor: "pointer"}}
                   onMouseEnter={() => {handleSeriesMenu(series, true)}}
@@ -170,10 +168,11 @@ export const renderRightPanelContent = () => {
                     {
                       series == seriesMenu && (showButtonMenu || seriesMenuOpen) ? (
                         <>
-                          <div key={index} className="video-button-hover"
+                          <div className="video-button-hover"
                             style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                             >
-                              <button className="svg-button-desktop-transparent left-corner-align">
+                              <button className="svg-button-desktop-transparent left-corner-align"
+                              onClick={() => dispatch(toggleSeriesWindow())}>
                                 <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
                               </button>
                               <button className="svg-button-desktop-transparent right-corner-align"
@@ -186,7 +185,7 @@ export const renderRightPanelContent = () => {
                       </>
                       ) : (<></>)
                     }
-                    <div key={index} className="video-button"
+                    <div className="video-button"
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
@@ -210,8 +209,8 @@ export const renderRightPanelContent = () => {
                   series.seasons.length > 1 ? (
                     <span id="episodeNumber">
                       {(() => {
-                        const minYear = Math.min(...series.seasons.map((season: SeasonData) => season.year));
-                        const maxYear = Math.max(...series.seasons.map((season: SeasonData) => season.year));
+                        const minYear = Math.min(...series.seasons.map((season: SeasonData) => Number.parseInt(season.year)));
+                        const maxYear = Math.max(...series.seasons.map((season: SeasonData) => Number.parseInt(season.year)));
                         return minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
                       })()}
                     </span>
@@ -223,7 +222,10 @@ export const renderRightPanelContent = () => {
                   model={[
                     {
                       label: t('editButton'),
-                      command: () => dispatch(toggleSeriesMenu())
+                      command: () => {
+                        dispatch(toggleSeriesMenu());
+                        dispatch(toggleSeriesWindow());
+                      }
                     },
                     {
                       label: t('markWatched'),
@@ -334,7 +336,7 @@ export const renderRightPanelContent = () => {
                 }
                 <section className="season-info-text">
                   {
-                    selectedSeason.directedBy != "" ? (
+                    selectedSeason.directedBy.length !== 0 ? (
                       <span id="directedBy">{"Directed by " + selectedSeason.directedBy || ""}</span>
                     ) : (<span></span>)
                   }
@@ -352,12 +354,12 @@ export const renderRightPanelContent = () => {
                 </button>
                 <button className="svg-button-desktop" title="Mark as watched">
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
-                <button className="svg-button-desktop">
+                <button className="svg-button-desktop" onClick={() => dispatch(toggleSeasonWindow())}>
                 <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
                 </button>
                 <button className="svg-button-desktop"
                 onClick={(e) => {
-                  dispatch(toggleSeriesMenu());
+                  dispatch(toggleSeasonMenu());
                   cm.current?.show(e);
                 }}>
                   <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M12 27C13.6569 27 15 25.6569 15 24C15 22.3431 13.6569 21 12 21C10.3431 21 9 22.3431 9 24C9 25.6569 10.3431 27 12 27Z" fill="#FFFFFF"></path><path d="M24 27C25.6569 27 27 25.6569 27 24C27 22.3431 25.6569 21 24 21C22.3431 21 21 22.3431 21 24C21 25.6569 22.3431 27 24 27Z" fill="#FFFFFF"></path><path d="M39 24C39 25.6569 37.6569 27 36 27C34.3431 27 33 25.6569 33 24C33 22.3431 34.3431 21 36 21C37.6569 21 39 22.3431 39 24Z" fill="#FFFFFF"></path></svg>
@@ -366,19 +368,22 @@ export const renderRightPanelContent = () => {
                   model={[
                     {
                       label: t('editButton'),
-                      command: () => dispatch(toggleSeriesMenu())
+                      command: () => {
+                        dispatch(toggleSeasonMenu());
+                        dispatch(toggleSeasonWindow());
+                      }
                     },
                     ...(selectedLibrary?.type !== "Shows" ? [{
                       label: t('correctIdentification'),
-                      command: () => dispatch(toggleSeriesMenu())
+                      command: () => dispatch(toggleSeasonMenu())
                       }] : []),
                     {
                       label: t('updateMetadata'),
-                      command: () => dispatch(toggleSeriesMenu())
+                      command: () => dispatch(toggleSeasonMenu())
                     },
                     {
                       label: t('removeButton'),
-                      command: () => dispatch(toggleSeriesMenu())
+                      command: () => dispatch(toggleSeasonMenu())
                     }
                 ]}
                 ref={cm} className="dropdown-menu"/>
@@ -414,9 +419,8 @@ export const renderRightPanelContent = () => {
                       <div className={`arrow ${isContextMenuShown ? (' arrow-rotate'): ('')}`}></div>
                   </div>
                   <ul id={selectedSeries.id + "dropdown"} className={`menu ${isContextMenuShown ? (' menu-open'): ('')}`}>
-                    {selectedSeries.seasons.map((season: SeasonData, index: number) => (
-                      <li
-                        key={season.id + "btn"}
+                    {selectedSeries.seasons.map((season: SeasonData) => (
+                      <li key={season.id}
                         onClick={() => {
                           toggleMenu();
                           handleSeasonSelection(season);
@@ -430,8 +434,8 @@ export const renderRightPanelContent = () => {
               )
             }
             <div className="episodes-container">
-              {episodes.map((episode: any, index: number) => (
-                <div key={episode.id + "div"} className="episode-box" 
+              {selectedSeason.episodes.map((episode: EpisodeData) => (
+                <div key={episode.id} className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <ContextMenu 
                   model={[
@@ -465,10 +469,10 @@ export const renderRightPanelContent = () => {
                           <input
                           type="range"
                           min="0"
-                          max={episode.duration}
-                          value={episode.currentTime}
+                          max={episode.runtimeInSeconds}
+                          value={episode.timeWatched}
                           step="1"
-                          style={{'background': `linear-gradient(to right, #8EDCE6 ${episode.currentTime + 1550 * 100 / (episode.duration)}%, #646464 0px`}}
+                          style={{'background': `linear-gradient(to right, #8EDCE6 ${episode.timeWatched + 1550 * 100 / (episode.runtimeInSeconds)}%, #646464 0px`}}
                           className="slider hide-slider-thumb"/>
                         </div>
                       ) : (
@@ -478,7 +482,7 @@ export const renderRightPanelContent = () => {
                     {
                       (showButtonMenu || episodeMenuOpen) && episode == selectedEpisode ? (
                         <>
-                          <div key={episode.id + "btnHover"} className="video-button-hover"
+                          <div className="video-button-hover"
                             style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                             >
                               <button className="play-button-episode center-align" onClick={() => handleEpisodeSelection(episode)}>
@@ -498,7 +502,7 @@ export const renderRightPanelContent = () => {
                       </>
                       ) : (<></>)
                     }
-                    <div key={episode.id + "btn"} className="video-button"
+                    <div className="video-button"
                     style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
                     >
                       {

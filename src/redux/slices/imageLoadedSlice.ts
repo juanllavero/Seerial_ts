@@ -9,10 +9,10 @@ name: 'imageLoaded',
 initialState,
 reducers: {
     loadImage: (state) => {
-    state.isImageLoaded = true;
+        state.isImageLoaded = true;
     },
     removeImage: (state) => {
-    state.isImageLoaded = false;
+        state.isImageLoaded = false;
     },
 },
 });

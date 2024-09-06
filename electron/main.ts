@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'path';
 import * as fs from 'fs';
+import axios from 'axios';
 
 import { MPVController } from '../src/data/objects/MPVController';
 import propertiesReader from 'properties-reader';
@@ -71,8 +72,41 @@ ipcMain.handle('get-images', async (_event, dirPath) => {
 });
 //#endregion
 
-//#region MEDIA INFO
+//#region DOWNLOAD IMAGES
+ipcMain.on('download-image-url', async (event, imageUrl: string, downloadDir: string) => {
+  try {
+      // Definir la carpeta donde se guardará la imagen
+      const folderPath = Utils.getExternalPath(downloadDir);
+      if (!fs.existsSync(folderPath)) {
+          fs.mkdirSync(folderPath);
+      }
 
+      // Obtener el número de archivos en la carpeta
+      const files = fs.readdirSync(folderPath);
+      const newFileName = `${files.length + 1}.jpg`; // Sumar 1 para que no haya duplicados
+      const imagePath = path.join(folderPath, newFileName);
+
+      // Descargar la imagen usando axios
+      const response = await axios({
+          url: imageUrl,
+          responseType: 'stream',
+      });
+
+      // Guardar la imagen en la carpeta
+      const writer = fs.createWriteStream(imagePath);
+      response.data.pipe(writer);
+
+      writer.on('finish', () => {
+          event.reply('download-complete', `Imagen guardada en ${imagePath}`);
+      });
+
+      writer.on('error', (err) => {
+          event.reply('download-error', `Error al guardar la imagen: ${err.message}`);
+      });
+  } catch (error: any) {
+      event.reply('download-error', `Error al descargar la imagen: ${error.message}`);
+  }
+});
 //#endregion
 
 //#region PROPERTIES AND DATA READING

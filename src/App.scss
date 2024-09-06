@@ -897,7 +897,7 @@ html, body {
     background: #101010;
     box-shadow: 0 0 8px 1px black;
     color: $color-text-default;
-    position: fixed;
+    position: absolute;
     width: max-content;
     margin-top: 0.5em;
     opacity: 0;
@@ -1178,6 +1178,34 @@ html, body {
         .dialog-horizontal-box{
           display: flex;
           flex-flow: row nowrap;
+          justify-content: space-between;
+
+          #seasonBackgroundImage {
+            width: 65%;
+          }
+
+          .media-input {
+            display: flex;
+            flex-flow: row nowrap;
+
+            input {
+              margin-right: 0.6em;
+              width: 100%;
+            }
+          }
+
+          .dialog-background-buttons {
+            display: flex;
+            flex-flow: column nowrap;
+          }
+          
+          .dialog-background-buttons > * {
+            margin-bottom: 0.5em;
+          }
+
+          button {
+            padding: 0.7em;
+          }
         }
 
         .dialog-horizontal-box > * {
@@ -1187,6 +1215,7 @@ html, body {
         .dialog-input-box {
           display: flex;
           flex-flow: column wrap;
+          width: 100%;
 
           span {
             font-size: small;
@@ -1206,6 +1235,10 @@ html, body {
             color: $color-text-primary;
 
             transition: background-color .15s ease;
+          }
+
+          input::placeholder {
+            color: $color-text-default;
           }
 
           input:focus {
@@ -1479,7 +1512,12 @@ html, body {
 }
 
 .horizontal-center-align {
+  display: flex;
   justify-content: center;
+
+  input {
+    margin-right: 0.7em;
+  }
 }
 
 /* Text Clamp */

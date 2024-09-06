@@ -1,26 +1,42 @@
+import { Cast } from './Cast';
 import { Season } from './Season';
 
 export class Series {
   id: string;
-  themdbID: number;
+    
+  //Common data
   name: string;
   overview: string;
+  coverSrc: string;
+  nameLock: boolean;
+  overviewLock: boolean;
+
+  //Show
   year: string;
   score: number;
+  tagline: string;
+  logoSrc: string;
+  creator: string[];
+  genres: string[];
+  cast: Cast[];
+  musicComposer: string[];
+  productionStudios: string[];
+  yearLock: boolean;
+  studioLock: boolean;
+  taglineLock: boolean;
+
+  //Other
+  themdbID: number;
+  isCollection: boolean;
   order: number;
   numberOfSeasons: number;
-  coverSrc: string;
-  logoSrc: string;
   folder: string;
   videoZoom: number;
   episodeGroupID: string;
-  seasons: Season[] = [];
-  genres: string[] = [];
+  seasons: Season[];
   playSameMusic: boolean;
   analyzingFiles: boolean;
   currentlyWatchingSeason: number;
-  productionStudios: string;
-  isCollection: boolean;
 
   constructor(order: number) {
     this.id = crypto.randomUUID();
@@ -30,6 +46,7 @@ export class Series {
     this.year = '';
     this.score = 0;
     this.order = order;
+    this.seasons = [];
     this.numberOfSeasons = 0;
     this.coverSrc = '';
     this.logoSrc = '';
@@ -39,8 +56,18 @@ export class Series {
     this.playSameMusic = false;
     this.analyzingFiles = false;
     this.currentlyWatchingSeason = -1;
-    this.productionStudios = '';
+    this.productionStudios = [];
     this.isCollection = false;
+    this.nameLock = false;
+    this.overviewLock = false;
+    this.tagline = '';
+    this.creator = [];
+    this.genres = [];
+    this.cast = [];
+    this.musicComposer = [];
+    this.yearLock = false;
+    this.studioLock = false;
+    this.taglineLock = false;
   }
 
   toJSON(): any {
@@ -64,7 +91,14 @@ export class Series {
       analyzingFiles: this.analyzingFiles,
       currentlyWatchingSeason: this.currentlyWatchingSeason,
       productionStudios: this.productionStudios,
-      isCollection: this.isCollection
+      isCollection: this.isCollection,
+      tagline: this.tagline,
+      creator: this.creator,
+      cast: this.cast,
+      musicComposer: this.musicComposer,
+      yearLock: this.yearLock,
+      studioLock: this.studioLock,
+      taglineLock: this.taglineLock,
     };
   }
 
@@ -89,6 +123,14 @@ export class Series {
     series.currentlyWatchingSeason = jsonData.currentlyWatchingSeason;
     series.productionStudios = jsonData.productionStudios;
     series.isCollection = jsonData.isCollection;
+    series.tagline = jsonData.tagline;
+    series.creator = jsonData.creator;
+    series.genres = jsonData.genres;
+    series.cast = jsonData.cast;
+    series.musicComposer = jsonData.musicComposer;
+    series.yearLock = jsonData.yearLock;
+    series.studioLock = jsonData.studioLock;
+    series.taglineLock = jsonData.taglineLock;
 
     return series;
   }
@@ -253,11 +295,11 @@ export class Series {
     this.currentlyWatchingSeason = index;
   }
 
-  getProductionStudios(): string {
+  getProductionStudios(): string[] {
     return this.productionStudios;
   }
 
-  setProductionStudios(productionStudios: string): void {
+  setProductionStudios(productionStudios: string[]): void {
     this.productionStudios = productionStudios;
   }
 

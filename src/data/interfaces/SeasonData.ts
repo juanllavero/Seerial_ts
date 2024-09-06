@@ -3,11 +3,30 @@ import {CastData} from "@interfaces/CastData"
 
 export interface SeasonData{
     id: string;
+
+    //Common data
     name: string;
-    overview: string;
     year: string;
-    order: number;
+    overview: string;
+    nameLock: boolean;
+    yearLock: boolean;
+    overviewLock: boolean;
+
+    //Moviecreator:
     score: number;
+    tagline: string;
+    creator: string[];
+    genres: string[];
+    cast: CastData[];
+    musicComposer: string[];
+    productionStudios: string[];
+    directedBy: string[];
+    writtenBy: string[];
+    studioLock: boolean;
+    taglineLock: boolean;
+    
+    //Other
+    order: number;
     seasonNumber: number;
     logoSrc: string;
     coverSrc: string;
@@ -25,12 +44,5 @@ export interface SeasonData{
     subtitleTrackLanguage: string;
     selectedSubtitleTrack: number;
     episodes: EpisodeData[];
-    genres: string[];
     currentlyWatchingEpisode: number;
-    cast: CastData[];
-    creator: string;
-    musicComposer: string;
-    directedBy: string;
-    writtenBy: string;
-    productionStudios: string;
 }
