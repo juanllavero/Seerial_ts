@@ -1259,6 +1259,7 @@ html, body {
             a {
               height: 100%;
               width: 2.5em;
+              min-width: 40px;
               background-color: $color-light;
 
               border-radius: 5px 0 0 5px;
@@ -1597,4 +1598,65 @@ html, body {
 
 .clamp-text-action.open .clamp-text-less {
   display: inline;
+}
+
+.rti--container * {
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+/* Tags Input Styles */
+.rti--container {
+  background: $color-lighter !important;
+  border: none !important;
+  border-radius: 0 3px 3px 0 !important;
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: baseline !important;
+  gap: 0.3em !important;
+  padding: 0.5em !important;
+  outline: none !important;
+  
+  .rti--input {
+    line-height: normal !important;
+    width: fit-content !important;
+    color: $color-text-primary !important;
+  }
+
+  .rti--input:focus-within {
+    background: none !important;
+    color: $color-text-primary !important;
+  }
+  
+  .rti--tag {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: baseline !important;
+    background: $color-default !important;
+    border-radius: 4px !important;
+    padding: 0.4em 0.8em 0.4em 0 !important;
+
+    margin: 0 !important;
+    
+    height: 2.3em !important;
+  
+    span {
+      margin-top: 0.1em !important;
+      color: $color-text-primary !important;
+    }
+  }
+  
+  .rti--tag button {
+    color: $color-text-default !important;
+    background: none !important;
+  }
+  
+  .rti--tag button:hover {
+    color: $color-text-primary !important;
+  }
+}
+
+.rti--container:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
 }

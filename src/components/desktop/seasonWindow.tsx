@@ -84,14 +84,14 @@ const renderSeasonWindow = () => {
             setName(season.name);
             setYear(season.year);
             setOverview(season.overview);
-            setStudios(season.productionStudios);
+            setStudios(["Test", "Studio"]);
             setTagline(season.tagline);
 
             setNameLock(season.nameLock);
             setYearLock(season.yearLock);
             setOverviewLock(season.overviewLock);
-            setStudiosLock(season.taglineLock);
-            setTaglineLock(season.studioLock);
+            setTaglineLock(season.taglineLock);
+            setStudiosLock(season.studioLock);
         }
     }, [seasonMenuOpen]);
 
