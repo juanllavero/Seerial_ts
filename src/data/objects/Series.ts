@@ -30,6 +30,7 @@ export class Series {
   isCollection: boolean;
   order: number;
   numberOfSeasons: number;
+  numberOfEpisodes: number;
   folder: string;
   videoZoom: number;
   episodeGroupID: string;
@@ -38,16 +39,17 @@ export class Series {
   analyzingFiles: boolean;
   currentlyWatchingSeason: number;
 
-  constructor(order: number) {
+  constructor() {
     this.id = crypto.randomUUID();
     this.themdbID = -1;
     this.name = '';
     this.overview = '';
     this.year = '';
     this.score = 0;
-    this.order = order;
+    this.order = 0;
     this.seasons = [];
     this.numberOfSeasons = 0;
+    this.numberOfEpisodes = 0;
     this.coverSrc = '';
     this.logoSrc = '';
     this.folder = '';
@@ -80,6 +82,7 @@ export class Series {
       score: this.score,
       order: this.order,
       numberOfSeasons: this.numberOfSeasons,
+      numberOfEpisodes: this.numberOfEpisodes,
       coverSrc: this.coverSrc,
       logoSrc: this.logoSrc,
       folder: this.folder,
@@ -103,14 +106,16 @@ export class Series {
   }
 
   static fromJSON(jsonData: any): Series {
-    const series = new Series(jsonData.order);
+    const series = new Series();
     series.id = jsonData.id;
+    series.order = jsonData.order;
     series.themdbID = jsonData.themdbID;
     series.name = jsonData.name;
     series.overview = jsonData.overview;
     series.year = jsonData.year;
     series.score = jsonData.score;
     series.numberOfSeasons = jsonData.numberOfSeasons;
+    series.numberOfEpisodes = jsonData.numberOfEpisodes;
     series.coverSrc = jsonData.coverSrc;
     series.logoSrc = jsonData.logoSrc;
     series.folder = jsonData.folder;

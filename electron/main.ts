@@ -16,6 +16,9 @@ import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { Utils } from '../src/data/objects/Utils';
+import { MetadataManager } from '../src/data/objects/MetadataManager';
+import { Library } from '../src/data/objects/Library';
+import { DataManager } from '../src/data/objects/DataManager';
 
 //#region EXTERNAL PATHS
 /**
@@ -64,11 +67,7 @@ ipcMain.handle('translate', (_event, key) => {
 
 //#region GET FILES
 ipcMain.handle('get-images', async (_event, dirPath) => {
-  const files = fs.readdirSync(dirPath);
-  const images = files.filter((file) =>
-    ['.png', '.jpg', '.jpeg', '.gif'].includes(path.extname(file).toLowerCase())
-  );
-  return images.map((image) => path.join(dirPath, image));
+  return DataManager.getImages(dirPath);
 });
 //#endregion
 
@@ -172,6 +171,21 @@ const getMediaInfo = async (episode: EpisodeData) => {
 ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
   return getMediaInfo(episode);
 });
+//#endregion
+
+//#region METADATA DOWNLOAD
+
+DataManager.initFolders();
+
+MetadataManager.initConnection();
+
+const getMetadata = async () => {
+  await MetadataManager.scanShow(new Library("Test", "es-ES", "Shows", 
+    0, [], true, false), "F:\\ANIME\\FullMetal Alchemist Brotherhood");
+};
+
+getMetadata();
+
 //#endregion
 
 //#region WINDOWS CREATION

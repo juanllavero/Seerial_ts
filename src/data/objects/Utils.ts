@@ -4,15 +4,18 @@ import { EpisodeData } from '@interfaces/EpisodeData';
 import { MediaInfoData } from '@interfaces/MediaInfoData';
 import { SubtitleTrackData } from '@interfaces/SubtitleTrackData';
 import { VideoTrackData } from '@interfaces/VideoTrackData';
+import axios from 'axios';
 import { exec } from 'child_process';
 import { app } from 'electron';
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
+import * as fs from 'fs';
 import { promisify } from 'util';
 
 const execPromise = promisify(exec);
 
 export class Utils {
+    static videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.mpeg', '.m2ts'];
     
     public static getMediaInfo(episode: EpisodeData | undefined): Promise<EpisodeData> | undefined {
         if (!episode)
@@ -312,7 +315,7 @@ export class Utils {
     public static getExternalPath(relativePath: string): string {
         const basePath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
         return path.join(basePath, relativePath);
-    };
+    }
 
     public static async getChapters(episode: EpisodeData): Promise<ChapterData[]> {
         const chaptersArray: ChapterData[] = [];
@@ -344,5 +347,49 @@ export class Utils {
         }
 
         return chaptersArray;
-      }
+    }
+
+    public static downloadImage = async (url: string, filePath: string) => {
+        const response = await axios({
+          url,
+          method: 'GET',
+          responseType: 'stream'
+        });
+      
+        return new Promise<void>((resolve, reject) => {
+          const writer = fs.createWriteStream(filePath);
+          response.data.pipe(writer);
+          writer.on('finish', resolve);
+          writer.on('error', reject);
+        });
+    }
+
+    public static getValidVideoFiles = async (folderPath: string) => {
+        const videoFiles: string[] = [];
+        const filesAndFolders = await fs.promises.readdir(folderPath, { withFileTypes: true });
+
+        // Get video files in folder dir and subfolders (only 1 step of depth)
+        for (const fileOrFolder of filesAndFolders) {
+            const fullPath = path.join(folderPath, fileOrFolder.name);
+
+            if (fileOrFolder.isFile() && this.isVideoFile(fullPath)) {
+                videoFiles.push(fullPath);
+            } else if (fileOrFolder.isDirectory()) {
+                const subFiles = await fs.promises.readdir(fullPath);
+                for (const subFile of subFiles) {
+                    const subFilePath = path.join(fullPath, subFile);
+                    if (fs.lstatSync(subFilePath).isFile() && this.isVideoFile(subFilePath)) {
+                        videoFiles.push(subFilePath);
+                    }
+                }
+            }
+        }
+
+        return videoFiles;
+    }
+
+    public static isVideoFile(filePath: string): boolean {
+        const ext = path.extname(filePath).toLowerCase();
+        return this.videoExtensions.includes(ext);
+    }
 }

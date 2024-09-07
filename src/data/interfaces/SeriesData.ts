@@ -30,6 +30,7 @@ export interface SeriesData{
     isCollection: boolean;
     order: number;
     numberOfSeasons: number;
+    numberOfEpisodes: number;
     folder: string;
     videoZoom: number;
     episodeGroupID: string;
