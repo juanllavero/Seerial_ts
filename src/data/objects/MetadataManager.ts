@@ -1,5 +1,5 @@
 import propertiesReader from 'properties-reader';
-import { MovieDb, ShowResponse, TvEpisodeGroupsResponse, TvSeasonResponse } from 'moviedb-promise';
+import { Episode, EpisodeGroupResponse, EpisodeResult, MovieDb, ShowResponse, TvEpisodeGroupsResponse, TvSeasonResponse } from 'moviedb-promise';
 import { Series } from './Series';
 import { Library } from './Library';
 import * as fs from 'fs';
@@ -108,13 +108,13 @@ export class MetadataManager {
             if (this.moviedb && showData.id && seasonBasic.season_number){
                 const seasonFull = await this.moviedb.seasonInfo({ id: showData.id, season_number: seasonBasic.season_number, language: library.getLanguage() });
                 
-                if (seasonFull !== null)
-                    seasonsMetadata.push(seasonFull);
+                /*if (seasonFull !== null)
+                    seasonsMetadata.push(seasonFull);*/
             }
         });
 
         // Download Episodes Group Metadata
-        let episodesGroup = null;
+        let episodesGroup = undefined;
         if (show.episodeGroupID !== "")
             episodesGroup = await this.moviedb?.episodeGroup({ id: show.themdbID});
 
@@ -136,23 +136,206 @@ export class MetadataManager {
                     });
                 }
             });
-        }else if (series.getSeasons().size() > 1){
+        }else if (show.getSeasons().length > 1){
             //If two seasons have the same name
-            if (series.getSeasons().getFirst().getName().equals(series.getSeasons().get(1).getName())){
-                for (Season season : series.getSeasons()){
-                    if (season.getSeasonNumber() != 0)
-                        season.setName(App.textBundle.getString("season") + " " + season.getSeasonNumber());
+            if (show.getSeasons()[0].getName() === show.getSeasons()[1].getName()){
+                show.seasons.forEach(season => {
+                    if (season.getSeasonNumber() !== 0)
+                        season.setName("Season " + season.getSeasonNumber());
+                });
+            }
+        }
+
+        if (show.getSeasons().length === 0)
+            library.getAnalyzedFolders().delete(show.getFolder());
+        else
+            console.log(library);
+    };
+
+    private static async processEpisode(libary: Library, show: Series, video: string, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined, exist: boolean) {
+        //SeasonMetadataBasic and episode metadata to find for the current file
+        let seasonMetadata: TvSeasonResponse | null = null;
+        let episodeMetadata: Episode | null = null;
+
+        let realSeason: number | undefined = 0;
+        let realEpisode: number | undefined = -1;
+
+        //Name of the file without the extension
+        let fullName = path.parse(video).name;
+        let seasonEpisode: [number, number?] = this.extractEpisodeSeason(fullName);
+
+        if (!Number.isNaN(seasonEpisode))
+            return;
+
+        //If there is no season and episode numbers
+        if (!seasonEpisode[1]){
+            const absoluteNumber = seasonEpisode[0];
+            let episodeFound = false;
+            let episodeNumber = 1;
+
+            //Find the real season and episode for the file
+            for (const season of seasonsMetadata) {
+                if (season.season_number && season.season_number >= 1) {
+                  if (season.episodes && (episodeNumber + season.episodes.length) < absoluteNumber) {
+                    episodeNumber += season.episodes.length;
+                    continue;
+                  }
+
+                  if (season.episodes){
+                    for (let i = 0; i < season.episodes.length; i++) {
+                        if (episodeNumber === absoluteNumber) {
+                          episodeMetadata = season.episodes[i];
+                          seasonMetadata = season;
+                          episodeFound = true;
+                          break;
+                        }
+                        episodeNumber++;
+                      }
+                  }
+                }
+        
+                if (episodeFound) break;
+            }
+    
+            if (!episodeFound) return;
+        } else {
+            const [episodeNumber, seasonNumber] = seasonEpisode;
+    
+            realSeason = seasonNumber;
+            realEpisode = episodeNumber;
+    
+            let toFindMetadata = true;
+            for (const season of seasonsMetadata) {
+                if (season.season_number === seasonNumber) {
+                    toFindMetadata = false;
+                    break;
+                }
+            }
+    
+            if (toFindMetadata || !show.getEpisodeGroupID()) {
+                if (!episodesGroup) {
+                    episodesGroup = await this.moviedb?.episodeGroup({ id: show.episodeGroupID });
+                }
+    
+                if (episodesGroup && episodesGroup.groups) {
+                    let found = false;
+                    for (const episodeGroup of episodesGroup.groups) {
+                        if (episodeGroup.order !== seasonNumber || !episodeGroup.episodes) continue;
+            
+                        for (const episode of episodeGroup.episodes) {
+                            if (episode.order && (episode.order + 1) === episodeNumber) {
+                                realSeason = episode.season_number;
+                                realEpisode = episode.episode_number;
+                                found = true;
+                                break;
+                            }
+                        }
+            
+                        if (found) break;
+                    }   
+        
+                    for (const seasonMeta of seasonsMetadata) {
+                        if (seasonMeta.season_number === realSeason && seasonMeta.episodes) {
+                            seasonMetadata = seasonMeta;
+            
+                            for (const episodeMeta of seasonMeta.episodes) {
+                                if (episodeMeta.episode_number === realEpisode) {
+                                    episodeMetadata = episodeMeta;
+                                    break;
+                                }
+                            }
+            
+                            break;
+                        }
+                    }
+                } else return;
+            } else {
+                for (const seasonMeta of seasonsMetadata) {
+                    if (seasonMeta.season_number === realSeason) {
+                        seasonMetadata = seasonMeta;
+            
+                        for (const episodeMeta of seasonMeta.episodes) {
+                            if (episodeMeta.episode_number === realEpisode) {
+                                episodeMetadata = episodeMeta;
+                                break;
+                            }
+                        }
+        
+                        break;
+                    }
                 }
             }
         }
 
-        if (series.getSeasons().isEmpty())
-            library.getAnalyzedFolders().remove(series.getFolder());
+        if (!seasonMetadata || !episodeMetadata) return;
+    
+        let season: Season | null = null;
+        if (realEpisode !== -1) {
+            season = show.getSeasons()[realSeason] ?? new Season();
+        } else if (seasonMetadata.season_number) {
+            season = show.getSeasons()[seasonMetadata.season_number] ?? new Season();
+        }
+    
+        if (season === null) {
+            season = new Season();
+            show.addSeason(season);
+    
+            season.setName(seasonMetadata.name);
+            season.setOverview(seasonMetadata.overview);
+            season.setYear(seasonMetadata.episodes[0].air_date.split('-')[0]);
+            season.setProductionStudios(series.getProductionStudios());
+            season.setSeasonNumber(realEpisode !== -1 ? realSeason : seasonMetadata.season_number);
+            season.setScore(seasonMetadata.vote_average);
+    
+            if (!season.getBackgroundSrc() || season.getBackgroundSrc() === 'resources/img/DefaultBackground.png') {
+            // Add logic for saving backgrounds if needed
+            }
+    
+            // Add additional functionality for downloading and setting credits, logos, etc.
+        }
+    
+        let episode: Episode;
+        if (realEpisode !== -1) {
+            episode = season.getEpisode(realEpisode) ?? new Episode();
+        } else {
+            episode = season.getEpisode(episodeMetadata.episode_number) ?? new Episode();
+        }
+    
+        if (episode) {
+            episode.setVideoSrc(video);
+        } else {
+            episode = new Episode();
+            season.addEpisode(episode);
+            episode.setSeasonID(season.getId());
+            episode.setVideoSrc(video);
+            // Set episode data and fetch media info
+        }
     };
 
-    private static async processEpisode(libary: Library, video: string, seasonsMetadata: TvSeasonResponse, episodesGroup: TvEpisodeGroupsResponse, exist: boolean) {
-
-    };
+    /**
+     * Function to detec episode and season numbers in a video file name
+     * @param filename path to the video file
+     * @returns array of 1 to 2 elements corresponding with the episode and season number detected, or NaN if no episode was found
+     */
+    private static extractEpisodeSeason(filename: string): [number, number?] {
+        const regexPatterns = [
+          /[Ss](\d{1,4})[Ee](\d{1,4})/i,       // S01E02, s1e2, S1.E2
+          /[Ss](\d{1,4})[\.]?E(\d{1,4})/i,     // S1.E2
+          /[Ss](\d{1,4})[\s\-]+Ep?(\d{1,4})/i, // S01 E02, S1 E2
+          /(?:\b|^)(\d{1,4})(?:[^\d]+(\d{1,4}))?/i, // 2 or "3 - 2" or "Title 720p - 2"
+        ];
+      
+        for (const regex of regexPatterns) {
+          const match = filename.match(regex);
+          if (match) {
+            const episode = parseInt(match[2] ?? match[1], 10); // Extract episode
+            const season = match[2] ? parseInt(match[1], 10) : undefined; // Extract season if present
+            return season ? [episode, season] : [episode];
+          }
+        }
+      
+        return [NaN]; // Return NaN if no episode found
+    }
 
     private static async setSeriesMetadataAndImages(library: Library, show: Series, showData: ShowResponse, exists: boolean) {
         show.name = showData.name ?? "";
