@@ -367,8 +367,20 @@ export class Utils {
     }
 
     public static getFilesInFolder = async (folderPath: string) => {
-        return await fs.promises.readdir(folderPath, { withFileTypes: true });
-    }
+        try {
+            const stats = await fs.promises.stat(folderPath);
+            
+            if (!stats.isDirectory()) {
+                console.log(`${folderPath} no es un directorio`);
+                return [];
+            }
+    
+            return await fs.promises.readdir(folderPath, { withFileTypes: true });
+        } catch (error) {
+            console.error(`Error al acceder a la ruta ${folderPath}:`, error);
+            return [];
+        }
+    };
 
     public static getValidVideoFiles = async (folderPath: string) => {
         const videoFiles: string[] = [];

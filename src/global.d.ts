@@ -23,6 +23,7 @@ export interface ElectronAPI {
   getImages: (dirPath) => Promise<string[]>;
   getMediaInfo: (episode: EpisodeData) => EpisodeData;
   scanFiles: (library: LibraryData) => LibraryData;
+  updateLibrary: (library: LibraryData) => void;
 }
   
 declare global {

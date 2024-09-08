@@ -72,14 +72,18 @@ const dataSlice = createSlice({
 
       const libraries = state.libraries;
 
+      console.log(libraries);
+
+      console.log(action.payload);
+
       if (libraries){
-        // Update Season in list
-        const index = libraries.findIndex(
+        // Update Library in list
+        const libraryIndex = libraries.findIndex(
           (library) => library.id === action.payload.id
         );
 
-        if (index >= 0) {
-          libraries[index] = action.payload;
+        if (libraryIndex >= 0) {
+          libraries[libraryIndex] = action.payload;
         }
       }
 

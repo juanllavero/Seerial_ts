@@ -65,17 +65,20 @@ const renderLibraryWindow = () => {
     };
 
     const handleSave = async () => {
-        if (folders.length !== 0){
+        if (folders.length === 0){
             console.log("Error folder");
         }else{
             if (addLibraryMode){
                 const newLibrary = new Library(name, language, type, 0, folders);
-                const newLibraryUpdated = await window.electronAPI.scanFiles(newLibrary.toLibraryData());
+                window.electronAPI.scanFiles(newLibrary.toLibraryData());
 
-                if (newLibraryUpdated)
-                    dispatch(addLibrary(newLibraryUpdated));
-            }else{
-                // Edit library
+                dispatch(addLibrary(newLibrary));
+            }else if (selectedLibrary){
+                selectedLibrary.name = name;
+                selectedLibrary.language = language;
+                selectedLibrary.folders = folders;
+
+                window.electronAPI.scanFiles(selectedLibrary);
             }
         }
         

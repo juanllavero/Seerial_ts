@@ -9,14 +9,18 @@ import { Season } from './Season';
 import { Episode as EpisodeLocal } from './Episode';
 import { Cast } from './Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
+import { BrowserWindow } from 'electron';
 
 export class MetadataManager {
+    static win: BrowserWindow | null;
     static moviedb: MovieDb | undefined;
     static library: Library;
 
-    public static initConnection = (): boolean => {
+    public static initConnection = (window: BrowserWindow | null): boolean => {
         if (this.moviedb)
             return true;
+
+        this.win = window;
 
         const properties = propertiesReader('keys.properties');
 
@@ -557,9 +561,6 @@ export class MetadataManager {
             if (!fs.existsSync(outputImageDir)) {
               fs.mkdirSync(outputImageDir);
             }
-
-            console.log("AASD");
-            console.log(images);
 
             // Download season background
             if (!onlyPosters && images.backdrops && images.backdrops.length > 1 && images.backdrops[0].file_path){

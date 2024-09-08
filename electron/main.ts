@@ -178,12 +178,16 @@ ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
 DataManager.initFolders();
 
 ipcMain.handle('scan-files', async (_event, library: LibraryData) => {
-  MetadataManager.initConnection();
+  MetadataManager.initConnection(win);
 
   let newLibrary: Library | undefined = new Library(library.name, library.language, library.type, library.order, library.folders);
   newLibrary = await MetadataManager.scanFiles(newLibrary);
-  
-  return newLibrary ? newLibrary.toLibraryData() : undefined;
+
+  win?.webContents.send('update-library', newLibrary?.toLibraryData());
+});
+
+ipcMain.on('update-library', (_event, library: LibraryData) => {
+  win?.webContents.send('update-library', library);
 });
 
 //#endregion

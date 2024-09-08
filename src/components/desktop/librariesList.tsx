@@ -3,7 +3,7 @@ import { selectLibrary, setLibraryForMenu, toggleLibraryEditWindow, resetSelecti
 import { removeTransparentImage } from '../../redux/slices/transparentImageLoadedSlice';
 import { RootState } from '../../redux/store';
 import { closeAllMenus, toggleLibraryMenu } from 'redux/slices/contextMenuSlice';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
 import { useTranslation } from 'react-i18next';
 
@@ -17,11 +17,12 @@ export const renderLibrariesList = () => {
     const libraryForMenu = useSelector((state: RootState) => state.data.libraryForMenu);
 
     const cm = useRef<ContextMenu | null>(null);
-
+    
     useEffect(() => {
-        if (libraries && libraries.length > 0)
+        if (libraries && libraries.length > 0 && !selectedLibrary) {
             handleSelectLibrary(libraries[0]);
-    }, []);
+        }
+    }, [libraries, selectedLibrary]);
 
     //#region CONTEXT MENU ITEMS
     const menuItems = [
@@ -52,11 +53,11 @@ export const renderLibrariesList = () => {
     ];
     //#endregion
 
-    const handleSelectLibrary = (library: any) => {
+    const handleSelectLibrary = useCallback((library: any) => {
         dispatch(selectLibrary(library));
         dispatch(resetSelection());
         dispatch(removeTransparentImage());
-    };
+    }, [dispatch]);
 
     return (
         <div className="libraries-list scroll">
