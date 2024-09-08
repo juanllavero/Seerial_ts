@@ -417,6 +417,10 @@ export class Season {
     this.writtenBy = writtenBy;
   }
 
+  getEpisode(number: number): Episode | undefined {
+    return this.episodes.find(episode => episode.episodeNumber === number);
+  }
+
   private static getString(genres: string[]): string {
     return genres.join(', ');
   }

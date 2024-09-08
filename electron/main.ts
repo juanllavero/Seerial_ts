@@ -139,13 +139,13 @@ let mpvController: MPVController | null = null;
 
 const jsonFilePath = "./src/data/data.json";
 
-// Read data from JSON
+// Read data from JSON    **** Error: La llama 2 veces seguidas
 const loadData = (): any => {
   try {
     const data = fs.readFileSync(jsonFilePath, 'utf8');
     return JSON.parse(data);
   } catch (err) {
-    console.error("Error reading data.json:", err);
+    console.error("Error reading data.json");
     return [];
   }
 };
@@ -177,14 +177,14 @@ ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
 
 DataManager.initFolders();
 
-MetadataManager.initConnection();
+ipcMain.handle('scan-files', async (_event, library: LibraryData) => {
+  MetadataManager.initConnection();
 
-const getMetadata = async () => {
-  await MetadataManager.scanShow(new Library("Test", "es-ES", "Shows", 
-    0, [], true, false), "F:\\ANIME\\FullMetal Alchemist Brotherhood");
-};
-
-getMetadata();
+  let newLibrary: Library | undefined = new Library(library.name, library.language, library.type, library.order, library.folders);
+  newLibrary = await MetadataManager.scanFiles(newLibrary);
+  
+  return newLibrary ? newLibrary.toLibraryData() : undefined;
+});
 
 //#endregion
 

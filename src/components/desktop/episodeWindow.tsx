@@ -43,7 +43,7 @@ const renderEpisodeWindow = () => {
         const fetchImages = async () => {
             setPasteUrl(false);
             
-            const path = await window.electronAPI.getExternalPath("resources/img/discCovers/" + selectedEpisode?.id + "/");
+            const path = await window.electronAPI.getExternalPath("resources/img/thumbnails/video/" + selectedEpisode?.id + "/");
             if (path) {
                 const images = await window.electronAPI.getImages(path);
                 setImages(images);
@@ -104,8 +104,8 @@ const renderEpisodeWindow = () => {
             setName(selectedEpisode.name);
             setYear(selectedEpisode.year);
             setOverview(selectedEpisode.overview);
-            setDirectedBy(selectedEpisode.directedBy);
-            setWrittenBy(selectedEpisode.writtenBy);
+            setDirectedBy(selectedEpisode.directedBy[0]);
+            setWrittenBy(selectedEpisode.writtenBy[0]);
 
             setNameLock(selectedEpisode.nameLock);
             setYearLock(selectedEpisode.yearLock);
@@ -219,9 +219,9 @@ const renderEpisodeWindow = () => {
                 overview: overview,
                 year: year,
                 order: selectedEpisode.order,
-                imgSrc: selectedImage ? ("resources/img/discCovers/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
-                directedBy: directedBy,
-                writtenBy: writtenBy,
+                imgSrc: selectedImage ? ("resources/img/thumbnails/video/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
+                directedBy: [directedBy],
+                writtenBy: [writtenBy],
                 nameLock: nameLock,
                 yearLock: yearLock,
                 overviewLock: overviewLock,
@@ -250,7 +250,7 @@ const renderEpisodeWindow = () => {
 
     const handleDownload = () => {
         setPasteUrl(false);
-        window.ipcRenderer.send('download-image-url', imageUrl, "resources/img/discCovers/" + selectedEpisode?.id + "/");
+        window.ipcRenderer.send('download-image-url', imageUrl, "resources/img/thumbnails/video/" + selectedEpisode?.id + "/");
     };
 
     return (
@@ -321,7 +321,7 @@ const renderEpisodeWindow = () => {
                                 </div>
                             </div>
                             {
-                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.directedBy !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.directedBy[0] !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('directedBy')}</span>
                                         <div className={`dialog-input-lock ${directedLock ? ' locked' : ''}`}>
@@ -339,7 +339,7 @@ const renderEpisodeWindow = () => {
                                 ) : (<></>)
                             }
                             {
-                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.writtenBy !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.writtenBy[0] !== "" ? (
                                     <div className="dialog-input-box">
                                         <span>{t('writtenBy')}</span>
                                         <div className={`dialog-input-lock ${writtenLock ? ' locked' : ''}`}>

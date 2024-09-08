@@ -4,17 +4,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
-import { toggleLibraryEditWindow } from "redux/slices/dataSlice";
+import { addLibrary, toggleLibraryEditWindow } from "redux/slices/dataSlice";
 import { useTranslation } from "react-i18next";
+import { Library } from "@objects/Library";
 
 const renderLibraryWindow = () => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
     const { i18n } = useTranslation();
+    const [name, setName] = useState<string>("");
+    const [type, setType] = useState<string>("Movies");
     const [folders, setFolders] = useState<string[]>([]);
     const [language, setLanguage] = useState<string>(i18n.language);
-
-    const [selectedLibraryType, setSelectedLibraryType] = useState<string>("Movies");
+    const [addLibraryMode, setAddLibraryMode] = useState<boolean>(true);
 
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
     const libraryMenuOpen = useSelector((state: RootState) => state.data.libraryEditWindow);
@@ -62,11 +64,39 @@ const renderLibraryWindow = () => {
         //i18n.changeLanguage(selectedLanguage);  // Cambia el idioma en i18next
     };
 
+    const handleSave = async () => {
+        if (folders.length !== 0){
+            console.log("Error folder");
+        }else{
+            if (addLibraryMode){
+                const newLibrary = new Library(name, language, type, 0, folders);
+                const newLibraryUpdated = await window.electronAPI.scanFiles(newLibrary.toLibraryData());
+
+                if (newLibraryUpdated)
+                    dispatch(addLibrary(newLibraryUpdated));
+            }else{
+                // Edit library
+            }
+        }
+        
+        dispatch(toggleLibraryEditWindow());
+    }
+
     useEffect(() => {
-        if (selectedLibrary)
+        dispatch(changeMenuSection(Section.General));
+        if (selectedLibrary){
             setLanguage(selectedLibrary.language);
-        else
+            setFolders(selectedLibrary.folders);
+            setName(selectedLibrary.name);
+            setType(selectedLibrary.type)
+            setAddLibraryMode(false);
+        }else{
             setLanguage(i18n.language);
+            setType("Movies");
+            setName(t('movies'));
+            setFolders([]);
+        }
+            
     }, [libraryMenuOpen]);
 
     return (
@@ -103,9 +133,10 @@ const renderLibraryWindow = () => {
                             <button className={`dialog-library-btn ${
                                 selectedLibrary ? (
                                     selectedLibrary.type !== "Shows" ? ' dialog-library-btn-active' : 'dialog-library-btn-disabled'
-                                ) : selectedLibraryType !== "Shows" ? ' dialog-library-btn-active' : ''}`}
+                                ) : type !== "Shows" ? ' dialog-library-btn-active' : ''}`}
                                 onClick={() => {
-                                    setSelectedLibraryType("Movies");
+                                    setType("Movies");
+                                    setName(t('movies'));
                                 }}>
                                 <svg
                                 id="libraries-button-svg" 
@@ -127,9 +158,10 @@ const renderLibraryWindow = () => {
                             <button className={`dialog-library-btn ${
                                 selectedLibrary ? (
                                     selectedLibrary.type === "Shows" ? ' dialog-library-btn-active' : 'dialog-library-btn-disabled'
-                                ) : selectedLibraryType === "Shows" ? ' dialog-library-btn-active' : ''}`}
+                                ) : type === "Shows" ? ' dialog-library-btn-active' : ''}`}
                                 onClick={() => {
-                                    setSelectedLibraryType("Shows");
+                                    setType("Shows");
+                                    setName(t('shows'));
                                 }}>
                                 <svg
                                 id="libraries-button-svg" 
@@ -152,11 +184,7 @@ const renderLibraryWindow = () => {
                             <section className="dialog-horizontal-box">
                             <div className="dialog-input-box">
                                 <span>{t('name')}</span>
-                                <input type="text" defaultValue=
-                                    {
-                                        selectedLibrary ? selectedLibrary.name 
-                                        : selectedLibraryType === "Shows" ? "Shows" : "Movies" 
-                                    }
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)}
                                 />
                             </div>
                             <div className="dialog-input-box">
@@ -188,7 +216,6 @@ const renderLibraryWindow = () => {
                             <button className="desktop-dialog-btn add-folder-btn" onClick={handleSelectFolder}>
                                 {t('addFolder')}
                             </button>
-                            
                         </>
                         ) : (<></>)
                     }
@@ -196,7 +223,11 @@ const renderLibraryWindow = () => {
                 </section>
                 <section className="dialog-bottom">
                     <button className="desktop-dialog-btn" onClick={() => dispatch(toggleLibraryEditWindow())}>{t('cancelButton')}</button>
-                    <button className="btn-app-color">{t('saveButton')}</button>
+                    <button className="btn-app-color" onClick={
+                        menuSection === Section.General ? () => dispatch(changeMenuSection(Section.Folders)) : () => handleSave()
+                    }>{
+                        menuSection === Section.General ? `${t('next')}` : `${t('saveButton')}`
+                    }</button>
                 </section>
                 </div>
             </section>

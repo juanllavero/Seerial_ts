@@ -10,7 +10,9 @@ import { app } from 'electron';
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 import * as fs from 'fs';
+import fsExtra from 'fs-extra';
 import { promisify } from 'util';
+import { Season } from './Season';
 
 const execPromise = promisify(exec);
 
@@ -364,9 +366,13 @@ export class Utils {
         });
     }
 
+    public static getFilesInFolder = async (folderPath: string) => {
+        return await fs.promises.readdir(folderPath, { withFileTypes: true });
+    }
+
     public static getValidVideoFiles = async (folderPath: string) => {
         const videoFiles: string[] = [];
-        const filesAndFolders = await fs.promises.readdir(folderPath, { withFileTypes: true });
+        const filesAndFolders = await this.getFilesInFolder(folderPath);
 
         // Get video files in folder dir and subfolders (only 1 step of depth)
         for (const fileOrFolder of filesAndFolders) {
@@ -392,4 +398,69 @@ export class Utils {
         const ext = path.extname(filePath).toLowerCase();
         return this.videoExtensions.includes(ext);
     }
+
+    public static fileExists(filePath: string): boolean {
+        return fs.existsSync(filePath);
+    }
+
+    //#region BACKGROUND PROCESSING
+    private static async copyAndRenameImage(srcImagePath: string, destDirPath: string, imageName: string) {
+        const srcPath = path.join(srcImagePath, imageName);
+        const destDir = path.join(destDirPath, imageName);
+    
+        try {
+            await fsExtra.copy(srcPath, destDir);
+        } catch (e) {
+            console.error(`copyAndRenameImage: image ${srcImagePath}/${imageName} could not be copied to ${destDirPath}`);
+        }
+    }
+    
+    public static async saveBackground(season: Season, imageToCopy: string, copyImages: boolean) {
+        const baseDir = `resources/img/backgrounds/${season.getId()}/`;
+        await fsExtra.ensureDir(baseDir);
+    
+        if (copyImages) {
+            const directoryPath = path.dirname(imageToCopy);
+            await this.copyAndRenameImage(directoryPath, baseDir, 'background.jpg');
+            await this.copyAndRenameImage(directoryPath, baseDir, 'transparencyEffect.png');
+            await this.copyAndRenameImage(directoryPath, baseDir, 'fullBlur.jpg');
+    
+            season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
+        } else {
+            try {
+                // Copy the original image
+                await fsExtra.copy(imageToCopy, path.join(baseDir, 'background.jpg'));
+                season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
+    
+                // Set transparency effect
+                await this.setTransparencyEffect(season.getBackgroundSrc(), path.join(baseDir, 'transparencyEffect.png'));
+    
+                // Process blur and save
+                await this.processBlurAndSave(season.getBackgroundSrc(), path.join(baseDir, 'fullBlur.jpg'));
+            } catch (e) {
+                console.error('saveBackground: error processing image with blur or transparency');
+            }
+        }
+    }
+    
+    private static async setTransparencyEffect(src: string, outputPath: string) {
+        // Custom transparency effect logic should be implemented here
+        try {
+            // For now, we can simply copy the image to simulate the effect
+            await fsExtra.copy(src, outputPath);
+        } catch (e) {
+            console.error('setTransparencyEffect: error applying transparency effect to background');
+        }
+    }
+
+    private static async processBlurAndSave(imagePath: string, outputFilePath: string) {
+        try {
+            // For now, just copy the image as no blur processing is done
+            await fsExtra.copy(imagePath, outputFilePath);
+        } catch (e) {
+            console.error('processBlurAndSave: error copying image');
+        }
+        return null;
+    }
+    //#endregion
 }

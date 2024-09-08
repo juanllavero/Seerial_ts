@@ -1,28 +1,53 @@
+import { LibraryData } from '@interfaces/LibraryData.ts';
 import { Series } from './Series.ts';
+import { SeriesData } from '@interfaces/SeriesData.ts';
 
 export class Library {
   id: string;
   name: string;
   language: string;
   type: string;
-  isCollection: boolean;
   order: number;
   folders: string[];
-  showOnFullscreen: boolean;
   series: Series[] = [];
   analyzedFiles: Map<string, string> = new Map();
   analyzedFolders: Map<string, string> = new Map();
   seasonFolders: Map<string, string> = new Map();
 
-  constructor(name: string, lang: string, type: string, order: number, folders: string[], showOnFullscreen: boolean, isCollection: boolean) {
+  constructor(name: string, lang: string, type: string, order: number, folders: string[]) {
     this.id = crypto.randomUUID();
     this.name = name;
     this.language = lang;
     this.type = type;
     this.order = order;
     this.folders = folders;
-    this.showOnFullscreen = showOnFullscreen;
-    this.isCollection = isCollection;
+  }
+
+  toLibraryData(): LibraryData {
+    return {
+      id: this.id,
+      name: this.name,
+      language: this.language,
+      type: this.type,
+      isCollection: false, // o según sea necesario en tu lógica
+      order: this.order,
+      folders: this.folders,
+      showOnFullscreen: false, // o según sea necesario
+      series: this.series.map(s => s.toJSON()), // Asumiendo que SeriesData tiene un método toJSON
+      analyzedFiles: new Map(this.analyzedFiles),
+      analyzedFolders: new Map(this.analyzedFolders),
+      seasonFolders: new Map(this.seasonFolders),
+    };
+  }
+
+  static fromLibraryData(data: LibraryData): Library {
+    const library = new Library(data.name, data.language, data.type, data.order, data.folders);
+    library.id = data.id;
+    library.series = data.series.map((s: SeriesData) => Series.fromJSON(s)); // Convierte SeriesData a Series
+    library.analyzedFiles = new Map(data.analyzedFiles);
+    library.analyzedFolders = new Map(data.analyzedFolders);
+    library.seasonFolders = new Map(data.seasonFolders);
+    return library;
   }
 
   // Convertir Library a JSON
@@ -34,7 +59,6 @@ export class Library {
       type: this.type,
       order: this.order,
       folders: this.folders,
-      showOnFullscreen: this.showOnFullscreen,
       series: this.series.map(s => s.toJSON()), // Convertir cada Series a JSON
       analyzedFiles: Array.from(this.analyzedFiles.entries()), // Convertir Map a array de pares
       analyzedFolders: Array.from(this.analyzedFolders.entries()),
@@ -50,8 +74,6 @@ export class Library {
       jsonData.type,
       jsonData.order,
       jsonData.folders,
-      jsonData.showOnFullscreen,
-      jsonData.isCollection ? jsonData.isCollection : false,
     );
 
     library.id = jsonData.id;
@@ -97,14 +119,6 @@ export class Library {
 
   setFolders(folders: string[]): void {
     this.folders = folders;
-  }
-
-  isShowOnFullscreen(): boolean {
-    return this.showOnFullscreen;
-  }
-
-  setShowOnFullscreen(showOnFullscreen: boolean): void {
-    this.showOnFullscreen = showOnFullscreen;
   }
 
   getSeries(): Series[] {

@@ -63,6 +63,28 @@ const dataSlice = createSlice({
     toggleLibraryEditWindow: (state) => {
       state.libraryEditWindow = !state.libraryEditWindow;
     },
+    addLibrary: (state, action) => {
+      state.libraries.push(action.payload);
+      state.selectedLibrary = action.payload;
+    },
+    updateLibrary: (state, action) => {
+      state.selectedLibrary = action.payload;
+
+      const libraries = state.libraries;
+
+      if (libraries){
+        // Update Season in list
+        const index = libraries.findIndex(
+          (library) => library.id === action.payload.id
+        );
+
+        if (index >= 0) {
+          libraries[index] = action.payload;
+        }
+      }
+
+      // Check if series, season, episode have been removed
+    },
 
     // SERIES AND SEASONS REDUCERS
     showSeriesMenu: (state, action: PayloadAction<SeriesData>) => {
@@ -137,5 +159,5 @@ const dataSlice = createSlice({
 
 export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster, setLibraryForMenu, toggleLibraryEditWindow
     , showSeriesMenu, selectSeries, selectSeason, resetSelection, updateSeason, selectEpisode, showMenu, 
-    toggleEpisodeWindow, updateEpisode, toggleSeriesWindow, toggleSeasonWindow } = dataSlice.actions;
+    toggleEpisodeWindow, updateEpisode, toggleSeriesWindow, toggleSeasonWindow, addLibrary, updateLibrary } = dataSlice.actions;
 export default dataSlice.reducer;

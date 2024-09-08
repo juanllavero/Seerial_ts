@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   minimizeWindow: () => ipcRenderer.send('minimize-window'),
   maximizeWindow: () => ipcRenderer.send('maximize-window'),
   closeWindow: () => ipcRenderer.send('close-window'),
+  scanFiles: (library: LibraryData) => ipcRenderer.invoke('scan-files', library),
   getLibraryData: () => ipcRenderer.invoke('get-library-data'),
   saveLibraryData: (newData: any) => ipcRenderer.invoke('save-library-data', newData),
   startMPV: (library: LibraryData, series: SeriesData, season: SeasonData, episode: EpisodeData) => ipcRenderer.send('play-video', library, series, season, episode),

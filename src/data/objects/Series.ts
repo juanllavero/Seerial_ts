@@ -24,6 +24,9 @@ export class Series {
   yearLock: boolean;
   studioLock: boolean;
   taglineLock: boolean;
+  creatorLock: boolean;
+  musicLock: boolean;
+  genresLock: boolean;
 
   //Other
   themdbID: number;
@@ -70,6 +73,9 @@ export class Series {
     this.yearLock = false;
     this.studioLock = false;
     this.taglineLock = false;
+    this.creatorLock = false;
+    this.musicLock = false;
+    this.genresLock = false;
   }
 
   toJSON(): any {
@@ -102,6 +108,9 @@ export class Series {
       yearLock: this.yearLock,
       studioLock: this.studioLock,
       taglineLock: this.taglineLock,
+      creatorLock: this.creatorLock,
+      musicLock: this.musicLock,
+      genresLock: this.genresLock
     };
   }
 
@@ -136,6 +145,9 @@ export class Series {
     series.yearLock = jsonData.yearLock;
     series.studioLock = jsonData.studioLock;
     series.taglineLock = jsonData.taglineLock;
+    series.creatorLock = jsonData.creatorLock;
+    series.musicLock = jsonData.musicLock;
+    series.genresLock = jsonData.genresLock;
 
     return series;
   }
@@ -310,5 +322,9 @@ export class Series {
 
   private static getString(genres: string[]): string {
     return genres.join(', ');
+  }
+
+  getSeason(number: number): Season | undefined {
+    return this.seasons.find(season => season.seasonNumber === number);
   }
 }

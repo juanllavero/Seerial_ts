@@ -22,6 +22,7 @@ export interface ElectronAPI {
   openFolderDialog: () => Promise<string[]>;
   getImages: (dirPath) => Promise<string[]>;
   getMediaInfo: (episode: EpisodeData) => EpisodeData;
+  scanFiles: (library: LibraryData) => LibraryData;
 }
   
 declare global {

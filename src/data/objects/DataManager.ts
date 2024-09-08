@@ -10,9 +10,9 @@ export class DataManager {
         this.createFolder('resources/img/posters/');
         this.createFolder('resources/img/logos/');
         this.createFolder('resources/img/backgrounds/');
-        this.createFolder('resources/img/thumbails/');
-        this.createFolder('resources/img/thumbails/video/');
-        this.createFolder('resources/img/thumbails/chapters/');
+        this.createFolder('resources/img/thumbnails/');
+        this.createFolder('resources/img/thumbnails/video/');
+        this.createFolder('resources/img/thumbnails/chapters/');
         this.createFolder('resources/img/DownloadCache/');
     }
 

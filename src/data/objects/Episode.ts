@@ -1,8 +1,9 @@
-import { Chapter } from './Chapter';
-import { MediaInfo } from './MediaInfo';
-import { VideoTrack } from './VideoTrack';
-import { AudioTrack } from './AudioTrack';
 import { SubtitleTrack } from './SubtitleTrack';
+import { MediaInfoData } from '@interfaces/MediaInfoData';
+import { VideoTrackData } from '@interfaces/VideoTrackData';
+import { AudioTrackData } from '@interfaces/AudioTrackData';
+import { SubtitleTrackData } from '@interfaces/SubtitleTrackData';
+import { ChapterData } from '@interfaces/ChapterData';
 
 export class Episode {
   id: string;
@@ -14,10 +15,10 @@ export class Episode {
   nameLock: boolean;
   yearLock: boolean;
   overviewLock: boolean;
+  imdbScore: number;
 
   //Show
   score: number;
-  imdbScore: number;
   directedBy: string[];
   writtenBy: string[];
   directedLock: boolean;
@@ -33,11 +34,11 @@ export class Episode {
   seasonID: string;
   watched: boolean;
   timeWatched: number;
-  chapters: Chapter[];
-  mediaInfo?: MediaInfo;
-  videoTracks: VideoTrack[];
-  audioTracks: AudioTrack[];
-  subtitleTracks: SubtitleTrack[];
+  chapters: ChapterData[];
+  mediaInfo?: MediaInfoData;
+  videoTracks: VideoTrackData[];
+  audioTracks: AudioTrackData[];
+  subtitleTracks: SubtitleTrackData[];
   
   constructor() {
     this.id = crypto.randomUUID();
@@ -275,39 +276,39 @@ export class Episode {
     return this.timeWatched;
   }
 
-  getChapters(): Chapter[] {
+  getChapters(): ChapterData[] {
     return this.chapters;
   }
 
-  addChapter(chapter: Chapter): void {
+  addChapter(chapter: ChapterData): void {
     this.chapters.push(chapter);
   }
 
-  getMediaInfo(): MediaInfo | undefined {
+  getMediaInfo(): MediaInfoData | undefined {
     return this.mediaInfo;
   }
 
-  setMediaInfo(mediaInfo: MediaInfo): void {
+  setMediaInfo(mediaInfo: MediaInfoData): void {
     this.mediaInfo = mediaInfo;
   }
 
-  getVideoTracks(): VideoTrack[] {
+  getVideoTracks(): VideoTrackData[] {
     return this.videoTracks;
   }
 
-  setVideoTracks(videoTracks: VideoTrack[]): void {
+  setVideoTracks(videoTracks: VideoTrackData[]): void {
     this.videoTracks = videoTracks;
   }
 
-  getAudioTracks(): AudioTrack[] {
+  getAudioTracks(): AudioTrackData[] {
     return this.audioTracks;
   }
 
-  setAudioTracks(audioTracks: AudioTrack[]): void {
+  setAudioTracks(audioTracks: AudioTrackData[]): void {
     this.audioTracks = audioTracks;
   }
 
-  getSubtitleTracks(): SubtitleTrack[] {
+  getSubtitleTracks(): SubtitleTrackData[] {
     return this.subtitleTracks;
   }
 
