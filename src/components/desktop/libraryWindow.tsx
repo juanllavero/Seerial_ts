@@ -71,8 +71,6 @@ const renderLibraryWindow = () => {
             if (addLibraryMode){
                 const newLibrary = new Library(name, language, type, 0, folders);
                 window.electronAPI.scanFiles(newLibrary.toLibraryData());
-
-                dispatch(addLibrary(newLibrary));
             }else if (selectedLibrary){
                 selectedLibrary.name = name;
                 selectedLibrary.language = language;

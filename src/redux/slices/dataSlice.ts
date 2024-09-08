@@ -64,26 +64,26 @@ const dataSlice = createSlice({
       state.libraryEditWindow = !state.libraryEditWindow;
     },
     addLibrary: (state, action) => {
-      state.libraries.push(action.payload);
+      state.libraries = [...state.libraries, action.payload];
       state.selectedLibrary = action.payload;
     },
     updateLibrary: (state, action) => {
       state.selectedLibrary = action.payload;
 
-      const libraries = state.libraries;
+      if (state.libraries.includes(action.payload)){
+        const libraries = state.libraries;
 
-      console.log(libraries);
-
-      console.log(action.payload);
-
-      if (libraries){
-        // Update Library in list
-        const libraryIndex = libraries.findIndex(
-          (library) => library.id === action.payload.id
-        );
-
-        if (libraryIndex >= 0) {
-          libraries[libraryIndex] = action.payload;
+        if (libraries){
+          // Update Library in list
+          const libraryIndex = libraries.findIndex(
+            (library) => library.id === action.payload.id
+          );
+  
+          if (libraryIndex >= 0) {
+            libraries[libraryIndex] = action.payload;
+          }
+        }else {
+          state.libraries = [...state.libraries, action.payload];
         }
       }
 

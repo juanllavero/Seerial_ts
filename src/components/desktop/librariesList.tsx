@@ -17,7 +17,7 @@ export const renderLibrariesList = () => {
     const libraryForMenu = useSelector((state: RootState) => state.data.libraryForMenu);
 
     const cm = useRef<ContextMenu | null>(null);
-    
+
     useEffect(() => {
         if (libraries && libraries.length > 0 && !selectedLibrary) {
             handleSelectLibrary(libraries[0]);

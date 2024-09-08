@@ -16,9 +16,39 @@ import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { Utils } from '../src/data/objects/Utils';
-import { MetadataManager } from '../src/data/objects/MetadataManager';
 import { Library } from '../src/data/objects/Library';
 import { DataManager } from '../src/data/objects/DataManager';
+
+//#region PROPERTIES AND DATA READING
+
+// Leer el archivo de propiedades
+const properties = propertiesReader('keys.properties');
+
+// Obtener la clave API
+const apiKey = properties.get('TMDB_API_KEY');
+
+if (apiKey) {
+    const moviedb = new MovieDb(String(apiKey));
+
+    if (!moviedb)
+      console.error('This App needs an API Key from TheMovieDB');
+} else {
+    console.error('This App needs an API Key from TheMovieDB');
+}
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+process.env.APP_ROOT = path.join(__dirname, '..')
+
+export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+
+let win: BrowserWindow | null;
+let controlsWindow: BrowserWindow | null;
+let mpvController: MPVController | null = null;
+
+//#endregion
 
 //#region EXTERNAL PATHS
 /**
@@ -108,61 +138,6 @@ ipcMain.on('download-image-url', async (event, imageUrl: string, downloadDir: st
 });
 //#endregion
 
-//#region PROPERTIES AND DATA READING
-
-// Leer el archivo de propiedades
-const properties = propertiesReader('keys.properties');
-
-// Obtener la clave API
-const apiKey = properties.get('TMDB_API_KEY');
-
-if (apiKey) {
-    const moviedb = new MovieDb(String(apiKey));
-
-    if (!moviedb)
-      console.error('This App needs an API Key from TheMovieDB');
-} else {
-    console.error('This App needs an API Key from TheMovieDB');
-}
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-process.env.APP_ROOT = path.join(__dirname, '..')
-
-export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
-
-let win: BrowserWindow | null;
-let controlsWindow: BrowserWindow | null;
-let mpvController: MPVController | null = null;
-
-const jsonFilePath = "./src/data/data.json";
-
-// Read data from JSON    **** Error: La llama 2 veces seguidas
-const loadData = (): any => {
-  try {
-    const data = fs.readFileSync(jsonFilePath, 'utf8');
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Error reading data.json");
-    return [];
-  }
-};
-
-// Save data in JSON
-const saveData = (newData: any) => {
-  try {
-    fs.writeFileSync(jsonFilePath, JSON.stringify(newData), 'utf8');
-    return true;
-  } catch (err) {
-    console.error("Error saving data:", err);
-    return false;
-  }
-};
-
-//#endregion
-
 //#region MEDIA INFO
 const getMediaInfo = async (episode: EpisodeData) => {
   return await Utils.getMediaInfo(episode);
@@ -178,16 +153,19 @@ ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
 DataManager.initFolders();
 
 ipcMain.handle('scan-files', async (_event, library: LibraryData) => {
-  MetadataManager.initConnection(win);
+  DataManager.initConnection(win);
 
   let newLibrary: Library | undefined = new Library(library.name, library.language, library.type, library.order, library.folders);
-  newLibrary = await MetadataManager.scanFiles(newLibrary);
-
-  win?.webContents.send('update-library', newLibrary?.toLibraryData());
+  newLibrary = await DataManager.scanFiles(newLibrary);
 });
 
 ipcMain.on('update-library', (_event, library: LibraryData) => {
   win?.webContents.send('update-library', library);
+});
+
+ipcMain.on('get-libraries', async (_event) => {
+  let libraries = DataManager.getLibraries();
+  win?.webContents.send('send-libraries', libraries.map(library => library.toLibraryData()));
 });
 
 //#endregion
@@ -358,11 +336,11 @@ ipcMain.handle('dialog:openFolder', async () => {
 
 //#region LIBRARY DATA COMMUNICATION
 ipcMain.handle('get-library-data', async () => {
-  return loadData();
+  return DataManager.loadData();
 });
 
 ipcMain.handle('save-library-data', async (_event, newData) => {
-  return saveData(newData);
+  return DataManager.saveData(newData);
 });
 
 //#endregion

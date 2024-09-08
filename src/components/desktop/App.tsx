@@ -5,7 +5,7 @@ import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
-import { setLibraries, setLibraryForMenu, toggleLibraryEditWindow, updateLibrary } from 'redux/slices/dataSlice';
+import { selectLibrary, setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/dataSlice';
 import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
@@ -21,8 +21,6 @@ import { LibraryData } from '@interfaces/LibraryData';
 function App() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-
-  const libraries = useSelector((state: RootState) => state.data.libraries);
 
   const isVideoLoaded = useSelector((state: RootState) => state.video.isLoaded);
   const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
@@ -42,6 +40,17 @@ function App() {
       }
     });
 
+    window.ipcRenderer.on('update-libraries', async (_event, newLibraries: LibraryData[]) => {
+      dispatch(setLibraries(newLibraries));
+      saveLibraries(newLibraries);
+    });
+
+    window.ipcRenderer.on('add-library', (_event, newLibrary: LibraryData, newLibraries: LibraryData[]) => {
+      dispatch(setLibraries(newLibraries));
+      dispatch(selectLibrary(newLibrary));
+      saveLibraries(newLibraries);
+    })
+
     window.electronAPI.onWindowStateChange((state: string) => {
       dispatch(toggleMaximize(state === 'maximized'));
     });
@@ -49,11 +58,6 @@ function App() {
     window.ipcRenderer.on('video-stopped', (_event) => {
       dispatch(closeVideo());
     });
-
-    window.ipcRenderer.on('update-library', (_event, newLibrary: LibraryData) => {
-      dispatch(updateLibrary(newLibrary));
-      saveLibrary(libraries);
-    })
   }, [dispatch]);
 
   const showControls = () => {
@@ -65,7 +69,7 @@ function App() {
   }
 
   // Save data function
-  const saveLibrary = (newData: any[]) => {
+  const saveLibraries = (newData: LibraryData[]) => {
     console.log(newData);
     // @ts-ignore
     window.electronAPI.saveLibraryData(newData).then((success: boolean) => {
