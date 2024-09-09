@@ -165,6 +165,7 @@ ipcMain.on('update-library', (_event, library: LibraryData) => {
 
 ipcMain.on('get-libraries', async (_event) => {
   let libraries = DataManager.getLibraries();
+
   win?.webContents.send('send-libraries', libraries.map(library => library.toLibraryData()));
 });
 

@@ -88,48 +88,51 @@ export class Season {
 
   static fromJSON(json: any): Season {
     const season = new Season();
-    season.id = json.id;
-    season.name = json.name;
-    season.overview = json.overview;
-    season.year = json.year;
-    season.order = json.order;
-    season.score = json.score;
-    season.seasonNumber = json.seasonNumber;
-    season.logoSrc = json.logoSrc;
-    season.coverSrc = json.coverSrc;
-    season.backgroundSrc = json.backgroundSrc;
-    season.videoSrc = json.videoSrc;
-    season.musicSrc = json.musicSrc;
-    season.seriesID = json.seriesID;
-    season.themdbID = json.themdbID;
-    season.imdbID = json.imdbID;
-    season.lastDisc = json.lastDisc;
-    season.folder = json.folder;
-    season.showName = json.showName;
-    season.audioTrackLanguage = json.audioTrackLanguage;
-    season.selectedAudioTrack = json.selectedAudioTrack;
-    season.subtitleTrackLanguage = json.subtitleTrackLanguage;
-    season.selectedSubtitleTrack = json.selectedSubtitleTrack;
-    season.episodes = json.episodes.map((e: any) => Episode.fromJSON(e));
-    season.genres = json.genres;
-    season.currentlyWatchingEpisode = json.currentlyWatchingEpisode;
-    season.cast = json.cast; // Ajustar si tienes una clase Cast
-    season.creator = json.creator;
-    season.musicComposer = json.musicComposer;
-    season.directedBy = json.directedBy;
-    season.writtenBy = json.writtenBy;
-    season.productionStudios = json.productionStudios;
-    season.tagline = json.tagline;
-    season.nameLock = json.nameLock;
-    season.yearLock = json.yearLock;
-    season.overviewLock = json.overviewLock;
-    season.studioLock = json.studioLock;
-    season.taglineLock = json.taglineLock;
+
+    // Asignar atributos solo si están presentes en json
+    season.id = json.id || season.id;
+    season.name = json.name || season.name;
+    season.overview = json.overview || season.overview;
+    season.year = json.year || season.year;
+    season.order = json.order || season.order;
+    season.score = json.score || season.score;
+    season.seasonNumber = json.seasonNumber || season.seasonNumber;
+    season.logoSrc = json.logoSrc || season.logoSrc;
+    season.coverSrc = json.coverSrc || season.coverSrc;
+    season.backgroundSrc = json.backgroundSrc || season.backgroundSrc;
+    season.videoSrc = json.videoSrc || season.videoSrc;
+    season.musicSrc = json.musicSrc || season.musicSrc;
+    season.seriesID = json.seriesID || season.seriesID;
+    season.themdbID = json.themdbID || season.themdbID;
+    season.imdbID = json.imdbID || season.imdbID;
+    season.lastDisc = json.lastDisc || season.lastDisc;
+    season.folder = json.folder || season.folder;
+    season.showName = json.showName !== undefined ? json.showName : season.showName;
+    season.audioTrackLanguage = json.audioTrackLanguage || season.audioTrackLanguage;
+    season.selectedAudioTrack = json.selectedAudioTrack !== undefined ? json.selectedAudioTrack : season.selectedAudioTrack;
+    season.subtitleTrackLanguage = json.subtitleTrackLanguage || season.subtitleTrackLanguage;
+    season.selectedSubtitleTrack = json.selectedSubtitleTrack !== undefined ? json.selectedSubtitleTrack : season.selectedSubtitleTrack;
+    season.episodes = json.episodes ? json.episodes.map((e: any) => Episode.fromJSON(e)) : season.episodes;
+    season.genres = json.genres || season.genres;
+    season.currentlyWatchingEpisode = json.currentlyWatchingEpisode !== undefined ? json.currentlyWatchingEpisode : season.currentlyWatchingEpisode;
+    season.cast = json.cast || season.cast; // Ajustar si tienes una clase Cast
+    season.creator = json.creator || season.creator;
+    season.musicComposer = json.musicComposer || season.musicComposer;
+    season.directedBy = json.directedBy || season.directedBy;
+    season.writtenBy = json.writtenBy || season.writtenBy;
+    season.productionStudios = json.productionStudios || season.productionStudios;
+    season.tagline = json.tagline || season.tagline;
+    season.nameLock = json.nameLock !== undefined ? json.nameLock : season.nameLock;
+    season.yearLock = json.yearLock !== undefined ? json.yearLock : season.yearLock;
+    season.overviewLock = json.overviewLock !== undefined ? json.overviewLock : season.overviewLock;
+    season.studioLock = json.studioLock !== undefined ? json.studioLock : season.studioLock;
+    season.taglineLock = json.taglineLock !== undefined ? json.taglineLock : season.taglineLock;
+
     return season;
   }
 
   toJSON(): any {
-    return {
+    const json: any = {
       id: this.id,
       name: this.name,
       overview: this.overview,
@@ -166,8 +169,17 @@ export class Season {
       yearLock: this.yearLock,
       overviewLock: this.overviewLock,
       studioLock: this.studioLock,
-      taglineLock: this.taglineLock,
+      taglineLock: this.taglineLock
     };
+
+    // Filtrar atributos solo si están asignados o tienen un valor definido
+    Object.keys(json).forEach(key => {
+      if (json[key] === undefined || json[key] === null || (Array.isArray(json[key]) && json[key].length === 0)) {
+        delete json[key];
+      }
+    });
+
+    return json;
   }
 
   getId(): string {

@@ -449,12 +449,14 @@ html, body {
   color: $color-text-primary;
   font-size: 3.5em;
   font-weight: bold;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.628));
 }
 
 #seasonTitle{
   color: $color-text-primary;
   font-size: 2em;
   font-weight: bold;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.628));
 }
 
 .season-info-text{
@@ -464,15 +466,21 @@ html, body {
 
 .season-info-text span{
   font-size: medium;
-  color: $color-text-default;
+  color: $color-bright;
 }
 
 #directedBy{
   font-size: small;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
 }
 
 #date{
   margin-top: 10px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
+}
+
+#genres {
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
 }
 
 .rating-info{
@@ -484,12 +492,14 @@ html, body {
 
 .rating-info img{
   width: 40px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
 }
 
 .rating-info span{
-  color: $color-text-default;
+  color: $color-bright;
   font-weight: bold;
   margin-left: 5px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
 }
 
 .season-info-buttons-container{
@@ -499,8 +509,9 @@ html, body {
 
 .overview-container{
   max-width: 700px;
-
   margin-top: 1em;
+  color: $color-bright;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
 }
 
 /* SEASON INFO BUTTONS */

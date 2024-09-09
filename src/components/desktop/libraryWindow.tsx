@@ -38,11 +38,11 @@ const renderLibraryWindow = () => {
 
             if (languageName)
                 return languageName.charAt(0).toUpperCase() + languageName.slice(1);
-          } catch (error) {
+        } catch (error) {
             console.error('Error retrieving language and country name:', error);
             return lang;
-          }
-      };
+        }
+    };
 
     const handleSelectFolder = async () => {
         const result = await window.electronAPI.openFolderDialog();

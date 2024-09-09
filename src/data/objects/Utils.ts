@@ -366,6 +366,16 @@ export class Utils {
         });
     }
 
+    public static isFolder = async (folderPath: string) => {
+        try {
+            const stats = await fs.promises.stat(folderPath);
+            return stats.isDirectory();
+        } catch (error) {
+            console.error(`Error al acceder a la ruta ${folderPath}:`, error);
+            return false;
+        }
+    }
+
     public static getFilesInFolder = async (folderPath: string) => {
         try {
             const stats = await fs.promises.stat(folderPath);

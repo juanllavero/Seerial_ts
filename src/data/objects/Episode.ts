@@ -73,39 +73,42 @@ export class Episode {
 
   static fromJSON(json: any): Episode {
     const episode = new Episode();
-    episode.id = json.id;
-    episode.name = json.name;
-    episode.overview = json.overview;
-    episode.year = json.year;
-    episode.order = json.order;
-    episode.score = json.score;
-    episode.imdbScore = json.imdbScore;
-    episode.runtime = json.runtime;
-    episode.runtimeInSeconds = json.runtimeInSeconds;
-    episode.episodeNumber = json.episodeNumber;
-    episode.seasonNumber = json.seasonNumber;
-    episode.videoSrc = json.videoSrc;
-    episode.imgSrc = json.imgSrc;
-    episode.seasonID = json.seasonID;
-    episode.watched = json.watched;
-    episode.timeWatched = json.timeWatched;
-    episode.chapters = json.chapters;
-    episode.mediaInfo = json.mediaInfo;
-    episode.videoTracks = json.videoTracks;
-    episode.audioTracks = json.audioTracks;
-    episode.subtitleTracks = json.subtitleTracks;
-    episode.directedBy = json.directedBy;
-    episode.writtenBy = json.writtenBy;
-    episode.nameLock = json.nameLock;
-    episode.yearLock = json.yearLock;
-    episode.overviewLock = json.overviewLock;
-    episode.directedLock = json.directedLock;
-    episode.writtenLock = json.writtenLock;
+
+    // Asignar atributos solo si están presentes en json
+    episode.id = json.id || episode.id;
+    episode.name = json.name || episode.name;
+    episode.overview = json.overview || episode.overview;
+    episode.year = json.year || episode.year;
+    episode.order = json.order !== undefined ? json.order : episode.order;
+    episode.score = json.score !== undefined ? json.score : episode.score;
+    episode.imdbScore = json.imdbScore !== undefined ? json.imdbScore : episode.imdbScore;
+    episode.runtime = json.runtime !== undefined ? json.runtime : episode.runtime;
+    episode.runtimeInSeconds = json.runtimeInSeconds !== undefined ? json.runtimeInSeconds : episode.runtimeInSeconds;
+    episode.episodeNumber = json.episodeNumber !== undefined ? json.episodeNumber : episode.episodeNumber;
+    episode.seasonNumber = json.seasonNumber !== undefined ? json.seasonNumber : episode.seasonNumber;
+    episode.videoSrc = json.videoSrc || episode.videoSrc;
+    episode.imgSrc = json.imgSrc || episode.imgSrc;
+    episode.seasonID = json.seasonID || episode.seasonID;
+    episode.watched = json.watched !== undefined ? json.watched : episode.watched;
+    episode.timeWatched = json.timeWatched !== undefined ? json.timeWatched : episode.timeWatched;
+    episode.chapters = json.chapters ? json.chapters : episode.chapters;
+    episode.mediaInfo = json.mediaInfo ? json.mediaInfo : episode.mediaInfo;
+    episode.videoTracks = json.videoTracks ? json.videoTracks : episode.videoTracks;
+    episode.audioTracks = json.audioTracks ? json.audioTracks : episode.audioTracks;
+    episode.subtitleTracks = json.subtitleTracks ? json.subtitleTracks : episode.subtitleTracks;
+    episode.directedBy = json.directedBy ? json.directedBy : episode.directedBy;
+    episode.writtenBy = json.writtenBy ? json.writtenBy : episode.writtenBy;
+    episode.nameLock = json.nameLock !== undefined ? json.nameLock : episode.nameLock;
+    episode.yearLock = json.yearLock !== undefined ? json.yearLock : episode.yearLock;
+    episode.overviewLock = json.overviewLock !== undefined ? json.overviewLock : episode.overviewLock;
+    episode.directedLock = json.directedLock !== undefined ? json.directedLock : episode.directedLock;
+    episode.writtenLock = json.writtenLock !== undefined ? json.writtenLock : episode.writtenLock;
+
     return episode;
   }
 
   toJSON(): any {
-    return {
+    const json: any = {
       id: this.id,
       name: this.name,
       overview: this.overview,
@@ -122,19 +125,28 @@ export class Episode {
       seasonID: this.seasonID,
       watched: this.watched,
       timeWatched: this.timeWatched,
-      chapters: this.chapters, // Ajustar si tienes una clase Chapter
-      mediaInfo: this.mediaInfo, // Ajustar si tienes una clase MediaInfo
-      videoTracks: this.videoTracks, // Ajustar si tienes una clase VideoTrack
-      audioTracks: this.audioTracks, // Ajustar si tienes una clase AudioTrack
-      subtitleTracks: this.subtitleTracks, // Ajustar si tienes una clase SubtitleTrack
-      directedBy: this.directedBy,
-      writtenBy: this.writtenBy,
+      chapters: this.chapters.length ? this.chapters : undefined,
+      mediaInfo: this.mediaInfo ? this.mediaInfo : undefined,
+      videoTracks: this.videoTracks.length ? this.videoTracks : undefined,
+      audioTracks: this.audioTracks.length ? this.audioTracks : undefined,
+      subtitleTracks: this.subtitleTracks.length ? this.subtitleTracks : undefined,
+      directedBy: this.directedBy.length ? this.directedBy : undefined,
+      writtenBy: this.writtenBy.length ? this.writtenBy : undefined,
       nameLock: this.nameLock,
       yearLock: this.yearLock,
       overviewLock: this.overviewLock,
       directedLock: this.directedLock,
-      writtenLock: this.writtenLock,
+      writtenLock: this.writtenLock
     };
+
+    // Filtrar atributos solo si están asignados o tienen un valor definido
+    Object.keys(json).forEach(key => {
+      if (json[key] === undefined || json[key] === null || (Array.isArray(json[key]) && json[key].length === 0)) {
+        delete json[key];
+      }
+    });
+
+    return json;
   }
 
   getId(): string {

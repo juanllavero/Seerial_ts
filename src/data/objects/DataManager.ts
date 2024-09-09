@@ -10,6 +10,7 @@ import { Episode as EpisodeLocal } from './Episode';
 import { Cast } from './Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { BrowserWindow } from 'electron';
+import { LibraryData } from '@interfaces/LibraryData';
 
 export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
@@ -19,6 +20,9 @@ export class DataManager {
     static win: BrowserWindow | null;
     static moviedb: MovieDb | undefined;
     static library: Library;
+    static imageLangs: string[] = [
+        "es", "en", "ja"
+    ];
 
     public static initFolders = async () => {
         this.createFolder('resources/');
@@ -42,14 +46,26 @@ export class DataManager {
     }
 
     //#region JSON LOAD AND SAVE
-    // Read data from JSON    **** Error: La llama 2 veces seguidas
+    /**
+     * Function to load libraries stored in a JSON file
+     * @returns LibraryData[] array with libraries
+     */
     public static loadData = (): any => {
-        try {
-            const data = fs.readFileSync(this.DATA_PATH, 'utf8');
-        return JSON.parse(data);
-        } catch (err) {
-            console.error("Error reading data.json");
-            return [];
+        if (this.libraries.length === 0){
+            try {
+                const data = fs.readFileSync(this.DATA_PATH, 'utf8');
+                
+                const jsonData: LibraryData[] = JSON.parse(data);
+
+                this.libraries = jsonData.map((libraryData: any) => Library.fromJSON(libraryData));
+                
+                return jsonData;
+            } catch (err) {
+                console.error("Error reading data.json");
+                return [];
+            }
+        }else {
+            return this.libraries;
         }
     };
     
@@ -100,7 +116,12 @@ export class DataManager {
         this.addLibrary(newLibrary);
 
         this.win?.webContents.send('add-library', this.library.toLibraryData(), 
-            this.libraries.map(library => library.toLibraryData()));
+            this.libraries.map((library: Library) => library.toLibraryData()));
+
+        const isoLanguage = this.library.language.split('-')[0];
+
+        if (!this.imageLangs.includes(isoLanguage))
+            this.imageLangs.push(isoLanguage);
         
         let showsLibrary: boolean = this.library.type === "Shows";
         for (const rootFolder of this.library.folders) {
@@ -110,7 +131,7 @@ export class DataManager {
                 if (showsLibrary){
                     await this.scanTVShow(file.parentPath + "\\" + file.name);
                 }else{
-                    console.log("MovieScan");
+                    await this.scanMovie(file.parentPath + "\\" + file.name);
                 }
             }
         }
@@ -120,8 +141,11 @@ export class DataManager {
         return newLibrary;
     };
 
-    public static async scanTVShow(folder: string): Promise<Series | undefined> {
+    public static async scanTVShow(folder: string) {
         if (!this.moviedb)
+            return undefined;
+
+        if (!await Utils.isFolder(folder))
             return undefined;
 
         const videoFiles = await Utils.getValidVideoFiles(folder);
@@ -174,7 +198,7 @@ export class DataManager {
             // Search for the show
             try{
                 const res = await this.moviedb.searchTv({ query: `${finalName}`, year: Number.parseInt(year), page: 1 });
-                if (res && res.results){
+                if (res && res.results && res.results[0]){
                     themdbID = res.results[0].id ?? -1;
                     show.themdbID = themdbID;
 
@@ -225,7 +249,6 @@ export class DataManager {
 
         this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
         this.library.series.push(show);
-        return show;
     };
 
     private static async processEpisodes(videoFiles: string[], show: Series, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined, exists: boolean) {
@@ -393,7 +416,7 @@ export class DataManager {
             season.setOverview(seasonMetadata.overview ?? "");
             season.setYear(seasonMetadata.episodes && seasonMetadata.episodes[0] && seasonMetadata.episodes[0].air_date ? seasonMetadata.episodes[0].air_date : "");
             season.setSeasonNumber(realEpisode !== -1 ? realSeason ?? 0 : (seasonMetadata.season_number ?? 0));
-    
+
             if (!season.getBackgroundSrc() || season.getBackgroundSrc() === 'resources/img/DefaultBackground.png') {
                 if (show.getSeasons().length > 1) {
                     let s: any = undefined;
@@ -495,14 +518,16 @@ export class DataManager {
                 }
 
                 // Download thumbnails
-                for (const thumbnail of thumbnails) {
-                    if (thumbnail.file_path){
+                for (const [index, thumbnail] of thumbnails.entries()) {
+                    if (thumbnail.file_path) {
                         const url = `${imageBaseURL}${thumbnail.file_path}`;
-                        const imageFilePath = path.join(outputDir, thumbnails.indexOf(thumbnail) + ".jpg");
-                        await Utils.downloadImage(url, imageFilePath);
+                        const imageFilePath = path.join(outputDir, index + ".jpg");
 
-                        if (thumbnails.indexOf(thumbnail) === 0){
-                            episode.imgSrc = "resources/img/thumbnails/video/" + episode.id + "/" + thumbnails.indexOf(thumbnail) + ".jpg";
+                        if (index === 0) {
+                            await Utils.downloadImage(url, imageFilePath);
+                            episode.imgSrc = `resources/img/thumbnails/video/${episode.id}/${index}.jpg`;
+                        } else {
+                            Utils.downloadImage(url, imageFilePath);
                         }
                     }
                 }
@@ -549,12 +574,12 @@ export class DataManager {
         show.score = showData.vote_average ? (((showData.vote_average * 10.0)) / 10.0) : 0;
         show.numberOfSeasons = showData.number_of_seasons ?? 0;
         show.numberOfEpisodes = showData.number_of_episodes ?? 0;
-        show.productionStudios = show.studioLock ? showData.production_companies ? showData.production_companies.map(company => company.name ?? "") : [""] : [""];
-        show.genres = !show.genresLock ? showData.genres ? showData.genres.map(genre => genre.name ?? "") : [""] : [""];
+        show.productionStudios = !show.studioLock ? show.productionStudios : showData.production_companies ? showData.production_companies.map(company => company.name ?? "") : [];
+        show.genres = !show.genresLock ? show.genres : showData.genres ? showData.genres.map(genre => genre.name ?? "") : [];
         show.tagline = !show.taglineLock ? showData.tagline ?? "" : "";
         show.playSameMusic = true;
 
-        show.creator = !show.creatorLock ? showData.created_by ? showData.created_by.map(creator => creator.name ?? "") : [""] : [""];
+        show.creator = !show.creatorLock ? show.creator : showData.created_by ? showData.created_by.map(creator => creator.name ?? "") : [];
 
         const credits = await this.moviedb?.tvCredits({ id: show.themdbID });
         
@@ -628,27 +653,30 @@ export class DataManager {
         
             // Download logos
             for (const logo of logos) {
-                if (logo.file_path){
+                if (logo.file_path && (logo.iso_639_1 === null || (logo.iso_639_1 && this.imageLangs.includes(logo.iso_639_1)))) {
                     const logoUrl = `${baseUrl}${logo.file_path}`;
-                    const logoFilePath = path.join(outputLogosDir, `${logo.file_path.split('/').pop()}`);
-                    await Utils.downloadImage(logoUrl, logoFilePath);
-
-                    if (logos.indexOf(logo) === 0){
-                        show.logoSrc = "resources/img/logos/" + show.id + "/" + `${logo.file_path.split('/').pop()}`;
+                    const logoFilePath = path.join(outputLogosDir, logo.file_path.split('/').pop()!);
+                    
+                    if (show.logoSrc === "") {
+                        await Utils.downloadImage(logoUrl, logoFilePath);
+                        show.logoSrc = `resources/img/logos/${show.id}/${logo.file_path.split('/').pop()}`;
+                    }else {
+                        Utils.downloadImage(logoUrl, logoFilePath);
                     }
                 }
             }
-        
+
             // Download posters
             for (const poster of posters) {
-                if (poster.file_path){
+                if (poster.file_path && (poster.iso_639_1 === null || (poster.iso_639_1 && this.imageLangs.includes(poster.iso_639_1)))) {
                     const posterUrl = `${baseUrl}${poster.file_path}`;
-                    const posterFilePath = path.join(outputPostersDir, `${poster.file_path.split('/').pop()}`);
-                    await Utils.downloadImage(posterUrl, posterFilePath);
-
-                    if (posters.indexOf(poster) === 0){
-                        console.log(show.name);
-                        show.coverSrc = "resources/img/posters/" + show.id + "/" + `${poster.file_path.split('/').pop()}`;;
+                    const posterFilePath = path.join(outputPostersDir, poster.file_path.split('/').pop()!);
+                    
+                    if (show.coverSrc === "") {
+                        await Utils.downloadImage(posterUrl, posterFilePath);
+                        show.coverSrc = `resources/img/posters/${show.id}/${poster.file_path.split('/').pop()}`;
+                    }else {
+                        Utils.downloadImage(posterUrl, posterFilePath);
                     }
                 }
             }
@@ -657,11 +685,82 @@ export class DataManager {
           }
     };
 
-    public static async scanMovie(): Promise<string> {
-        return '';
+    public static async scanMovie(root: string) {
+        if (!this.moviedb)
+            return;
+
+        if (!await Utils.isFolder(root)){
+            //#region MOVIE FILE ONLY
+
+            const nameAndYear = this.extractNameAndYear(root.split('.').slice(0, -1).join('.'));
+
+            let name;
+            let year;
+            const movieMetadata = await this.searchMovie(name, year);
+
+            //#endregion
+        }else {
+
+
+            
+            let name;
+            let year;
+            const movieMetadata = await this.searchMovie(name, year);
+
+        }
+
     };
+
+    private static async searchMovie(name: string, year: string) {
+        if (!this.moviedb)
+            return undefined;
+
+        try{
+            const res = await this.moviedb.searchMovie({ query: `${name}`, year: Number.parseInt(year), page: 1 });
+            if (res && res.results && res.results[0]){
+                let themdbID = res.results[0].id ?? -1;
+
+                if (themdbID === -1)
+                    return undefined;
+
+                return await this.moviedb.movieInfo({ id: themdbID, language: this.library.language });
+            }else{
+                console.log("searchMovie: movie not found for '" + name + "; " + year + "'");
+                return undefined;
+            }
+        } catch (e) {
+            console.log("searchMovie: search for movie has failed with error " + e);
+            return undefined;
+        }
+    }
+
+    private static extractNameAndYear(source: string) {
+        // Remove parentheses and extra spaces
+        const cleanSource = source.replace(/[()]/g, '').replace(/\s{2,}/g, ' ').trim();
+
+        // Regex to get name and year
+        const regex = /^(.*?)(?:[\s.-]*(\d{4}))?$/;
+        const match = cleanSource.match(regex);
+
+        let name = '';
+        let year = '1';
+
+        if (match) {
+            name = match[1];
+            year = match[2] || '1';
+        } else {
+            name = cleanSource;
+        }
+
+        // Clean and format the name
+        name = name.replace(/[-_]/g, ' ').replace(/\s{2,}/g, ' ').trim();
+
+        return [name, year];
+    }
+
     //#endregion
 
+    //#region UTILS
     public static createFolder = async (folderDir: string) => {
         Utils.getExternalPath(folderDir)
         if (!fs.existsSync(folderDir)) {
@@ -676,4 +775,5 @@ export class DataManager {
         );
         return images.map((image) => path.join(dirPath, image));
     }
+    //#endregion
 }

@@ -164,11 +164,11 @@ export const renderRightPanelContent = () => {
                   <div style={{cursor: "pointer"}}
                   onMouseEnter={() => {handleSeriesMenu(series, true)}}
                   onMouseLeave={() => {handleSeriesMenu(series, false)}}
-                  onClick={() => handleSeriesSelection(series)}>
+                  >
                     {
                       series == seriesMenu && (showButtonMenu || seriesMenuOpen) ? (
                         <>
-                          <div className="video-button-hover"
+                          <div className="video-button-hover" onClick={() => handleSeriesSelection(series)}
                             style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                             >
                               <button className="svg-button-desktop-transparent left-corner-align"
@@ -341,11 +341,11 @@ export const renderRightPanelContent = () => {
                     ) : (<span></span>)
                   }
                   <span id="date">{selectedSeason.year || ""}</span>
-                  <span id="genres">{selectedSeries.genres || ""}</span>
+                  <span id="genres">{selectedSeries.genres.join(', ') || ""}</span>
                 </section>
                 <div className="rating-info">
                   <img src="./src/assets/svg/themoviedb.svg" alt="TheMovieDB logo"/>
-                  <span id="rating">{selectedSeason.score || "N/A"}</span>
+                  <span id="rating">{(selectedLibrary.type === "Shows" ? selectedSeries.score.toFixed(2) : selectedSeason.score.toFixed(2)) || "N/A"}</span>
                 </div>
                 <section className="season-info-buttons-container">
                 <button className="play-button-desktop">

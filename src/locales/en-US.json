@@ -188,5 +188,6 @@
     "inProgress": "In progress",
     "media": "Media",
     "orderByTitle": "Order by title",
-    "tagline": "Tagline"
+    "tagline": "Tagline",
+    "tags": "Tags"
   }

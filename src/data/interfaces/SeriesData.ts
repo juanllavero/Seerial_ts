@@ -24,6 +24,9 @@ export interface SeriesData{
     yearLock: boolean;
     studioLock: boolean;
     taglineLock: boolean;
+    creatorLock: boolean;
+    musicLock: boolean;
+    genresLock: boolean;
 
     //Other
     themdbID: number;

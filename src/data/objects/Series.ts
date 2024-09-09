@@ -79,7 +79,7 @@ export class Series {
   }
 
   toJSON(): any {
-    return {
+    const json: any = {
       id: this.id,
       themdbID: this.themdbID,
       name: this.name,
@@ -112,42 +112,50 @@ export class Series {
       musicLock: this.musicLock,
       genresLock: this.genresLock
     };
+
+    // Filter attributes
+    Object.keys(json).forEach(key => {
+      if (json[key] === undefined || json[key] === null || (Array.isArray(json[key]) && json[key].length === 0)) {
+        delete json[key];
+      }
+    });
+
+    return json;
   }
 
   static fromJSON(jsonData: any): Series {
     const series = new Series();
-    series.id = jsonData.id;
-    series.order = jsonData.order;
-    series.themdbID = jsonData.themdbID;
-    series.name = jsonData.name;
-    series.overview = jsonData.overview;
-    series.year = jsonData.year;
-    series.score = jsonData.score;
-    series.numberOfSeasons = jsonData.numberOfSeasons;
-    series.numberOfEpisodes = jsonData.numberOfEpisodes;
-    series.coverSrc = jsonData.coverSrc;
-    series.logoSrc = jsonData.logoSrc;
-    series.folder = jsonData.folder;
-    series.videoZoom = jsonData.videoZoom;
-    series.episodeGroupID = jsonData.episodeGroupID;
-    series.seasons = jsonData.seasons.map((s: any) => Season.fromJSON(s));
-    series.genres = jsonData.genres;
-    series.playSameMusic = jsonData.playSameMusic;
-    series.analyzingFiles = jsonData.analyzingFiles;
-    series.currentlyWatchingSeason = jsonData.currentlyWatchingSeason;
-    series.productionStudios = jsonData.productionStudios;
-    series.isCollection = jsonData.isCollection;
-    series.tagline = jsonData.tagline;
-    series.creator = jsonData.creator;
-    series.genres = jsonData.genres;
-    series.cast = jsonData.cast;
-    series.musicComposer = jsonData.musicComposer;
-    series.yearLock = jsonData.yearLock;
-    series.studioLock = jsonData.studioLock;
-    series.taglineLock = jsonData.taglineLock;
-    series.creatorLock = jsonData.creatorLock;
-    series.musicLock = jsonData.musicLock;
-    series.genresLock = jsonData.genresLock;
+    series.id = jsonData.id || series.id;
+    series.order = jsonData.order || series.order;
+    series.themdbID = jsonData.themdbID || series.themdbID;
+    series.name = jsonData.name || series.name;
+    series.overview = jsonData.overview || series.overview;
+    series.year = jsonData.year || series.year;
+    series.score = jsonData.score || series.score;
+    series.numberOfSeasons = jsonData.numberOfSeasons || series.numberOfSeasons;
+    series.numberOfEpisodes = jsonData.numberOfEpisodes || series.numberOfEpisodes;
+    series.coverSrc = jsonData.coverSrc || series.coverSrc;
+    series.logoSrc = jsonData.logoSrc || series.logoSrc;
+    series.folder = jsonData.folder || series.folder;
+    series.videoZoom = jsonData.videoZoom || series.videoZoom;
+    series.episodeGroupID = jsonData.episodeGroupID || series.episodeGroupID;
+    series.seasons = jsonData.seasons ? jsonData.seasons.map((s: any) => Season.fromJSON(s)) : series.seasons;
+    series.genres = jsonData.genres || series.genres;
+    series.playSameMusic = jsonData.playSameMusic || series.playSameMusic;
+    series.analyzingFiles = jsonData.analyzingFiles || series.analyzingFiles;
+    series.currentlyWatchingSeason = jsonData.currentlyWatchingSeason || series.currentlyWatchingSeason;
+    series.productionStudios = jsonData.productionStudios || series.productionStudios;
+    series.isCollection = jsonData.isCollection || series.isCollection;
+    series.tagline = jsonData.tagline || series.tagline;
+    series.creator = jsonData.creator || series.creator;
+    series.cast = jsonData.cast || series.cast;
+    series.musicComposer = jsonData.musicComposer || series.musicComposer;
+    series.yearLock = jsonData.yearLock || series.yearLock;
+    series.studioLock = jsonData.studioLock || series.studioLock;
+    series.taglineLock = jsonData.taglineLock || series.taglineLock;
+    series.creatorLock = jsonData.creatorLock || series.creatorLock;
+    series.musicLock = jsonData.musicLock || series.musicLock;
+    series.genresLock = jsonData.genresLock || series.genresLock;
 
     return series;
   }

@@ -78,9 +78,9 @@ export class Library {
 
     library.id = jsonData.id;
     library.series = jsonData.series.map((s: any) => Series.fromJSON(s));
-    library.analyzedFiles = new Map(jsonData.analyzedFiles);
-    library.analyzedFolders = new Map(jsonData.analyzedFolders);
-    library.seasonFolders = new Map(jsonData.seasonFolders);
+    library.analyzedFiles = new Map(Object.entries(jsonData.analyzedFiles || {}));
+    library.analyzedFolders = new Map(Object.entries(jsonData.analyzedFolders || {}));
+    library.seasonFolders = new Map(Object.entries(jsonData.seasonFolders || {}));
 
     return library;
   }

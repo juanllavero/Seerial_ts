@@ -17,6 +17,7 @@ import renderLibraryWindow from './libraryWindow';
 import renderEpisodeWindow from './episodeWindow';
 import renderSeasonWindow from './seasonWindow';
 import { LibraryData } from '@interfaces/LibraryData';
+import renderSeriesWindow from './seriesWindow';
 
 function App() {
   const dispatch = useDispatch();
@@ -97,6 +98,7 @@ function App() {
       {
         <>
           {renderLibraryWindow()}
+          {renderSeriesWindow()}
           {renderSeasonWindow()}
           {renderEpisodeWindow()}
         </>
