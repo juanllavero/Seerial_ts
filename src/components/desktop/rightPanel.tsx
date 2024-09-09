@@ -189,7 +189,14 @@ export const renderRightPanelContent = () => {
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
-                          <ResolvedImage src={series.isCollection ? series.coverSrc : series.seasons[0].coverSrc} alt="Poster"
+                          <ResolvedImage src={series.coverSrc} alt="Poster"
+                          style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
+                          onError={(e: any) => {
+                            e.target.onerror = null; // To avoid infinite loop
+                            e.target.src = "./src/resources/img/fileNotFound.png";
+                          }}/>
+                        ) : series.seasons[0].coverSrc !== "" ? (
+                          <ResolvedImage src={series.seasons[0].coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
@@ -215,7 +222,7 @@ export const renderRightPanelContent = () => {
                       })()}
                     </span>
                   ) : (
-                    <span id="episodeNumber">{series.seasons[0].year}</span>
+                    <span id="episodeNumber">{new Date(series.seasons[0].year).getFullYear()}</span>
                   )
                 }
                 <ContextMenu 

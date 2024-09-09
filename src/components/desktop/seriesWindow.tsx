@@ -64,6 +64,7 @@ const renderSeriesWindow = () => {
         }
 
         const fetchPosters = async () => {
+            console.log(series);
             const posterPath = await window.electronAPI.getExternalPath("resources/img/posters/" + series?.id + "/");
             if (posterPath) {
                 const images = await window.electronAPI.getImages(posterPath);
@@ -199,10 +200,10 @@ const renderSeriesWindow = () => {
                                 <button className={`desktop-dialog-side-btn ${menuSection === Section.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
                                 onClick={() => dispatch(changeMenuSection(Section.Posters))}>{t('postersButton')}</button>
                             </>
-                        ) : (
+                        ) : series?.isCollection ? (
                             <button className={`desktop-dialog-side-btn ${menuSection === Section.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
                             onClick={() => dispatch(changeMenuSection(Section.Posters))}>{t('postersButton')}</button>
-                        )
+                        ) : null
                     }
                     </div>
                     <div className="dialog-center-right scroll">
