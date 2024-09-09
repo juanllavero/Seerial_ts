@@ -19,6 +19,7 @@ const execPromise = promisify(exec);
 export class Utils {
     static videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.mpeg', '.m2ts'];
     
+    //#region MEDIA INFO
     public static getMediaInfo(episode: EpisodeData | undefined): Promise<EpisodeData> | undefined {
         if (!episode)
             return undefined;
@@ -314,11 +315,6 @@ export class Utils {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
-    public static getExternalPath(relativePath: string): string {
-        const basePath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
-        return path.join(basePath, relativePath);
-    }
-
     public static async getChapters(episode: EpisodeData): Promise<ChapterData[]> {
         const chaptersArray: ChapterData[] = [];
         
@@ -350,6 +346,12 @@ export class Utils {
 
         return chaptersArray;
     }
+    //#endregion
+
+    public static getExternalPath(relativePath: string): string {
+        const basePath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
+        return path.join(basePath, relativePath);
+    }
 
     public static downloadImage = async (url: string, filePath: string) => {
         const response = await axios({
@@ -364,6 +366,12 @@ export class Utils {
           writer.on('finish', resolve);
           writer.on('error', reject);
         });
+    }
+
+    public static getFileName(filePath: string) {
+        const fileNameWithExtension = filePath.split(/[/\\]/).pop() || '';
+        const fileName = fileNameWithExtension.split('.').slice(0, -1).join('.') || fileNameWithExtension;
+        return fileName;
     }
 
     public static isFolder = async (folderPath: string) => {

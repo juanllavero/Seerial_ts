@@ -12,7 +12,7 @@ export class Season {
   yearLock: boolean;
   overviewLock: boolean;
 
-  //Moviecreator:
+  //Movie
   score: number;
   tagline: string;
   creator: string[];
@@ -22,6 +22,11 @@ export class Season {
   productionStudios: string[];
   directedBy: string[];
   writtenBy: string[];
+  creatorLock: boolean;
+  musicLock: boolean;
+  directedLock: boolean;
+  writtenLock: boolean;
+  genresLock: boolean;
   studioLock: boolean;
   taglineLock: boolean;
   
@@ -84,6 +89,11 @@ export class Season {
     this.overviewLock = false;
     this.studioLock = false;
     this.taglineLock = false;
+    this.creatorLock = false;
+    this.musicLock = false;
+    this.directedLock = false;
+    this.writtenLock = false;
+    this.genresLock = false;
   }
 
   static fromJSON(json: any): Season {
@@ -127,6 +137,11 @@ export class Season {
     season.overviewLock = json.overviewLock !== undefined ? json.overviewLock : season.overviewLock;
     season.studioLock = json.studioLock !== undefined ? json.studioLock : season.studioLock;
     season.taglineLock = json.taglineLock !== undefined ? json.taglineLock : season.taglineLock;
+    season.creatorLock = json.creatorLock !== undefined ? json.creatorLock : season.creatorLock;
+    season.musicLock = json.musicLock !== undefined ? json.musicLock : season.musicLock;
+    season.directedLock = json.directedLock !== undefined ? json.directedLock : season.directedLock;
+    season.writtenLock = json.writtenLock !== undefined ? json.writtenLock : season.writtenLock;
+    season.genresLock = json.genresLock !== undefined ? json.genresLock : season.genresLock;
 
     return season;
   }
@@ -169,7 +184,11 @@ export class Season {
       yearLock: this.yearLock,
       overviewLock: this.overviewLock,
       studioLock: this.studioLock,
-      taglineLock: this.taglineLock
+      taglineLock: this.taglineLock,
+      creatorLock: this.creatorLock,
+      musicLock: this.musicLock,
+      directedLock: this.directedLock,
+      writtenLock: this.writtenLock,
     };
 
     // Filtrar atributos solo si están asignados o tienen un valor definido
@@ -431,6 +450,10 @@ export class Season {
 
   getEpisode(number: number): Episode | undefined {
     return this.episodes.find(episode => episode.episodeNumber === number);
+  }
+
+  getEpisodeById(id: string): Episode | undefined {
+    return this.episodes.find(episode => episode.id === id);
   }
 
   private static getString(genres: string[]): string {

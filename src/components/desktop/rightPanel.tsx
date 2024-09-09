@@ -189,7 +189,7 @@ export const renderRightPanelContent = () => {
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
-                          <ResolvedImage src={series.coverSrc} alt="Poster"
+                          <ResolvedImage src={series.isCollection ? series.coverSrc : series.seasons[0].coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
@@ -336,12 +336,12 @@ export const renderRightPanelContent = () => {
                 }
                 <section className="season-info-text">
                   {
-                    selectedSeason.directedBy.length !== 0 ? (
+                    selectedSeason.directedBy && selectedSeason.directedBy.length !== 0 ? (
                       <span id="directedBy">{"Directed by " + selectedSeason.directedBy || ""}</span>
                     ) : (<span></span>)
                   }
                   <span id="date">{selectedSeason.year || ""}</span>
-                  <span id="genres">{selectedSeries.genres.join(', ') || ""}</span>
+                  <span id="genres">{selectedLibrary.type == "Shows" ? selectedSeason.genres ? selectedSeries.genres.join(', ') || "" : selectedSeries.genres ? selectedSeries.genres.join(', ') || "" : "" : ""}</span>
                 </section>
                 <div className="rating-info">
                   <img src="./src/assets/svg/themoviedb.svg" alt="TheMovieDB logo"/>

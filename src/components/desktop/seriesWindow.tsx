@@ -19,8 +19,6 @@ const renderSeriesWindow = () => {
     const series = useSelector((state: RootState) => state.data.seriesMenu);
     const season = useSelector((state: RootState) => state.data.selectedSeason);
 
-    const [resolution, setResolution] = useState({ width: 0, height: 0 });
-
     const [pasteUrl, setPasteUrl] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>('');
     const [imageDownloaded, setImageDownloaded] = useState<boolean>(false);
@@ -124,14 +122,6 @@ const renderSeriesWindow = () => {
         });
     }, []);
 
-    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        const img = e.currentTarget;
-        setResolution({
-        width: img.naturalWidth,
-        height: img.naturalHeight,
-        });
-    };
-
     const handleSavingChanges = () => {
         if (season) {
             dispatch(updateSeason({
@@ -180,7 +170,7 @@ const renderSeriesWindow = () => {
 
     const handleDownload = () => {
         setPasteUrl(false);
-        window.ipcRenderer.send('download-image-url', imageUrl, "resources/img/seriesCovers/" + series?.id + "/");
+        window.ipcRenderer.send('download-image-url', imageUrl, "resources/img/posters/" + series?.id + "/");
     };
 
     return (

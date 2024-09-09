@@ -57,7 +57,7 @@ const renderSeasonWindow = () => {
         }
 
         const fetchPosters = async () => {
-            const posterPath = await window.electronAPI.getExternalPath("resources/img/seriesCovers/" + season?.id + "/");
+            const posterPath = await window.electronAPI.getExternalPath("resources/img/posters/" + season?.id + "/");
             if (posterPath) {
                 const images = await window.electronAPI.getImages(posterPath);
                 setPosters(images);

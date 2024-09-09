@@ -1,5 +1,5 @@
 import propertiesReader from 'properties-reader';
-import { Episode, EpisodeGroupResponse, MovieDb, ShowResponse, TvSeasonResponse } from 'moviedb-promise';
+import { Episode, EpisodeGroupResponse, MovieDb, MovieResponse, ShowResponse, TvSeasonResponse } from 'moviedb-promise';
 import { Series } from './Series';
 import { Library } from './Library';
 import * as fs from 'fs';
@@ -11,6 +11,7 @@ import { Cast } from './Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { BrowserWindow } from 'electron';
 import { LibraryData } from '@interfaces/LibraryData';
+import axios from 'axios';
 
 export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
@@ -487,24 +488,7 @@ export class DataManager {
                 }
             }
 
-            let episodeData: EpisodeData | undefined = await Utils.getMediaInfo(episode);
-
-            if (episodeData){
-                if (episodeData.mediaInfo)
-                    episode.mediaInfo = episodeData.mediaInfo;
-
-                if (episodeData.videoTracks)
-                    episode.videoTracks = episodeData.videoTracks;
-
-                if (episodeData.audioTracks)
-                    episode.audioTracks = episodeData.audioTracks;
-
-                if (episodeData.subtitleTracks)
-                    episode.subtitleTracks = episodeData.subtitleTracks;
-
-                if (episodeData.chapters)
-                    episode.chapters = episodeData.chapters;
-            }
+            await this.processMediaInfo(episode);
 
             if (episodeMetadata.season_number && episodeMetadata.episode_number){
                 const images = await this.moviedb?.episodeImages({ id: show.themdbID, season_number: episodeMetadata.season_number, episode_number: episodeMetadata.episode_number })
@@ -578,8 +562,6 @@ export class DataManager {
         show.genres = !show.genresLock ? show.genres : showData.genres ? showData.genres.map(genre => genre.name ?? "") : [];
         show.tagline = !show.taglineLock ? showData.tagline ?? "" : "";
         show.playSameMusic = true;
-
-        show.creator = !show.creatorLock ? show.creator : showData.created_by ? showData.created_by.map(creator => creator.name ?? "") : [];
 
         const credits = await this.moviedb?.tvCredits({ id: show.themdbID });
         
@@ -667,8 +649,12 @@ export class DataManager {
             }
 
             // Download posters
+            let count = 30;
             for (const poster of posters) {
                 if (poster.file_path && (poster.iso_639_1 === null || (poster.iso_639_1 && this.imageLangs.includes(poster.iso_639_1)))) {
+                    if (count === 0)
+                        break;
+
                     const posterUrl = `${baseUrl}${poster.file_path}`;
                     const posterFilePath = path.join(outputPostersDir, poster.file_path.split('/').pop()!);
                     
@@ -678,6 +664,8 @@ export class DataManager {
                     }else {
                         Utils.downloadImage(posterUrl, posterFilePath);
                     }
+
+                    count--;
                 }
             }
           } catch (error) {
@@ -691,24 +679,175 @@ export class DataManager {
 
         if (!await Utils.isFolder(root)){
             //#region MOVIE FILE ONLY
+            if (!await Utils.isVideoFile(root))
+                return;
 
-            const nameAndYear = this.extractNameAndYear(root.split('.').slice(0, -1).join('.'));
+            const fileFullName = await Utils.getFileName(root);
+            const nameAndYear = this.extractNameAndYear(fileFullName);
 
-            let name;
-            let year;
+            let name = nameAndYear[0];
+            let year = nameAndYear[1];
+
             const movieMetadata = await this.searchMovie(name, year);
 
+            let show = new Series();
+            show.setName(name);
+            show.setFolder(root);
+            this.library.getAnalyzedFolders().set(root, show.getId());
+
+            let season = new Season();
+            this.library.getAnalyzedFolders().set(root, season.getId());
+            season.setSeriesID(show.getId());
+            season.setFolder(root);
+            show.addSeason(season);
+
+            if (movieMetadata){
+                await this.setSeasonMetadata(show, season, movieMetadata, name, year);
+            }else {
+                //Save movie without metadata
+                season.setName(name);
+                season.setYear(year !== "1" ? year : "");
+                season.setSeasonNumber(show.getSeasons().length);
+
+                this.saveDiscWithoutMetadata(season, root);
+                this.library.getSeries().push(show);
+                return;
+            }
+
+            await this.processMovie(season, root);
+            this.library.series.push(show);
             //#endregion
         }else {
+            let show: Series | null;
 
+            let exists: boolean = false;
+            if (this.library.getAnalyzedFolders().get(root)){
+                show = this.library.getSeriesById(this.library.getAnalyzedFolders().get(root) ?? "");
 
-            
-            let name;
-            let year;
-            const movieMetadata = await this.searchMovie(name, year);
+                if (show === null)
+                    return;
 
+                exists = true;
+            }else{
+                show = new Series();
+                show.setFolder(root);
+                this.library.getAnalyzedFolders().set(root, show.getId());
+            }
+
+            const filesInDir = await Utils.getFilesInFolder(root);
+            const folders: string[] = [];
+            const filesInRoot: string[] = [];
+    
+            for (const file of filesInDir) {
+                const filePath = `${root}/${file.name}`;
+                if (await Utils.isFolder(filePath)) {
+                    folders.push(filePath);
+                } else {
+                    if (await Utils.isVideoFile(filePath))
+                        filesInRoot.push(filePath);
+                }
+            }
+
+            if (folders.length > 0){
+                //#region FOLDERS CORRESPONDING DIFFERENT MOVIES FROM A COLLECTION
+                show.isCollection = true;
+
+                const fileFullName = await Utils.getFileName(root);
+                
+                show.setName(fileFullName);
+                show.setFolder(root);
+                this.library.getAnalyzedFolders().set(root, show.getId());
+
+                const processPromises = folders.map(async folder => {
+                    const fileFullName = await Utils.getFileName(folder);
+                    const nameAndYear = this.extractNameAndYear(fileFullName);
+                    
+                    let name = nameAndYear[0];
+                    let year = nameAndYear[1];
+
+                    const movieMetadata = await this.searchMovie(name, year);
+
+                    let season = new Season();
+                    this.library.getAnalyzedFolders().set(folder, season.getId());
+                    season.setSeriesID(show.getId());
+                    season.setFolder(folder);
+                    show.addSeason(season);
+
+                    const files = await Utils.getValidVideoFiles(folder);
+
+                    if (movieMetadata){
+                        await this.setSeasonMetadata(show, season, movieMetadata, name, year);
+                    }else {
+                        //Save videos without metadata
+                        season.setName(name);
+                        season.setYear(year !== "1" ? year : "");
+                        season.setSeasonNumber(show.getSeasons().length);
+
+                        const processPromises = files.map(async file => {
+                            await this.saveDiscWithoutMetadata(season, file);
+                        });
+        
+                        await Promise.all(processPromises);
+                        this.library.getSeries().push(show);
+                        return;
+                    }
+
+                    const processPromises = files.map(async file => {
+                        await this.processMovie(season, file);
+                    });
+
+                    await Promise.all(processPromises);
+                });
+                
+                await Promise.all(processPromises);
+                this.library.series.push(show);
+                //#endregion
+            }else{
+                //region MOVIE FILE/CONCERT FILES INSIDE FOLDER
+                const fileFullName = await Utils.getFileName(root);
+                const nameAndYear = this.extractNameAndYear(fileFullName);
+
+                let name = nameAndYear[0];
+                let year = nameAndYear[1];
+
+                const movieMetadata = await this.searchMovie(name, year);
+
+                show.setName(name);
+                show.setFolder(root);
+                this.library.getAnalyzedFolders().set(root, show.getId());
+
+                let season = new Season();
+                this.library.getAnalyzedFolders().set(root, season.getId());
+                season.setSeriesID(show.getId());
+                season.setFolder(root);
+                show.addSeason(season);
+
+                if (movieMetadata){
+                    await this.setSeasonMetadata(show, season, movieMetadata, name, year);
+                }else {
+                    //Save videos without metadata
+                    season.setName(name);
+                    season.setYear(year !== "1" ? year : "");
+                    season.setSeasonNumber(show.getSeasons().length);
+
+                    const processPromises = filesInRoot.map(async file => {
+                        await this.saveDiscWithoutMetadata(season, file);
+                    });
+    
+                    await Promise.all(processPromises);
+                    this.library.getSeries().push(show);
+                    return;
+                }
+
+                const processPromises = filesInRoot.map(async file => {
+                    await this.processMovie(season, file);
+                });
+
+                await Promise.all(processPromises);
+                this.library.series.push(show);
+                //#endregion
+            }
         }
-
     };
 
     private static async searchMovie(name: string, year: string) {
@@ -756,6 +895,283 @@ export class DataManager {
         name = name.replace(/[-_]/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
         return [name, year];
+    }
+
+    private static async setSeasonMetadata(show: Series, season: Season, movieMetadata: MovieResponse, name: string, year: string) {
+        season.setName(!season.nameLock ? movieMetadata.title ?? name : name);
+        season.setYear(!season.yearLock ? movieMetadata.release_date ?? year : year);
+        season.setOverview(!season.overviewLock ? movieMetadata.overview ?? "" : "");
+        season.tagline = !season.taglineLock ? movieMetadata.tagline ?? "" : "";
+        season.setThemdbID(movieMetadata.id ?? -1);
+        season.setImdbID(movieMetadata.imdb_id ?? "-1");
+        season.setScore(movieMetadata.vote_average ? ((movieMetadata.vote_average * 10) / 10) : 0);
+        season.setGenres(!season.genresLock ? season.genres : movieMetadata.genres ? movieMetadata.genres.map(genre => genre.name ?? "") : []);
+        season.productionStudios = !season.studioLock ? season.productionStudios : movieMetadata.production_companies ? movieMetadata.production_companies.map(company => company.name ?? "") : [];
+
+        if (season.getImdbID() !== "-1" && season.getImdbID() !== ""){
+            await this.setIMDBScore(season.imdbID, season);
+        }
+
+        //#region GET TAGS
+        const credits = await this.moviedb?.movieCredits({ id: season.getThemdbID(), language: this.library.language });
+
+        if (credits){
+            if (credits.crew){
+                if (!season.directedLock){
+                    season.directedBy.splice(0, season.directedBy.length);
+                    credits.crew.forEach(person => {
+                        if (person.name && person.job === "Director") season?.directedBy.push(person.name);
+                    });
+                }
+
+                if (!season.writtenLock){
+                    season.writtenBy.splice(0, season.writtenBy.length);
+                    credits.crew.forEach(person => {
+                        if (person.name && person.job === "Writer") season?.writtenBy.push(person.name);
+                    });
+                }
+
+                if (season.creator.length > 0)
+                    season.creator.splice(0, season.creator.length);
+    
+                if (season.musicComposer.length > 0)
+                    season.musicComposer.splice(0, season.musicComposer.length);
+    
+                credits.crew.forEach(person => {
+                    if (person.job && (person.job === "Author" || person.job === "Novel" || person.job === "Original Series Creator"
+                            || person.job === "Comic Book" || person.job === "Idea" || person.job === "Original Story" || person.job === "Story"
+                            || person.job === "Story by" || person.job === "Book"))
+                        if (person.name && !season.creatorLock) season.creator.push(person.name);
+                    
+                    if (person.job && person.job === "Original Music Composer")
+                        if (person.name && !season.musicLock) season.musicComposer.push(person.name);
+                });
+            }
+
+            if (credits.cast){
+                if (season.cast.length > 0)
+                    season.cast.splice(0, season.cast.length);
+    
+                credits.cast.forEach(person => {
+                    season.cast?.push(new Cast(person.name, person.character));
+                });
+            }
+        }
+        //#endregion
+
+        //#region IMAGES DOWNLOAD
+        const images = await this.moviedb?.movieImages({ id: season.getThemdbID() });
+
+        if (images){
+            let baseUrl = "https://image.tmdb.org/t/p/original";
+
+            const logos = images.logos || [];
+            const posters = images.posters || [];
+        
+            // Create folders if they do not exist
+            const outputLogosDir = Utils.getExternalPath('resources/img/logos/' + season.id);
+            if (!fs.existsSync(outputLogosDir)) {
+                fs.mkdirSync(outputLogosDir);
+            }
+
+            const outputPostersDir = Utils.getExternalPath('resources/img/posters/' + season.id);
+            if (!fs.existsSync(outputPostersDir)) {
+                fs.mkdirSync(outputPostersDir);
+            }
+
+            const outputPostersCollectionDir = Utils.getExternalPath('resources/img/posters/' + show.id);
+            if (show.isCollection){
+                if (!fs.existsSync(outputPostersCollectionDir)) {
+                    fs.mkdirSync(outputPostersCollectionDir);
+                }
+            }
+
+            const outputImageDir = Utils.getExternalPath('resources/img/DownloadCache');
+            if (!fs.existsSync(outputImageDir)) {
+                fs.mkdirSync(outputImageDir);
+            }
+
+            // Download season background
+            if (images.backdrops && images.backdrops.length > 1 && images.backdrops[0].file_path){
+                const imageUrl = `${baseUrl}${images.backdrops[0].file_path}`;
+                const imageFilePath = path.join(outputImageDir, season.themdbID + ".jpg");
+                await Utils.downloadImage(imageUrl, imageFilePath);
+            }
+        
+            // Download logos
+            for (const logo of logos) {
+                if (logo.file_path && (logo.iso_639_1 === null || (logo.iso_639_1 && this.imageLangs.includes(logo.iso_639_1)))) {
+                    const logoUrl = `${baseUrl}${logo.file_path}`;
+                    const logoFilePath = path.join(outputLogosDir, logo.file_path.split('/').pop()!);
+                    
+                    if (season.logoSrc === "") {
+                        await Utils.downloadImage(logoUrl, logoFilePath);
+                        season.logoSrc = `resources/img/logos/${season.id}/${logo.file_path.split('/').pop()}`;
+                    }else {
+                        Utils.downloadImage(logoUrl, logoFilePath);
+                    }
+                }
+            }
+
+            // Download posters
+            let count = 2;
+            let countFull = 30;
+            for (const poster of posters) {
+                if (poster.file_path && (poster.iso_639_1 === null || (poster.iso_639_1 && this.imageLangs.includes(poster.iso_639_1)))) {
+                    if (countFull === 0)
+                        break;
+
+                    const posterUrl = `${baseUrl}${poster.file_path}`;
+                    const posterFilePath = path.join(outputPostersDir, poster.file_path.split('/').pop()!);
+                    const posterColFilePath = path.join(outputPostersCollectionDir, poster.file_path.split('/').pop()!)
+                    
+                    if (season.coverSrc === "") {
+                        await Utils.downloadImage(posterUrl, posterFilePath);
+                        season.coverSrc = `resources/img/posters/${season.id}/${poster.file_path.split('/').pop()}`;
+                    }else {
+                        Utils.downloadImage(posterUrl, posterFilePath);
+                    }
+
+                    if (show.isCollection && count > 0){
+                        if (show.coverSrc === "") {
+                            await Utils.downloadImage(posterUrl, posterColFilePath);
+                            show.coverSrc = `resources/img/posters/${show.id}/${poster.file_path.split('/').pop()}`;
+                        }else {
+                            Utils.downloadImage(posterUrl, posterColFilePath);
+                        }
+
+                        count--;
+                    }
+
+                    countFull--;
+                }
+            }
+        }
+
+        const filePath: string = "resources/img/DownloadCache/" + season.getThemdbID() + ".jpg";
+        if (Utils.fileExists(filePath))
+            await Utils.saveBackground(season, filePath, false);
+        else
+            await Utils.saveBackground(season, "resources/img/DefaultBackground.png", false);
+        //#endregion
+    }
+
+    private static async saveDiscWithoutMetadata(season: Season, filePath: string) {
+        let episode: EpisodeLocal | undefined = new EpisodeLocal();
+
+        if (this.library.getAnalyzedFiles().get(filePath) && this.library.getAnalyzedFiles().get(filePath) !== null) {
+            episode = season.getEpisodeById(this.library.getAnalyzedFiles().get(filePath) ?? "");
+        }
+
+        if (!episode){
+            episode = new EpisodeLocal();
+            season.addEpisode(episode);
+            episode.setSeasonID(season.getId());
+            this.library.getAnalyzedFiles().set(filePath, episode.getId());
+
+            episode.setName(season.getName());
+            episode.setVideoSrc(filePath);
+            episode.setSeasonNumber(season.getSeasonNumber());
+            episode.setImgSrc("resources/img/Default_video_thumbnail.jpg");
+        }
+
+        await this.processMediaInfo(episode);
+    }
+
+    private static async processMovie(season: Season, filePath: string) {
+        let episode: EpisodeLocal | undefined = new EpisodeLocal();
+
+        if (this.library.getAnalyzedFiles().get(filePath) && this.library.getAnalyzedFiles().get(filePath) !== null) {
+            episode = season.getEpisodeById(this.library.getAnalyzedFiles().get(filePath) ?? "");
+        }else{
+            episode = new EpisodeLocal();
+            season.addEpisode(episode);
+            episode.setSeasonID(season.getId());
+            this.library.getAnalyzedFiles().set(filePath, episode.getId());
+
+            episode.setName(Utils.getFileName(filePath));
+            episode.setYear(season.getYear());
+            episode.setOverview(season.getOverview());
+            episode.setVideoSrc(filePath);
+            episode.setSeasonNumber(season.getSeasonNumber());
+        }
+
+        if (!episode)
+            return;
+
+        await this.processMediaInfo(episode);
+
+        const images = await this.moviedb?.movieImages({ id: season.themdbID })
+            
+        let imageBaseURL = "https://image.tmdb.org/t/p/original";
+        let thumbnails = images?.backdrops || [];
+
+        const outputDir = Utils.getExternalPath('resources/img/thumbnails/video/' + episode.id + "/");
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+
+        // Download thumbnails
+        let count = 5;
+        for (const [index, thumbnail] of thumbnails.entries()) {
+            if (thumbnail.file_path) {
+                if (count === 0)
+                    break;
+                
+                const url = `${imageBaseURL}${thumbnail.file_path}`;
+                const imageFilePath = path.join(outputDir, index + ".jpg");
+
+                if (index === 0) {
+                    await Utils.downloadImage(url, imageFilePath);
+                    episode.imgSrc = `resources/img/thumbnails/video/${episode.id}/${index}.jpg`;
+                } else {
+                    Utils.downloadImage(url, imageFilePath);
+                }
+
+                count--;
+            }
+        }
+    }
+
+    private static async processMediaInfo(episode: EpisodeLocal) {
+        let episodeData: EpisodeData | undefined = await Utils.getMediaInfo(episode);
+
+        if (episodeData){
+            if (episodeData.mediaInfo)
+                episode.mediaInfo = episodeData.mediaInfo;
+
+            if (episodeData.videoTracks)
+                episode.videoTracks = episodeData.videoTracks;
+
+            if (episodeData.audioTracks)
+                episode.audioTracks = episodeData.audioTracks;
+
+            if (episodeData.subtitleTracks)
+                episode.subtitleTracks = episodeData.subtitleTracks;
+
+            if (episodeData.chapters)
+                episode.chapters = episodeData.chapters;
+        }
+    }
+
+    private static async setIMDBScore(imdbID: string, season: Season): Promise<void> {
+        /*try {
+            const url = `https://www.imdb.com/title/${imdbID}`;
+            const { data } = await axios.get(url, { timeout: 6000 });
+    
+            const $ = cheerio.load(data);
+            const body = $('div.sc-bde20123-2');
+    
+            body.find('span.sc-bde20123-1').each((_, element) => {
+                const score = $(element).text();
+                console.log("Imdb score: " + score);
+                season.score = parseFloat(score);
+                return false;
+            });
+    
+        } catch (error) {
+            console.error('setIMDBScore: IMDB connection lost');
+        }*/
     }
 
     //#endregion

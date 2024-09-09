@@ -101,17 +101,17 @@ const renderEpisodeWindow = () => {
                 }
             });
 
-            setName(selectedEpisode.name);
-            setYear(selectedEpisode.year);
-            setOverview(selectedEpisode.overview);
-            setDirectedBy(selectedEpisode.directedBy[0]);
-            setWrittenBy(selectedEpisode.writtenBy[0]);
+            setName(selectedEpisode.name || "");
+            setYear(selectedEpisode.year || "");
+            setOverview(selectedEpisode.overview || "");
+            setDirectedBy(selectedEpisode.directedBy[0] || "");
+            setWrittenBy(selectedEpisode.writtenBy[0] || "");
 
-            setNameLock(selectedEpisode.nameLock);
-            setYearLock(selectedEpisode.yearLock);
-            setOverviewLock(selectedEpisode.overviewLock);
-            setDirectedLock(selectedEpisode.directedLock);
-            setWrittenLock(selectedEpisode.writtenLock);
+            setNameLock(selectedEpisode.nameLock || false);
+            setYearLock(selectedEpisode.yearLock || false);
+            setOverviewLock(selectedEpisode.overviewLock || false);
+            setDirectedLock(selectedEpisode.directedLock || false);
+            setWrittenLock(selectedEpisode.writtenLock || false);
         }
     }, [episodeMenuOpen]);
 

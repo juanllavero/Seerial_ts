@@ -34,9 +34,9 @@ export class Library {
       folders: this.folders,
       showOnFullscreen: false, // o según sea necesario
       series: this.series.map(s => s.toJSON()), // Asumiendo que SeriesData tiene un método toJSON
-      analyzedFiles: new Map(this.analyzedFiles),
-      analyzedFolders: new Map(this.analyzedFolders),
-      seasonFolders: new Map(this.seasonFolders),
+      analyzedFiles: Array.from(this.analyzedFiles.entries()),
+      analyzedFolders: Array.from(this.analyzedFiles.entries()),
+      seasonFolders: Array.from(this.analyzedFiles.entries()),
     };
   }
 
@@ -44,9 +44,9 @@ export class Library {
     const library = new Library(data.name, data.language, data.type, data.order, data.folders);
     library.id = data.id;
     library.series = data.series.map((s: SeriesData) => Series.fromJSON(s)); // Convierte SeriesData a Series
-    library.analyzedFiles = new Map(data.analyzedFiles);
-    library.analyzedFolders = new Map(data.analyzedFolders);
-    library.seasonFolders = new Map(data.seasonFolders);
+    library.analyzedFiles = new Map(data.analyzedFiles || {});
+    library.analyzedFolders = new Map(data.analyzedFolders || {});
+    library.seasonFolders = new Map(data.seasonFolders || {});
     return library;
   }
 
