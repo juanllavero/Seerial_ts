@@ -20,7 +20,11 @@ export const store = configureStore({
     video: videoSlice,
     windowState: windowStateSlice,
     sectionState: menuSectionsSlice,
-  }
+  },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+  }),
 })
 
 export type RootState = ReturnType<typeof store.getState>;

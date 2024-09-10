@@ -294,7 +294,7 @@ export const renderRightPanelContent = () => {
               }
             </div>
               {selectedSeason.backgroundSrc != "" ? (<div className="background-image">
-                  <ResolvedImage src={"resources/img/backgrounds/" + selectedSeason.id + "/transparencyEffect.png"} alt="Season Background"
+                  <ResolvedImage src={selectedSeason.backgroundSrc} alt="Season Background"
                   onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}/>
               </div>) : (<div></div>)}
             <div className="info-container">
@@ -530,7 +530,11 @@ export const renderRightPanelContent = () => {
                     </div>
                   </div>
                   <span id="episodeName" title={episode.name}>{episode.name}</span>
-                  <span id="episodeNumber">{t("episode") + " " + episode.episodeNumber}</span>
+                  {
+                    selectedLibrary?.type === "Shows" ? (
+                      <span id="episodeNumber">{t("episode") + " " + episode.episodeNumber}</span>
+                    ) : null
+                  }
                 </div>
               ))}
             </div>

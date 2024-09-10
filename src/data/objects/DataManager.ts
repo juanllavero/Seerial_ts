@@ -11,7 +11,6 @@ import { Cast } from './Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { BrowserWindow } from 'electron';
 import { LibraryData } from '@interfaces/LibraryData';
-import axios from 'axios';
 
 export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
@@ -60,6 +59,7 @@ export class DataManager {
 
                 this.libraries = jsonData.map((libraryData: any) => Library.fromJSON(libraryData));
                 
+                console.log(jsonData);
                 return jsonData;
             } catch (err) {
                 console.error("Error reading data.json");
@@ -414,7 +414,7 @@ export class DataManager {
             show.addSeason(season);
     
             season.setName(seasonMetadata.name ?? "");
-            season.setOverview(seasonMetadata.overview ?? "");
+            season.setOverview(seasonMetadata.overview ?? show.getOverview());
             season.setYear(seasonMetadata.episodes && seasonMetadata.episodes[0] && seasonMetadata.episodes[0].air_date ? seasonMetadata.episodes[0].air_date : "");
             season.setSeasonNumber(realEpisode !== -1 ? realSeason ?? 0 : (seasonMetadata.season_number ?? 0));
 
@@ -905,8 +905,8 @@ export class DataManager {
         season.setThemdbID(movieMetadata.id ?? -1);
         season.setImdbID(movieMetadata.imdb_id ?? "-1");
         season.setScore(movieMetadata.vote_average ? ((movieMetadata.vote_average * 10) / 10) : 0);
-        season.setGenres(!season.genresLock ? season.genres : movieMetadata.genres ? movieMetadata.genres.map(genre => genre.name ?? "") : []);
-        season.productionStudios = !season.studioLock ? season.productionStudios : movieMetadata.production_companies ? movieMetadata.production_companies.map(company => company.name ?? "") : [];
+        season.setGenres(season.genresLock ? season.genres : movieMetadata.genres ? movieMetadata.genres.map(genre => genre.name ?? "") : []);
+        season.productionStudios = season.studioLock ? season.productionStudios : movieMetadata.production_companies ? movieMetadata.production_companies.map(company => company.name ?? "") : [];
 
         if (season.getImdbID() !== "-1" && season.getImdbID() !== ""){
             await this.setIMDBScore(season.imdbID, season);
@@ -931,25 +931,25 @@ export class DataManager {
                     });
                 }
 
-                if (season.creator.length > 0)
+                if (!season.creatorLock && season.creator.length > 0)
                     season.creator.splice(0, season.creator.length);
     
-                if (season.musicComposer.length > 0)
+                if (!season.musicLock && season.musicComposer.length > 0)
                     season.musicComposer.splice(0, season.musicComposer.length);
     
                 credits.crew.forEach(person => {
-                    if (person.job && (person.job === "Author" || person.job === "Novel" || person.job === "Original Series Creator"
+                    if (!season.creatorLock && person.job && (person.job === "Author" || person.job === "Novel" || person.job === "Original Series Creator"
                             || person.job === "Comic Book" || person.job === "Idea" || person.job === "Original Story" || person.job === "Story"
                             || person.job === "Story by" || person.job === "Book"))
                         if (person.name && !season.creatorLock) season.creator.push(person.name);
                     
-                    if (person.job && person.job === "Original Music Composer")
+                    if (!season.musicLock && person.job && person.job === "Original Music Composer")
                         if (person.name && !season.musicLock) season.musicComposer.push(person.name);
                 });
             }
 
             if (credits.cast){
-                if (season.cast.length > 0)
+                if (season.cast && season.cast.length > 0)
                     season.cast.splice(0, season.cast.length);
     
                 credits.cast.forEach(person => {
@@ -1185,11 +1185,16 @@ export class DataManager {
     }
 
     public static getImages = async (dirPath: string) => {
-        const files = fs.readdirSync(dirPath);
-        const images = files.filter((file) =>
-            ['.png', '.jpg', '.jpeg', '.gif'].includes(path.extname(file).toLowerCase())
-        );
-        return images.map((image) => path.join(dirPath, image));
+        try{
+            const files = fs.readdirSync(dirPath);
+            const images = files.filter((file) =>
+                ['.png', '.jpg', '.jpeg', '.gif'].includes(path.extname(file).toLowerCase())
+            );
+            return images.map((image) => path.join(dirPath, image));
+        } catch(error) {
+            console.log("DataManager.getImages: Error getting images for path " + dirPath);
+            return [];
+        }
     }
     //#endregion
 }

@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
 import ResolvedImage from "@components/Image";
 import { TagsInput } from "react-tag-input-component";
+import { dirname } from "path";
 
 const renderSeasonWindow = () => {
     const dispatch = useDispatch();
@@ -33,14 +34,24 @@ const renderSeasonWindow = () => {
     const [nameLock, setNameLock] = useState<boolean>(false);
     const [yearLock, setYearLock] = useState<boolean>(false);
     const [overviewLock, setOverviewLock] = useState<boolean>(false);
-    const [studiosLock, setStudiosLock] = useState<boolean>(false);
     const [taglineLock, setTaglineLock] = useState<boolean>(false);
+    const [studiosLock, setStudiosLock] = useState<boolean>(false);
+    const [genresLock, setGenresLock] = useState<boolean>(false);
+    const [creatorLock, setCreatorLock] = useState<boolean>(false);
+    const [musicLock, setMusicLock] = useState<boolean>(false);
+    const [directedByLock, setDirectedByLock] = useState<boolean>(false);
+    const [writtenByLock, setWrittenByLock] = useState<boolean>(false);
 
     const [name, setName] = useState<string>("");
     const [year, setYear] = useState<string>("");
     const [overview, setOverview] = useState<string>("");
-    const [studios, setStudios] = useState<string[]>([""]);
     const [tagline, setTagline] = useState<string>("");
+    const [studios, setStudios] = useState<string[]>([""]);
+    const [genres, setGenres] = useState<string[]>([""]);
+    const [creator, setCreator] = useState<string[]>([""]);
+    const [music, setMusic] = useState<string[]>([""]);
+    const [directedBy, setDirectedBy] = useState<string[]>([""]);
+    const [writtenBy, setWrittenBy] = useState<string[]>([""]);
 
     useEffect(() => {
         const fetchLogos = async () => {
@@ -72,7 +83,7 @@ const renderSeasonWindow = () => {
         }else if (menuSection === Section.Posters){
             fetchPosters().then(() => setImageDownloaded(false));
         }
-    }, [menuSection, imageDownloaded]);
+    }, [menuSection, imageDownloaded, season]);
 
     useEffect(() => {
         if (seasonMenuOpen && season) {
@@ -81,21 +92,29 @@ const renderSeasonWindow = () => {
             setLogos(noImages);
             dispatch(changeMenuSection(Section.General));
 
-            setName(season.name);
-            setYear(season.year);
-            setOverview(season.overview);
+            setName(season.name || "");
+            setYear(season.year || "");
+            setOverview(season.overview || "");
+            setNameLock(season.nameLock || false);
+            setYearLock(season.yearLock || false);
+            setOverviewLock(season.overviewLock || false);
 
             if (library?.type === "Movies"){
-                setStudios(["Test", "Studio"]);
-                setTagline(season.tagline);
-                setTaglineLock(season.taglineLock);
-                setStudiosLock(season.studioLock);
+                setTagline(season.tagline || "");
+                setTaglineLock(season.taglineLock || false);
+                setStudiosLock(season.studioLock || false);
+                setGenresLock(season.genresLock || false);
+                setCreatorLock(season.creatorLock || false);
+                setMusicLock(season.musicLock || false);
+                setDirectedByLock(season.directedLock || false);
+                setWrittenByLock(season.writtenLock || false);
+                setStudios(season.productionStudios || []);
+                setGenres(season.genres || []);
+                setMusic(season.musicComposer || []);
+                setCreator(season.creator || []);
+                setDirectedBy(season.directedBy || []);
+                setWrittenBy(season.writtenBy || []);
             }
-            
-            setNameLock(season.nameLock);
-            setYearLock(season.yearLock);
-            setOverviewLock(season.overviewLock);
-            
         }
     }, [seasonMenuOpen]);
 
@@ -156,7 +175,12 @@ const renderSeasonWindow = () => {
                 overviewLock: season.overviewLock,
                 yearLock: season.yearLock,
                 studioLock: season.studioLock,
-                taglineLock: season.taglineLock
+                taglineLock: season.taglineLock,
+                creatorLock: false,
+                musicLock: false,
+                directedLock: false,
+                writtenLock: false,
+                genresLock: false
             }));
         }
 
@@ -184,6 +208,12 @@ const renderSeasonWindow = () => {
                     <div className="dialog-center-left">
                     <button className={`desktop-dialog-side-btn ${menuSection === Section.General ? ' desktop-dialog-side-btn-active' : ''}`}
                     onClick={() => dispatch(changeMenuSection(Section.General))}>{t('generalButton')}</button>
+                    {
+                        library?.type !== "Shows" ? (
+                            <button className={`desktop-dialog-side-btn ${menuSection === Section.Tags ? ' desktop-dialog-side-btn-active' : ''}`}
+                            onClick={() => dispatch(changeMenuSection(Section.Tags))}>{t('tags')}</button>
+                        ) : null
+                    }
                     <button className={`desktop-dialog-side-btn ${menuSection === Section.Details ? ' desktop-dialog-side-btn-active' : ''}`}
                     onClick={() => dispatch(changeMenuSection(Section.Details))}>{t('media')}</button>
                     {
@@ -202,136 +232,172 @@ const renderSeasonWindow = () => {
                     </div>
                     <div className="dialog-center-right scroll">
                     {
-                        menuSection == Section.General ? (
-                            !series?.isCollection ? (
-                                <>
-                                    <div className="dialog-input-box">
-                                        <span>{t('name')}</span>
-                                        <div className={`dialog-input-lock ${nameLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setNameLock(!nameLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <input type="text" value={name} onChange={(e) => {
-                                                setNameLock(true);
-                                                setName(e.target.value);
-                                            }}/>
-                                        </div>
+                        menuSection === Section.General ? (
+                            <>
+                                <div className="dialog-input-box">
+                                    <span>{t('name')}</span>
+                                    <div className={`dialog-input-lock ${nameLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setNameLock(!nameLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <input type="text" value={name} onChange={(e) => {
+                                            setNameLock(true);
+                                            setName(e.target.value);
+                                        }}/>
                                     </div>
-                                    <div className="dialog-input-box">
-                                        <span>{t('year')}</span>
-                                        <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setYearLock(!yearLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <input type="text" value={year} onChange={(e) => {
-                                                setYearLock(true);
-                                                setYear(e.target.value);
-                                            }}/>
-                                        </div>
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('year')}</span>
+                                    <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setYearLock(!yearLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <input type="text" value={year} onChange={(e) => {
+                                            setYearLock(true);
+                                            setYear(e.target.value);
+                                        }}/>
                                     </div>
-                                    
-                                    {
-                                        library?.type !== "Shows" ? (
-                                            <>
-                                            <div className="dialog-input-box">
-                                                <span>{t('studios')}</span>
-                                                <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
-                                                    <a href="#" onClick={() => setStudiosLock(!yearLock)}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                            <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                        </svg>
-                                                    </a>
-                                                    <TagsInput
-                                                        value={studios}
-                                                        onChange={setStudios}
-                                                        name="studiosInput"
-                                                        placeHolder=""
-                                                    />
-                                                </div>
+                                </div>
+                                
+                                {
+                                    library?.type !== "Shows" ? (
+                                        <>
+                                        <div className="dialog-input-box">
+                                            <span>{t('studios')}</span>
+                                            <div className={`dialog-input-lock ${studiosLock ? ' locked' : ''}`}>
+                                                <a href="#" onClick={() => setStudiosLock(!studiosLock)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                        <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                                    </svg>
+                                                </a>
+                                                <TagsInput
+                                                    value={studios}
+                                                    onChange={setStudios}
+                                                    name="studiosInput"
+                                                    placeHolder=""
+                                                />
                                             </div>
-                                            <div className="dialog-input-box">
-                                                <span>{t('tagline')}</span>
-                                                <div className={`dialog-input-lock ${yearLock ? ' locked' : ''}`}>
-                                                    <a href="#" onClick={() => setTaglineLock(!yearLock)}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                            <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                        </svg>
-                                                    </a>
-                                                    <input type="text" value={tagline} onChange={(e) => {
-                                                        setTaglineLock(true);
-                                                        setTagline(e.target.value);
-                                                    }}/>
-                                                </div>
+                                        </div>
+                                        <div className="dialog-input-box">
+                                            <span>{t('tagline')}</span>
+                                            <div className={`dialog-input-lock ${taglineLock ? ' locked' : ''}`}>
+                                                <a href="#" onClick={() => setTaglineLock(!taglineLock)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                        <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                                    </svg>
+                                                </a>
+                                                <input type="text" value={tagline} onChange={(e) => {
+                                                    setTaglineLock(true);
+                                                    setTagline(e.target.value);
+                                                }}/>
                                             </div>
-                                            </>
-                                        ) : null
-                                    }
-                                    <div className="dialog-input-box">
-                                        <span>{t('overview')}</span>
-                                        <div className={`dialog-input-lock ${overviewLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setOverviewLock(!overviewLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <textarea rows={5} value={overview} onChange={(e) => {
-                                                setOverviewLock(true);
-                                                setOverview(e.target.value);
-                                            }}/>
                                         </div>
+                                        </>
+                                    ) : null
+                                }
+                                <div className="dialog-input-box">
+                                    <span>{t('overview')}</span>
+                                    <div className={`dialog-input-lock ${overviewLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setOverviewLock(!overviewLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <textarea rows={5} value={overview} onChange={(e) => {
+                                            setOverviewLock(true);
+                                            setOverview(e.target.value);
+                                        }}/>
                                     </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="dialog-input-box">
-                                        <span>{t('name')}</span>
-                                        <div className={`dialog-input-lock ${nameLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setNameLock(!nameLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <input type="text" value={name} onChange={(e) => {
-                                                setNameLock(true);
-                                                setName(e.target.value);
-                                            }}/>
-                                        </div>
+                                </div>
+                            </>
+                        ) : menuSection === Section.Tags ? (
+                            <>
+                                <div className="dialog-input-box">
+                                    <span>{t('genres')}</span>
+                                    <div className={`dialog-input-lock ${genresLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setGenresLock(!genresLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <TagsInput
+                                            value={genres}
+                                            onChange={setGenres}
+                                            name="genresInput"
+                                            placeHolder=""
+                                        />
                                     </div>
-                                    <div className="dialog-input-box">
-                                        <span>{t('orderByTitle')}</span>
-                                        <div className={`dialog-input-lock ${nameLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setNameLock(!nameLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <input type="text" value={name} onChange={(e) => {
-                                                setNameLock(true);
-                                                setName(e.target.value);
-                                            }}/>
-                                        </div>
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('createdBy')}</span>
+                                    <div className={`dialog-input-lock ${creatorLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setCreatorLock(!creatorLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <TagsInput
+                                            value={creator}
+                                            onChange={setCreator}
+                                            name="creatorInput"
+                                            placeHolder=""
+                                        />
                                     </div>
-                                    <div className="dialog-input-box">
-                                        <span>{t('overview')}</span>
-                                        <div className={`dialog-input-lock ${overviewLock ? ' locked' : ''}`}>
-                                            <a href="#" onClick={() => setOverviewLock(!overviewLock)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
-                                                    <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-                                                </svg>
-                                            </a>
-                                            <textarea rows={5} value={overview} onChange={(e) => {
-                                                setOverviewLock(true);
-                                                setOverview(e.target.value);
-                                            }}/>
-                                        </div>
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('directedBy')}</span>
+                                    <div className={`dialog-input-lock ${directedByLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setDirectedByLock(!directedByLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <TagsInput
+                                            value={directedBy}
+                                            onChange={setDirectedBy}
+                                            name="directedByInput"
+                                            placeHolder=""
+                                        />
                                     </div>
-                                </>
-                            )
-                        ) : menuSection == Section.Details ? (
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('writtenBy')}</span>
+                                    <div className={`dialog-input-lock ${writtenByLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setWrittenByLock(!writtenByLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <TagsInput
+                                            value={writtenBy}
+                                            onChange={setWrittenBy}
+                                            name="writtenByInput"
+                                            placeHolder=""
+                                        />
+                                    </div>
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('musicBy')}</span>
+                                    <div className={`dialog-input-lock ${musicLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setMusicLock(!musicLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <TagsInput
+                                            value={music}
+                                            onChange={setMusic}
+                                            name="musicInput"
+                                            placeHolder=""
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        ) : menuSection === Section.Details ? (
                             <>
                                 <div className="dialog-horizontal-box">
                                     <div className="dialog-input-box">
@@ -408,7 +474,7 @@ const renderSeasonWindow = () => {
                                     onLoad={handleImageLoad}/>
                                 </div>
                             </>
-                        ) : menuSection == Section.Logos ? (
+                        ) : menuSection === Section.Logos ? (
                             <>
                                 {
                                     pasteUrl ? (
@@ -458,7 +524,7 @@ const renderSeasonWindow = () => {
                                 ))}
                                 </div>
                             </>
-                        ) : menuSection == Section.Posters ? (
+                        ) : menuSection === Section.Posters ? (
                             <>
                                 {
                                     pasteUrl ? (
@@ -495,7 +561,7 @@ const renderSeasonWindow = () => {
                                 {posters.map((image, index) => (
                                     <div key={image} className={`dialog-image-btn ${image.split('\\').pop() === selectedPoster ? ' dialog-image-btn-active' : ''}`}
                                     onClick={() => selectPoster(image.split('\\').pop())}>
-                                        <img src={`file://${image}`} alt={`img-${index}`} style={{ width: 190 }} />
+                                        <img src={`file://${image}`} alt={`img-${index}`} style={{ width: 185 }} />
                                         {
                                             image.split('\\').pop() === selectedPoster ? (
                                                 <>

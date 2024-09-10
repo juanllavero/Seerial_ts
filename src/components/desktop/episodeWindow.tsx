@@ -9,6 +9,7 @@ import { toggleEpisodeWindow, updateEpisode } from "redux/slices/dataSlice";
 import { VideoTrackData } from "@interfaces/VideoTrackData";
 import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
+import { TagsInput } from "react-tag-input-component";
 
 const renderEpisodeWindow = () => {
     const dispatch = useDispatch();
@@ -36,8 +37,8 @@ const renderEpisodeWindow = () => {
     const [name, setName] = useState<string>("");
     const [year, setYear] = useState<string>("");
     const [overview, setOverview] = useState<string>("");
-    const [directedBy, setDirectedBy] = useState<string>("");
-    const [writtenBy, setWrittenBy] = useState<string>("");
+    const [directedBy, setDirectedBy] = useState<string[]>([]);
+    const [writtenBy, setWrittenBy] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchImages = async () => {
@@ -104,8 +105,8 @@ const renderEpisodeWindow = () => {
             setName(selectedEpisode.name || "");
             setYear(selectedEpisode.year || "");
             setOverview(selectedEpisode.overview || "");
-            setDirectedBy(selectedEpisode.directedBy[0] || "");
-            setWrittenBy(selectedEpisode.writtenBy[0] || "");
+            setDirectedBy(selectedEpisode.directedBy || "");
+            setWrittenBy(selectedEpisode.writtenBy || "");
 
             setNameLock(selectedEpisode.nameLock || false);
             setYearLock(selectedEpisode.yearLock || false);
@@ -220,8 +221,8 @@ const renderEpisodeWindow = () => {
                 year: year,
                 order: selectedEpisode.order,
                 imgSrc: selectedImage ? ("resources/img/thumbnails/video/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
-                directedBy: [directedBy],
-                writtenBy: [writtenBy],
+                directedBy: directedBy,
+                writtenBy: writtenBy,
                 nameLock: nameLock,
                 yearLock: yearLock,
                 overviewLock: overviewLock,
@@ -330,10 +331,12 @@ const renderEpisodeWindow = () => {
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" value={directedBy} onChange={(e) => {
-                                                setDirectedLock(true);
-                                                setDirectedBy(e.target.value);
-                                            }}/>
+                                            <TagsInput
+                                                value={directedBy}
+                                                onChange={setDirectedBy}
+                                                name="directedByInput"
+                                                placeHolder=""
+                                            />
                                         </div>
                                     </div>
                                 ) : (<></>)
@@ -348,10 +351,12 @@ const renderEpisodeWindow = () => {
                                                     <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
                                                 </svg>
                                             </a>
-                                            <input type="text" value={writtenBy} onChange={(e) => {
-                                                setWrittenLock(true);
-                                                setWrittenBy(e.target.value);
-                                            }}/>
+                                            <TagsInput
+                                                value={writtenBy}
+                                                onChange={setWrittenBy}
+                                                name="writtenByInput"
+                                                placeHolder=""
+                                            />
                                         </div>
                                     </div>
                                 ) : (<></>)

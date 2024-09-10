@@ -452,7 +452,6 @@ export class Utils {
         if (copyImages) {
             const directoryPath = path.dirname(imageToCopy);
             await this.copyAndRenameImage(directoryPath, baseDir, 'background.jpg');
-            await this.copyAndRenameImage(directoryPath, baseDir, 'transparencyEffect.png');
             await this.copyAndRenameImage(directoryPath, baseDir, 'fullBlur.jpg');
     
             season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
@@ -461,36 +460,34 @@ export class Utils {
                 // Copy the original image
                 await fsExtra.copy(imageToCopy, path.join(baseDir, 'background.jpg'));
                 season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
-    
-                // Set transparency effect
-                await this.setTransparencyEffect(season.getBackgroundSrc(), path.join(baseDir, 'transparencyEffect.png'));
-    
+        
                 // Process blur and save
-                await this.processBlurAndSave(season.getBackgroundSrc(), path.join(baseDir, 'fullBlur.jpg'));
+                this.processBlurAndSave(this.getExternalPath(season.getBackgroundSrc()), path.join(baseDir, 'fullBlur.jpg'));
             } catch (e) {
-                console.error('saveBackground: error processing image with blur or transparency');
+                console.error('saveBackground: error processing image with blur');
             }
         }
     }
-    
-    private static async setTransparencyEffect(src: string, outputPath: string) {
-        // Custom transparency effect logic should be implemented here
-        try {
-            // For now, we can simply copy the image to simulate the effect
-            await fsExtra.copy(src, outputPath);
-        } catch (e) {
-            console.error('setTransparencyEffect: error applying transparency effect to background');
-        }
-    }
 
-    private static async processBlurAndSave(imagePath: string, outputFilePath: string) {
-        try {
-            // For now, just copy the image as no blur processing is done
-            await fsExtra.copy(imagePath, outputFilePath);
-        } catch (e) {
-            console.error('processBlurAndSave: error copying image');
-        }
-        return null;
-    }
+    public static processBlurAndSave = async (imagePath: string, outputPath: string) => {
+        return new Promise<void>(async (resolve, reject) => {
+            let imageMagickPath = await this.getExternalPath("resources/lib/magick.exe");
+            // Comando de ImageMagick usando la versión portable, añadiendo compresión
+            const command = `"${imageMagickPath}" "${imagePath}" -blur 0x${25} -quality ${75} "${outputPath}"`;
+
+            exec(command, (error, _stdout, stderr) => {
+            if (error) {
+                console.error(`Error al aplicar blur a la imagen: ${error.message}`);
+                reject(error);
+            } else if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                reject();
+            } else {
+                console.log(`Imagen generada con éxito: ${outputPath}`);
+                resolve();
+            }
+            });
+        });
+    };
     //#endregion
 }

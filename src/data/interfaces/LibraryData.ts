@@ -10,7 +10,7 @@ export interface LibraryData {
     folders: string[];
     showOnFullscreen: boolean;
     series: SeriesData[];
-    analyzedFiles: [string, string][];
-    analyzedFolders: [string, string][];
-    seasonFolders: [string, string][];
+    analyzedFiles: any;
+    analyzedFolders: any;
+    seasonFolders: any;
   }

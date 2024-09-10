@@ -24,6 +24,11 @@ export interface SeasonData{
     writtenBy: string[];
     studioLock: boolean;
     taglineLock: boolean;
+    creatorLock: boolean;
+    musicLock: boolean;
+    directedLock: boolean;
+    writtenLock: boolean;
+    genresLock: boolean;
     
     //Other
     order: number;
