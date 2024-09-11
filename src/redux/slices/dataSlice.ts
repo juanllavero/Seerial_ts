@@ -91,7 +91,7 @@ const dataSlice = createSlice({
     },
 
     // SERIES AND SEASONS REDUCERS
-    showSeriesMenu: (state, action: PayloadAction<SeriesData>) => {
+    showSeriesMenu: (state, action: PayloadAction<SeriesData | null>) => {
         state.seriesMenu = action.payload;
     },
     selectSeries: (state, action: PayloadAction<SeriesData>) => {

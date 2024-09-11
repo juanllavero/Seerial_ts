@@ -322,7 +322,7 @@ const renderEpisodeWindow = () => {
                                 </div>
                             </div>
                             {
-                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.directedBy[0] !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode ? (
                                     <div className="dialog-input-box">
                                         <span>{t('directedBy')}</span>
                                         <div className={`dialog-input-lock ${directedLock ? ' locked' : ''}`}>
@@ -342,7 +342,7 @@ const renderEpisodeWindow = () => {
                                 ) : (<></>)
                             }
                             {
-                                selectedLibrary?.type === "Shows" && selectedEpisode && selectedEpisode.writtenBy[0] !== "" ? (
+                                selectedLibrary?.type === "Shows" && selectedEpisode ? (
                                     <div className="dialog-input-box">
                                         <span>{t('writtenBy')}</span>
                                         <div className={`dialog-input-lock ${writtenLock ? ' locked' : ''}`}>
