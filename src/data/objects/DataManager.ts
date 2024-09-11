@@ -558,8 +558,8 @@ export class DataManager {
         show.score = showData.vote_average ? (((showData.vote_average * 10.0)) / 10.0) : 0;
         show.numberOfSeasons = showData.number_of_seasons ?? 0;
         show.numberOfEpisodes = showData.number_of_episodes ?? 0;
-        show.productionStudios = !show.studioLock ? show.productionStudios : showData.production_companies ? showData.production_companies.map(company => company.name ?? "") : [];
-        show.genres = !show.genresLock ? show.genres : showData.genres ? showData.genres.map(genre => genre.name ?? "") : [];
+        show.productionStudios = show.studioLock ? show.productionStudios : showData.production_companies ? showData.production_companies.map(company => company.name ?? "") : [];
+        show.genres = show.genresLock ? show.genres : showData.genres ? showData.genres.map(genre => genre.name ?? "") : [];
         show.tagline = !show.taglineLock ? showData.tagline ?? "" : "";
         show.playSameMusic = true;
 
@@ -590,6 +590,10 @@ export class DataManager {
                 if (person.job && person.job === "Original Music Composer")
                     if (person.name && !show.musicLock) show.musicComposer.push(person.name);
             });
+        }
+
+        if (show.creator.length === 0){
+            show.creator = showData.created_by ? showData.created_by.map(person => person.name ?? "") : [];
         }
 
         await this.downloadLogosAndPosters(show.themdbID, show, false);

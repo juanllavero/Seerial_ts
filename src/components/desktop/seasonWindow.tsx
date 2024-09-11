@@ -32,6 +32,7 @@ const renderSeasonWindow = () => {
     const [selectedPoster, selectPoster] = useState<string | undefined>(undefined);
 
     const [nameLock, setNameLock] = useState<boolean>(false);
+    const [orderLock, setOrderLock] = useState<boolean>(false);
     const [yearLock, setYearLock] = useState<boolean>(false);
     const [overviewLock, setOverviewLock] = useState<boolean>(false);
     const [taglineLock, setTaglineLock] = useState<boolean>(false);
@@ -43,6 +44,7 @@ const renderSeasonWindow = () => {
     const [writtenByLock, setWrittenByLock] = useState<boolean>(false);
 
     const [name, setName] = useState<string>("");
+    const [order, setOrder] = useState<number>(0);
     const [year, setYear] = useState<string>("");
     const [overview, setOverview] = useState<string>("");
     const [tagline, setTagline] = useState<string>("");
@@ -93,9 +95,11 @@ const renderSeasonWindow = () => {
             dispatch(changeMenuSection(Section.General));
 
             setName(season.name || "");
+            setOrder(season.order || 0);
             setYear(season.year || "");
             setOverview(season.overview || "");
             setNameLock(season.nameLock || false);
+            setOrderLock(season.orderLock || false);
             setYearLock(season.yearLock || false);
             setOverviewLock(season.overviewLock || false);
 
@@ -142,7 +146,7 @@ const renderSeasonWindow = () => {
                 name: name,
                 overview: overview,
                 year: year,
-                order: season.order,
+                order: order,
                 id: season.id,
                 tagline: library?.type === "Movies" ? tagline : season.tagline,
                 score: season.score,
@@ -172,6 +176,7 @@ const renderSeasonWindow = () => {
                 writtenBy: season.writtenBy,
                 productionStudios: library?.type === "Movies" ? studios : season.productionStudios,
                 nameLock: season.nameLock,
+                orderLock: orderLock,
                 overviewLock: season.overviewLock,
                 yearLock: season.yearLock,
                 studioLock: season.studioLock,
@@ -245,6 +250,20 @@ const renderSeasonWindow = () => {
                                         <input type="text" value={name} onChange={(e) => {
                                             setNameLock(true);
                                             setName(e.target.value);
+                                        }}/>
+                                    </div>
+                                </div>
+                                <div className="dialog-input-box">
+                                    <span>{t('sortingOrder')}</span>
+                                    <div className={`dialog-input-lock ${orderLock ? ' locked' : ''}`}>
+                                        <a href="#" onClick={() => setOrderLock(!orderLock)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+                                            </svg>
+                                        </a>
+                                        <input type="number" value={order} onChange={(e) => {
+                                            setOrderLock(true);
+                                            setOrder(Number.parseInt(e.target.value) || 0);
                                         }}/>
                                     </div>
                                 </div>

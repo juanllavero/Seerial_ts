@@ -9,6 +9,7 @@ export class Season {
   year: string;
   overview: string;
   nameLock: boolean;
+  orderLock: boolean;
   yearLock: boolean;
   overviewLock: boolean;
 
@@ -85,6 +86,7 @@ export class Season {
     this.productionStudios = [];
     this.tagline = '';
     this.nameLock = false;
+    this.orderLock = false;
     this.yearLock = false;
     this.overviewLock = false;
     this.studioLock = false;
@@ -133,6 +135,7 @@ export class Season {
     season.productionStudios = json.productionStudios || season.productionStudios;
     season.tagline = json.tagline || season.tagline;
     season.nameLock = json.nameLock !== undefined ? json.nameLock : season.nameLock;
+    season.orderLock = json.orderLock !== undefined ? json.orderLock : season.orderLock;
     season.yearLock = json.yearLock !== undefined ? json.yearLock : season.yearLock;
     season.overviewLock = json.overviewLock !== undefined ? json.overviewLock : season.overviewLock;
     season.studioLock = json.studioLock !== undefined ? json.studioLock : season.studioLock;
@@ -181,6 +184,7 @@ export class Season {
       productionStudios: this.productionStudios,
       tagline: this.tagline,
       nameLock: this.nameLock,
+      orderLock: this.orderLock,
       yearLock: this.yearLock,
       overviewLock: this.overviewLock,
       studioLock: this.studioLock,

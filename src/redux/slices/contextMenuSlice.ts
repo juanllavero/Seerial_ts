@@ -15,7 +15,7 @@ const initialState = {
 };
 
 const contextMenuSlice = createSlice({
-name: 'seasonMenu',
+name: 'contextMenu',
 initialState,
 reducers: {
     closeAllMenus: (state) => {

@@ -23,6 +23,7 @@ export const renderRightPanelContent = () => {
     const { t } = useTranslation();
 
     const isContextMenuShown = useSelector((state: RootState) => state.contextMenu.isContextShown);
+    const seasonMenuOpen = useSelector((state: RootState) => state.contextMenu.seasonMenu);
 
     const libraries = useSelector((state: RootState) => state.data.libraries);
     const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
@@ -183,7 +184,7 @@ export const renderRightPanelContent = () => {
                               </button>
                           </div>
                       </>
-                      ) : (<></>)
+                      ) : null
                     }
                     <div className="video-button"
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
@@ -298,7 +299,7 @@ export const renderRightPanelContent = () => {
                   onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}/>
               </div>) : (<div></div>)}
             <div className="info-container">
-              <div className="poster-image">
+              <div className={`poster-image ${selectedLibrary.type !== "Shows" && selectedSeries.seasons.length === 1 ? 'round-image' : ''}`}>
                 {
                   selectedLibrary.type == "Shows" || showCollectionPoster ? (
                     selectedSeries.coverSrc != "" ? (
@@ -323,7 +324,7 @@ export const renderRightPanelContent = () => {
                   )
                 }
                 {
-                  selectedLibrary.type == "Shows" ? (
+                  selectedLibrary.type === "Shows" ? (
                     <div className="continue-watching-info">
                       <span>{t('inProgress')} — {t('seasonLetter')}1 · {t('episodeLetter')}3</span>
                     </div>
@@ -332,23 +333,23 @@ export const renderRightPanelContent = () => {
                       onClick={changePoster}>
                       <span>{showCollectionPoster ? (t('seasonPoster')) : (t('collectionPoster'))}</span>
                     </button>
-                  ) : (<></>)
+                  ) : null
                 }
               </div>
               <section className="season-info">
                 {
                   selectedLibrary.type == "Shows" && selectedSeries.seasons.length > 1 ? (
                     <span id="seasonTitle">{selectedSeason.name}</span>
-                  ) : (<></>)
+                  ) : null
                 }
                 <section className="season-info-text">
                   {
                     selectedSeason.directedBy && selectedSeason.directedBy.length !== 0 ? (
-                      <span id="directedBy">{"Directed by " + selectedSeason.directedBy || ""}</span>
+                      <span id="directedBy">{t('directedBy') + " " + selectedSeason.directedBy || ""}</span>
                     ) : (<span></span>)
                   }
-                  <span id="date">{selectedSeason.year || ""}</span>
-                  <span id="genres">{selectedLibrary.type == "Shows" ? selectedSeason.genres ? selectedSeries.genres.join(', ') || "" : selectedSeries.genres ? selectedSeries.genres.join(', ') || "" : "" : ""}</span>
+                  <span id="date">{new Date(selectedSeason.year).getFullYear() || new Date(selectedSeries.year).getFullYear() || null}</span>
+                  <span id="genres">{selectedLibrary.type !== "Shows" ? (selectedSeason.genres && selectedSeason.genres.length > 0 ? selectedSeason.genres.join(', ') || "" : "") : selectedSeries.genres ? selectedSeries.genres.join(', ') || "" : ""}</span>
                 </section>
                 <div className="rating-info">
                   <img src="./src/assets/svg/themoviedb.svg" alt="TheMovieDB logo"/>
@@ -356,30 +357,24 @@ export const renderRightPanelContent = () => {
                 </div>
                 <section className="season-info-buttons-container">
                 <button className="play-button-desktop">
-                  <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
+                  <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
                   <span id="playText">{t('playButton')}</span>
                 </button>
                 <button className="svg-button-desktop" title="Mark as watched">
-                  <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
-                <button className="svg-button-desktop" onClick={() => dispatch(toggleSeasonWindow())}>
-                <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
+                  <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
+                <button className="svg-button-desktop" title={t('editButton')} onClick={() => dispatch(toggleSeasonWindow())}>
+                <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
                 </button>
                 <button className="svg-button-desktop"
                 onClick={(e) => {
                   dispatch(toggleSeasonMenu());
-                  cm.current?.show(e);
+                  if (!seasonMenuOpen)
+                    cm.current?.show(e);
                 }}>
-                  <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M12 27C13.6569 27 15 25.6569 15 24C15 22.3431 13.6569 21 12 21C10.3431 21 9 22.3431 9 24C9 25.6569 10.3431 27 12 27Z" fill="#FFFFFF"></path><path d="M24 27C25.6569 27 27 25.6569 27 24C27 22.3431 25.6569 21 24 21C22.3431 21 21 22.3431 21 24C21 25.6569 22.3431 27 24 27Z" fill="#FFFFFF"></path><path d="M39 24C39 25.6569 37.6569 27 36 27C34.3431 27 33 25.6569 33 24C33 22.3431 34.3431 21 36 21C37.6569 21 39 22.3431 39 24Z" fill="#FFFFFF"></path></svg>
+                  <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M12 27C13.6569 27 15 25.6569 15 24C15 22.3431 13.6569 21 12 21C10.3431 21 9 22.3431 9 24C9 25.6569 10.3431 27 12 27Z" fill="#FFFFFF"></path><path d="M24 27C25.6569 27 27 25.6569 27 24C27 22.3431 25.6569 21 24 21C22.3431 21 21 22.3431 21 24C21 25.6569 22.3431 27 24 27Z" fill="#FFFFFF"></path><path d="M39 24C39 25.6569 37.6569 27 36 27C34.3431 27 33 25.6569 33 24C33 22.3431 34.3431 21 36 21C37.6569 21 39 22.3431 39 24Z" fill="#FFFFFF"></path></svg>
                 </button>
                 <ContextMenu 
                   model={[
-                    {
-                      label: t('editButton'),
-                      command: () => {
-                        dispatch(toggleSeasonMenu());
-                        dispatch(toggleSeasonWindow());
-                      }
-                    },
                     ...(selectedLibrary?.type !== "Shows" ? [{
                       label: t('correctIdentification'),
                       command: () => dispatch(toggleSeasonMenu())
@@ -426,7 +421,19 @@ export const renderRightPanelContent = () => {
                       <div className={`arrow ${isContextMenuShown ? (' arrow-rotate'): ('')}`}></div>
                   </div>
                   <ul id={selectedSeries.id + "dropdown"} className={`menu ${isContextMenuShown ? (' menu-open'): ('')}`}>
-                    {selectedSeries.seasons.map((season: SeasonData) => (
+                    {[...selectedSeries.seasons].sort((a, b) => {
+                      if (a.order !== 0 && b.order !== 0) {
+                        return a.order - b.order;
+                      }
+                      
+                      if (a.order === 0 && b.order === 0) {
+                        // Order by date
+                        return new Date(a.year).getTime() - new Date(b.year).getTime();
+                      }
+                      
+                      // Order number gets preference
+                      return a.order === 0 ? 1 : -1;
+                    }).map((season: SeasonData) => (
                       <li key={season.id}
                         onClick={() => {
                           toggleMenu();
@@ -436,12 +443,10 @@ export const renderRightPanelContent = () => {
                     ))}
                   </ul>
                 </section>
-              ) : (
-                <></>
-              )
+              ) : null
             }
             <div className="episodes-container">
-              {selectedSeason.episodes.map((episode: EpisodeData) => (
+              {[...selectedSeason.episodes].sort((a, b) => a.episodeNumber - b.episodeNumber).map((episode: EpisodeData) => (
                 <div key={episode.id} className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <ContextMenu 
@@ -482,9 +487,7 @@ export const renderRightPanelContent = () => {
                           style={{'background': `linear-gradient(to right, #8EDCE6 ${episode.timeWatched + 1550 * 100 / (episode.runtimeInSeconds)}%, #646464 0px`}}
                           className="slider hide-slider-thumb"/>
                         </div>
-                      ) : (
-                        <></>
-                      )
+                      ) : null
                     }
                     {
                       (showButtonMenu || episodeMenuOpen) && episode == selectedEpisode ? (
@@ -507,7 +510,7 @@ export const renderRightPanelContent = () => {
                               </button>
                           </div>
                       </>
-                      ) : (<></>)
+                      ) : null
                     }
                     <div className="video-button"
                     style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
@@ -542,4 +545,6 @@ export const renderRightPanelContent = () => {
         </>
       );
     }
+
+    return null;
   };

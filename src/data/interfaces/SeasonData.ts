@@ -9,6 +9,7 @@ export interface SeasonData{
     year: string;
     overview: string;
     nameLock: boolean;
+    orderLock: boolean;
     yearLock: boolean;
     overviewLock: boolean;
 
