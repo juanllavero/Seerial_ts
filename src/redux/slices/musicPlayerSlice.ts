@@ -1,5 +1,5 @@
 import { EpisodeData } from '@interfaces/EpisodeData';
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface MusicPlayerState {
     songsList: EpisodeData[];
@@ -17,11 +17,11 @@ const musicPlayerSlice = createSlice({
   name: 'musicPlayer',
   initialState,
   reducers: {
-    setSongs: (state, action) => {
+    setSongs: (state, action: PayloadAction<EpisodeData[]>) => {
         state.songsList = action.payload;
     },
     setCurrentSong: (state, action) => {
-        if (action.payload < state.songsList.length)
+        if (state.songsList && action.payload < state.songsList.length)
             state.currentSong = action.payload;
     },
     playLastSong: (state) => {
@@ -30,7 +30,7 @@ const musicPlayerSlice = createSlice({
         }
     },
     playNextSong: (state) => {
-        if (state.currentSong < state.songsList.length - 1){
+        if (state.songsList && state.currentSong < state.songsList.length - 1){
             state.currentSong++;
         }
     },

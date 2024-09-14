@@ -19,7 +19,7 @@ export const renderLibrariesList = () => {
     const cm = useRef<ContextMenu | null>(null);
 
     useEffect(() => {
-        if (libraries && libraries.length > 0 && !selectedLibrary) {
+        if (libraries !== null && libraries.length > 0 && !selectedLibrary) {
             handleSelectLibrary(libraries[0]);
         }
     }, [libraries, selectedLibrary]);

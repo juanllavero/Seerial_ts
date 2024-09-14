@@ -28,9 +28,6 @@ function App() {
   const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
   const mainMenuOpen = useSelector((state: RootState) => state.contextMenu.mainMenu);
 
-  //Music Player
-  const songInPlayer = useSelector((state: RootState) => state.musicPlayer.currentSong);
-
   useEffect(() => {
     // @ts-ignore
     window.electronAPI.getLibraryData()
@@ -125,11 +122,7 @@ function App() {
           />
         </div>
 
-        {
-          songInPlayer !== -1 ? (
-            renderMusicPlayer()
-          ) : null
-        }
+        {renderMusicPlayer()}
 
         {/* Left Panel */}
         <section className="left-panel">

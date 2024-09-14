@@ -1830,6 +1830,10 @@ html, body {
   width: 100%;
   z-index: 100;
   background-color: transparent;
+  display: none;
+  opacity: 0;
+
+  transition: opacity 0.2s ease;
   .music-main {
     position: absolute;
     width: 100%;
@@ -1862,9 +1866,66 @@ html, body {
     position: absolute;
     bottom: 0;
     height: 5%;
-    min-height: 4em;
+    min-height: 6em;
     width: 100%;
-    background-color: #101010a5;
+    background-color: #090909;
+
+    .music-controls {
+      display: flex;
+      height: 100%;
+      width: 52%;
+
+      justify-content: space-between;
+      align-items: center;
+
+      img {
+        width: 5em;
+        height: 5em;
+        margin-left: 0.5em;
+        margin-right: 0.8em;
+        border-radius: 5px;
+      }
+
+      .music-controls-left {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+
+        .music-controls-text {
+          display: flex;
+          flex-flow: column nowrap;
+          text-align: left;
+  
+          #music-title {
+            font-size: medium;
+            font-weight: bold;
+
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+            white-space: nowrap !important;
+          }
+  
+          #music-subtitle {
+            font-size: medium;
+
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+            white-space: nowrap !important;
+          }
+  
+          #music-time {
+            font-size: small;
+          }
+        }
+
+        .music-controls-btns {
+          display: flex;
+
+        }
+      }
+
+      
+    }
   }
 
   .music-main-hidden {
@@ -1872,4 +1933,9 @@ html, body {
     transform: translateY(+100%);
     transition: all 0.2s;
   }
+}
+
+.show-music-player {
+  display: block;
+  opacity: 1;
 }

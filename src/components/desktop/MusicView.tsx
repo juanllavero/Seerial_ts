@@ -41,8 +41,6 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
             )
         );
 
-        dispatch(setSongs(allSongs));
-
         return allSongs;
     }, [selectedLibrary]);
 
@@ -74,6 +72,7 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                 <div className="song-btn-overlay">
                     <button onClick={
                         () => {
+                            dispatch(setSongs(songList));
                             dispatch(setCurrentSong(songList.indexOf(rowData)));
                             dispatch(toggleMusicPause());
                         }
@@ -102,12 +101,13 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     };
 
     useEffect(() => {
-        setSelectionMode(selectedElements.length > 0);
+        if (selectedElements)
+            setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
 
     return (
         <>
-            {selectionMode && (
+            {selectionMode && selectedElements && (
                 <div className="floating-box">
                     {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
                 </div>
