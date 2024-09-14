@@ -189,5 +189,11 @@
     "media": "Médias",
     "orderByTitle": "Trier par titre",
     "tagline": "Slogan",
-    "tags": "Étiquettes"
+    "tags": "Étiquettes",
+    "music": "Musique",
+    "title": "Titre",
+    "album": "Album",
+    "albumArtist": "Artiste de l'Album",
+    "artist": "Artiste",
+    "duration": "Durée"
   }  

@@ -11,6 +11,7 @@ import { Cast } from './Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { BrowserWindow } from 'electron';
 import { LibraryData } from '@interfaces/LibraryData';
+import ffmetadata from 'ffmetadata';
 
 export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
@@ -59,7 +60,6 @@ export class DataManager {
 
                 this.libraries = jsonData.map((libraryData: any) => Library.fromJSON(libraryData));
                 
-                console.log(jsonData);
                 return jsonData;
             } catch (err) {
                 console.error("Error reading data.json");
@@ -124,15 +124,16 @@ export class DataManager {
         if (!this.imageLangs.includes(isoLanguage))
             this.imageLangs.push(isoLanguage);
         
-        let showsLibrary: boolean = this.library.type === "Shows";
         for (const rootFolder of this.library.folders) {
             const filesInFolder = await Utils.getFilesInFolder(rootFolder);
 
             for (const file of filesInFolder) {
-                if (showsLibrary){
+                if (this.library.type === "Shows"){
                     await this.scanTVShow(file.parentPath + "\\" + file.name);
-                }else{
+                } else if (this.library.type === "Movies") {
                     await this.scanMovie(file.parentPath + "\\" + file.name);
+                } else {
+                    await this.scanMusic(file.parentPath + "\\" + file.name);
                 }
             }
         }
@@ -549,7 +550,7 @@ export class DataManager {
         }
     
         return [NaN]; // Return NaN if no episode found
-    }
+    };
 
     private static async setSeriesMetadataAndImages(show: Series, showData: ShowResponse, exists: boolean) {
         show.name = !show.nameLock ? showData.name ?? "" : "";
@@ -807,7 +808,7 @@ export class DataManager {
                 this.library.series.push(show);
                 //#endregion
             }else{
-                //region MOVIE FILE/CONCERT FILES INSIDE FOLDER
+                //#region MOVIE FILE/CONCERT FILES INSIDE FOLDER
                 const fileFullName = await Utils.getFileName(root);
                 const nameAndYear = this.extractNameAndYear(fileFullName);
 
@@ -875,7 +876,7 @@ export class DataManager {
             console.log("searchMovie: search for movie has failed with error " + e);
             return undefined;
         }
-    }
+    };
 
     private static extractNameAndYear(source: string) {
         // Remove parentheses and extra spaces
@@ -899,7 +900,7 @@ export class DataManager {
         name = name.replace(/[-_]/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
         return [name, year];
-    }
+    };
 
     private static async setSeasonMetadata(show: Series, season: Season, movieMetadata: MovieResponse, name: string, year: string) {
         season.setName(!season.nameLock ? movieMetadata.title ?? name : name);
@@ -1058,7 +1059,7 @@ export class DataManager {
         else
             await Utils.saveBackground(season, "resources/img/DefaultBackground.png", false);
         //#endregion
-    }
+    };
 
     private static async saveDiscWithoutMetadata(season: Season, filePath: string) {
         let episode: EpisodeLocal | undefined = new EpisodeLocal();
@@ -1080,7 +1081,7 @@ export class DataManager {
         }
 
         await this.processMediaInfo(episode);
-    }
+    };
 
     private static async processMovie(season: Season, filePath: string) {
         let episode: EpisodeLocal | undefined = new EpisodeLocal();
@@ -1135,7 +1136,7 @@ export class DataManager {
                 count--;
             }
         }
-    }
+    };
 
     private static async processMediaInfo(episode: EpisodeLocal) {
         let episodeData: EpisodeData | undefined = await Utils.getMediaInfo(episode);
@@ -1156,7 +1157,7 @@ export class DataManager {
             if (episodeData.chapters)
                 episode.chapters = episodeData.chapters;
         }
-    }
+    };
 
     private static async setIMDBScore(imdbID: string, season: Season): Promise<void> {
         /*try {
@@ -1176,8 +1177,110 @@ export class DataManager {
         } catch (error) {
             console.error('setIMDBScore: IMDB connection lost');
         }*/
+    };
+
+    //#endregion
+
+    //#region MUSIC METADATA EXTRACTION
+    public static async scanMusic(folder: string) {
+        if (!Utils.isFolder(folder))
+            return;
+
+        ffmetadata.setFfmpegPath(Utils.getInternalPath("lib/ffmpeg.exe"));
+
+        const files = await Utils.getMusicFiles(folder);
+
+        const processPromises = files.map(async musicFile => {
+            await this.processMusicFile(musicFile);
+        });
+
+        await Promise.all(processPromises);
+        this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
+    };
+
+    private static async processMusicFile(musicFile: string) {
+        ffmetadata.read(musicFile, async function(err, data) {
+            if (err) console.error("Error reading metadata", err);
+            else{
+                let artist: Series | undefined;
+                let album: Season | undefined;
+
+                const artistName = data["album_artist"] ? data["album_artist"] : '';
+
+                if (artistName !== ''){
+                    artist = DataManager.getArtist(artistName);
+                }else{
+                    artist = DataManager.getArtist("Unknown");
+                }
+
+                if (!artist){
+                    artist = new Series();
+                    artist.setName(artistName ?? "Unknown");
+                    DataManager.library.series.push(artist);
+                }
+
+                const albumName = data.album;
+
+                if (albumName && albumName !== ''){
+                    album = DataManager.getAlbum(artistName ?? "Unknown", albumName);
+                }else{
+                    album = DataManager.getAlbum("Unknown", "Unknown");
+                }
+
+                if (!album){
+                    album = new Season();
+                    album.setName(albumName ?? "Unknown");
+                    album.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
+                        data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
+                    album.setGenres(data.genre ? data.genre.split(',').map(genre => genre.trim()) : []);
+                    artist.seasons.push(album);
+                }
+
+                let song = new EpisodeLocal();
+                song.setName(data.title ?? Utils.getFileName(musicFile));
+                song.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
+                    data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
+                song.setSeasonNumber(data["disc"] ? Number.parseInt(data["disc"]) : 0);
+                song.setEpisodeNumber(data.track ? Number.parseInt(data.track) : 0);
+                song.album = albumName ?? "Unknown";
+                song.albumArtist = artistName ?? "Unknown";
+                song.setDirectedBy(data.artist ? data.artist.split(',').map(artist => artist.trim()) : []);
+                song.setWrittenBy(data.composer ? data.composer.split(',').map(composer => composer.trim()) : []);
+                
+                // Search for image in the same folder
+                let imageSrc = await Utils.findImageInFolder(path.dirname(musicFile));
+
+                // If no image is found in the same folder, search in the parent folder
+                if (!imageSrc) {
+                    const parentFolder = path.resolve(path.dirname(musicFile), '..');
+                    imageSrc = await Utils.findImageInFolder(parentFolder);
+                }
+
+                if (imageSrc){
+                    song.setImgSrc(imageSrc);
+                }
+
+                song.setVideoSrc(musicFile);
+                album.addEpisode(song);
+            }
+        });
+    };
+
+    private static getArtist(name: string) {
+        return this.library.series.find(artist => artist.name === name);
     }
 
+    private static getAlbum(artistName: string, albumName: string) {
+        const artist = this.getArtist(artistName);
+
+        return artist?.seasons.find(album => album.name === albumName);
+    }
+
+    private static getSong(artistName: string, albumName: string, songName: string) {
+        const album = this.getAlbum(artistName, albumName);
+
+        return album?.episodes.find(song => song.name === songName);
+    }
     //#endregion
 
     //#region UTILS

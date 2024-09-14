@@ -9,15 +9,21 @@ import { exec } from 'child_process';
 import { app } from 'electron';
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import * as fs from 'fs';
 import fsExtra from 'fs-extra';
 import { promisify } from 'util';
 import { Season } from './Season';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const execPromise = promisify(exec);
 
 export class Utils {
     static videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.mpeg', '.m2ts'];
+    static audioExtensions = ['.mp3', '.flac', '.wav', '.m4a', '.ogg', '.aac', '.wma'];
     
     //#region MEDIA INFO
     public static getMediaInfo(episode: EpisodeData | undefined): Promise<EpisodeData> | undefined {
@@ -34,8 +40,8 @@ export class Utils {
     
         // Usa ffprobe para obtener la información del video
         return new Promise(async (resolve, reject) => {
-            ffmpeg.setFfmpegPath(Utils.getExternalPath("resources/lib/ffmpeg.exe"));
-            ffmpeg.setFfprobePath(Utils.getExternalPath("resources/lib/ffprobe.exe"));
+            ffmpeg.setFfmpegPath(Utils.getInternalPath("lib/ffmpeg.exe"));
+            ffmpeg.setFfprobePath(Utils.getInternalPath("lib/ffprobe.exe"));
             ffmpeg.ffprobe(videoPath, async (err, data) => {
                 if (err) {
                     console.error('Error obtaining video metadata:', err);
@@ -353,6 +359,13 @@ export class Utils {
         return path.join(basePath, relativePath);
     }
 
+    public static getInternalPath(relativePath: string): string {
+        const filePath = app.isPackaged
+            ? path.join(process.resourcesPath, relativePath)  // Build app
+            : path.join(__dirname, "../src/", relativePath);  // In development
+        return filePath;
+    }
+
     public static downloadImage = async (url: string, filePath: string) => {
         const response = await axios({
           url,
@@ -374,12 +387,12 @@ export class Utils {
         return fileName;
     }
 
-    public static isFolder = async (folderPath: string) => {
+    public static isFolder = async (folderPath: string): Promise<boolean> => {
         try {
             const stats = await fs.promises.stat(folderPath);
             return stats.isDirectory();
         } catch (error) {
-            console.error(`Error al acceder a la ruta ${folderPath}:`, error);
+            console.error(`isFolder: Error al acceder a la ruta ${folderPath}:`, error);
             return false;
         }
     }
@@ -389,13 +402,12 @@ export class Utils {
             const stats = await fs.promises.stat(folderPath);
             
             if (!stats.isDirectory()) {
-                console.log(`${folderPath} no es un directorio`);
                 return [];
             }
     
             return await fs.promises.readdir(folderPath, { withFileTypes: true });
         } catch (error) {
-            console.error(`Error al acceder a la ruta ${folderPath}:`, error);
+            console.error(`getFilesInFolder: Error al acceder a la ruta ${folderPath}:`, error);
             return [];
         }
     };
@@ -429,9 +441,57 @@ export class Utils {
         return this.videoExtensions.includes(ext);
     }
 
+    public static isAudioFile(filePath: string): boolean {
+        const ext = path.extname(filePath).toLowerCase();
+        return this.audioExtensions.includes(ext);
+    }
+
     public static fileExists(filePath: string): boolean {
         return fs.existsSync(filePath);
     }
+
+    public static getMusicFiles = async (folderPath: string): Promise<string[]> => {
+        const musicFiles: string[] = [];
+        const searchDepth: number = 5;
+    
+        // Recursive function to explore subfolders
+        const exploreDirectory = async (currentPath: string, currentDepth: number): Promise<void> => {
+            const entries = await this.getFilesInFolder(currentPath);
+    
+            for (const entry of entries) {
+                const entryPath = path.join(currentPath, entry.name);
+    
+                if (entry.isFile() && this.isAudioFile(entryPath)) {
+                    musicFiles.push(entryPath);
+                } else if (entry.isDirectory() && currentDepth < searchDepth) {
+                    await exploreDirectory(entryPath, currentDepth + 1);
+                }
+            }
+        };
+    
+        await exploreDirectory(folderPath, 0);
+
+        return musicFiles;
+    }
+
+    /**
+     * Function to search for an image in a folder
+     * @param folderPath string that represents the folder path
+     * @returns string representing the image path if found or null if not
+     */
+    public static findImageInFolder = async (folderPath: string): Promise<string | null> => {
+        const files = await fs.promises.readdir(folderPath);
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+    
+        for (const file of files) {
+            const fileExt = path.extname(file).toLowerCase();
+            if (imageExtensions.includes(fileExt)) {
+                return path.join(folderPath, file);
+            }
+        }
+    
+        return null;
+    };
 
     //#region BACKGROUND PROCESSING
     private static async copyAndRenameImage(srcImagePath: string, destDirPath: string, imageName: string) {

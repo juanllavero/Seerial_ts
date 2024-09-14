@@ -189,5 +189,11 @@
     "media": "Media",
     "orderByTitle": "Order by title",
     "tagline": "Tagline",
-    "tags": "Tags"
+    "tags": "Tags",
+    "music": "Music",
+    "title": "Title",
+    "album": "Album",
+    "albumArtist": "Album Artist",
+    "artist": "Artist",
+    "duration": "Duration"
   }

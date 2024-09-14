@@ -23,6 +23,10 @@ export interface EpisodeData{
     directedLock: boolean;
     writtenLock: boolean;
 
+    //Song
+    album: string;
+    albumArtist: string;
+
     order: number;
     runtime: number;
     runtimeInSeconds: number;

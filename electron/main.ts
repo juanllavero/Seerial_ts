@@ -18,7 +18,6 @@ import { EpisodeData } from '@interfaces/EpisodeData';
 import { Utils } from '../src/data/objects/Utils';
 import { Library } from '../src/data/objects/Library';
 import { DataManager } from '../src/data/objects/DataManager';
-import { exec } from 'node:child_process';
 
 //#region PROPERTIES AND DATA READING
 

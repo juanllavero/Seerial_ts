@@ -24,6 +24,10 @@ export class Episode {
   directedLock: boolean;
   writtenLock: boolean;
 
+  //Song
+  album: string;
+  albumArtist: string;
+
   order: number;
   runtime: number;
   runtimeInSeconds: number;
@@ -69,6 +73,8 @@ export class Episode {
     this.overviewLock = false;
     this.directedLock = false;
     this.writtenLock = false;
+    this.album = '';
+    this.albumArtist = '';
   }
 
   static fromJSON(json: any): Episode {
@@ -103,6 +109,8 @@ export class Episode {
     episode.overviewLock = json.overviewLock !== undefined ? json.overviewLock : episode.overviewLock;
     episode.directedLock = json.directedLock !== undefined ? json.directedLock : episode.directedLock;
     episode.writtenLock = json.writtenLock !== undefined ? json.writtenLock : episode.writtenLock;
+    episode.album = json.album !== undefined ? json.album : episode.album;
+    episode.albumArtist = json.albumArtist !== undefined ? json.albumArtist : episode.albumArtist;
 
     return episode;
   }
@@ -136,7 +144,9 @@ export class Episode {
       yearLock: this.yearLock,
       overviewLock: this.overviewLock,
       directedLock: this.directedLock,
-      writtenLock: this.writtenLock
+      writtenLock: this.writtenLock,
+      album: this.album,
+      albumArtist: this.albumArtist
     };
 
     // Filtrar atributos solo si están asignados o tienen un valor definido

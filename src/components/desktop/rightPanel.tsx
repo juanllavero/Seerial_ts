@@ -17,6 +17,7 @@ import '../../i18n';
 import ResolvedImage from '@components/Image';
 import { useEffect, useRef, useState } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
+import MusicView from './MusicView';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -44,6 +45,10 @@ export const renderRightPanelContent = () => {
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
     const showCollectionPoster = useSelector((state: RootState) => state.data.showCollectionPoster);
     const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
+
+    //Order in songs table
+    const [sortColumn, setSortColumn] = useState<string>('name');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
     const cm = useRef<ContextMenu | null>(null);
     const cm2 = useRef<ContextMenu | null>(null);
@@ -153,6 +158,14 @@ export const renderRightPanelContent = () => {
           </>
         );
       }
+    }
+
+    if (selectedLibrary && selectedLibrary.type === "Music"){
+      return (
+        <>
+          <MusicView selectedLibrary={selectedLibrary} />
+        </>
+      )
     }
 
     // Show series view

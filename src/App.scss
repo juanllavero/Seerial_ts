@@ -16,7 +16,7 @@ $color-bright: #EDF2F4;
   margin: 0 auto;
   text-align: center;
 
-  font-family: sans-serif;
+  font-family: 'Verdana', sans-serif;
 
   display: flex;
   flex-direction: column;
@@ -511,7 +511,7 @@ html, body {
   max-width: 700px;
   margin-top: 1em;
   color: $color-bright;
-  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.779));
+  filter: drop-shadow(3px 3px 3px rgb(0, 0, 0));
 }
 
 /* SEASON INFO BUTTONS */
@@ -740,7 +740,7 @@ html, body {
   transition: opacity 0.5s ease-in;
   mask-image: 
   linear-gradient(to bottom, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
-  filter: brightness(0.9);
+  filter: brightness(0.8);
 }
 
 .background-image img.imageLoaded {
@@ -928,7 +928,7 @@ html, body {
     background: #101010;
     box-shadow: 0 0 8px 1px black;
     color: $color-text-default;
-    position: absolute;
+    position: fixed;
     width: max-content;
     margin-top: 0.5em;
     opacity: 0;
@@ -984,6 +984,7 @@ html, body {
   transition: opacity .15s linear;
   border-radius: 5px;
   z-index: 10;
+  border: none;
 
   ul {
     list-style-type: none;
@@ -995,7 +996,6 @@ html, body {
     font-size: small;
     background-color: transparent;
     text-align: left;
-    padding: 0.3em 0.8em;
     cursor: pointer;
 
     svg {
@@ -1014,11 +1014,9 @@ html, body {
   }
 
   li:hover {
-      background-color: #4e4e4e58;
-      
-      a {
-        color: $color-text-primary;
-      }
+    a {
+      color: $color-text-primary;
+    }
   }
 
   .active {
@@ -1690,4 +1688,137 @@ html, body {
 .rti--container:focus-within {
   border-color: transparent !important;
   box-shadow: none !important;
+}
+
+.music-container {
+  margin: 160px 40px 0 40px;
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    border-radius: 5px;
+    
+    
+    z-index: 1;
+    
+  }
+
+  th, td {
+    padding: 0.5em;
+    text-align: left;
+    width: auto;
+    border: none;
+
+    color: $color-text-primary;
+    
+    img {
+      border-radius: 5px;
+    }
+  }
+
+  th {
+    background-color: $color-light;
+    span{
+      margin-right: 0.3em;
+    }
+  }
+
+  th:hover {
+    background-color: $color-lighter;
+    color: $color-text-primary;
+    cursor: pointer;
+  }
+
+  tr {
+    border-radius: 5px;
+  }
+
+  .song-row-options {
+    display: flex;
+    min-width: 20px;
+  }
+}
+
+.floating-box {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  padding: 10px;
+  background: #000;
+  color: #fff;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.list-container {
+  height: 100vh;
+  background-color: #000;
+}
+
+.song-row {
+  background-color: transparent;
+  .song-image-container {
+    display: flex;
+    
+    .song-btn-overlay {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: #000000b0;
+      border-radius: 5px;
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+    
+      button {
+        border-radius: 50px;
+        width: 35px;
+        height: 35px;
+        outline: none;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    
+        svg path {
+          fill: $color-text-default;
+        }
+      }
+    
+      button:hover {  
+        svg path {
+          fill: $color-text-primary;
+        }
+      }
+    }
+  
+    .visible {
+      display: flex;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  }
+}
+
+.song-row:hover .song-image-container .song-btn-overlay {
+  display: flex;
+}
+
+.row-selected {
+  background-color: $color-more-lighter;
+  cursor: pointer;
+}
+
+.search-container {
+
+  .search-bar {
+    margin-bottom: 1em;
+    background-color: transparent;
+  }
 }

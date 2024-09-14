@@ -189,5 +189,11 @@
     "media": "Medios",
     "orderByTitle": "Ordenar por título",
     "tagline": "Eslogan",
-    "tags": "Etiquetas"
+    "tags": "Etiquetas",
+    "music": "Música",
+    "title": "Título",
+    "album": "Álbum",
+    "albumArtist": "Artista del Álbum",
+    "artist": "Artista",
+    "duration": "Duración"
   }
