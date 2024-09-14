@@ -18,6 +18,7 @@ import renderEpisodeWindow from './episodeWindow';
 import renderSeasonWindow from './seasonWindow';
 import { LibraryData } from '@interfaces/LibraryData';
 import renderSeriesWindow from './seriesWindow';
+import { renderMusicPlayer } from './MusicPlayer';
 
 function App() {
   const dispatch = useDispatch();
@@ -26,6 +27,9 @@ function App() {
   const isVideoLoaded = useSelector((state: RootState) => state.video.isLoaded);
   const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
   const mainMenuOpen = useSelector((state: RootState) => state.contextMenu.mainMenu);
+
+  //Music Player
+  const songInPlayer = useSelector((state: RootState) => state.musicPlayer.currentSong);
 
   useEffect(() => {
     // @ts-ignore
@@ -120,6 +124,12 @@ function App() {
             alt="Background noise"
           />
         </div>
+
+        {
+          songInPlayer !== -1 ? (
+            renderMusicPlayer()
+          ) : null
+        }
 
         {/* Left Panel */}
         <section className="left-panel">
