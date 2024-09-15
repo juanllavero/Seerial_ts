@@ -14,7 +14,7 @@ import { dirname } from 'path';
 import * as fs from 'fs';
 import fsExtra from 'fs-extra';
 import { promisify } from 'util';
-import { Season } from './Season';
+import { Season } from '../objects/Season';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -328,20 +328,16 @@ export class Utils {
           const { stdout } = await execPromise(`ffprobe -v error -show_entries chapter -of json -i "${episode.videoSrc}"`);
           const metadata = JSON.parse(stdout);
 
-          
-      
           if (metadata.chapters && metadata.chapters.length > 0) {
             metadata.chapters.forEach((chapter: any) => {
                 const chapterData: ChapterData = {
                     title: chapter.title || 'Sin título',
                     time: chapter.start_time || 0,
-                    displayTime: Utils.formatTime(chapter.start_time),
+                    displayTime: Utils.formatTime(chapter.start_time || 0),
                     thumbnailSrc: ''
                 };
 
                 chaptersArray.push(chapterData);
-
-                return chaptersArray;
             });
           } else {
             return chaptersArray;

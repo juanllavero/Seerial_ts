@@ -1,13 +1,13 @@
 import propertiesReader from 'properties-reader';
 import { Episode, EpisodeGroupResponse, MovieDb, MovieResponse, ShowResponse, TvSeasonResponse } from 'moviedb-promise';
-import { Series } from './Series';
-import { Library } from './Library';
+import { Series } from '../objects/Series';
+import { Library } from '../objects/Library';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Utils } from './Utils';
-import { Season } from './Season';
-import { Episode as EpisodeLocal } from './Episode';
-import { Cast } from './Cast';
+import { Season } from '../objects/Season';
+import { Episode as EpisodeLocal } from '../objects/Episode';
+import { Cast } from '../objects/Cast';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { BrowserWindow } from 'electron';
 import { LibraryData } from '@interfaces/LibraryData';
@@ -1274,12 +1274,6 @@ export class DataManager {
         const artist = this.getArtist(artistName);
 
         return artist?.seasons.find(album => album.name === albumName);
-    }
-
-    private static getSong(artistName: string, albumName: string, songName: string) {
-        const album = this.getAlbum(artistName, albumName);
-
-        return album?.episodes.find(song => song.name === songName);
     }
     //#endregion
 

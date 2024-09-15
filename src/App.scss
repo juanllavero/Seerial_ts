@@ -1829,9 +1829,10 @@ html, body {
   height: 100%;
   width: 100%;
   z-index: 100;
-  background-color: transparent;
+  background: transparent;
   display: none;
   opacity: 0;
+  pointer-events: none;
 
   transition: opacity 0.2s ease;
   .music-main {
@@ -1839,6 +1840,7 @@ html, body {
     width: 100%;
     height: 95%;
     background-color: rgb(18, 18, 18);
+    pointer-events: auto;
 
     display: flex;
     transition: all 0.2s;
@@ -1869,62 +1871,82 @@ html, body {
     min-height: 6em;
     width: 100%;
     background-color: #090909;
+    pointer-events: auto;
 
     .music-controls {
       display: flex;
       height: 100%;
-      width: 52%;
+      width: 100%;
 
       justify-content: space-between;
       align-items: center;
+      display: flex;
 
-      img {
-        width: 5em;
-        height: 5em;
-        margin-left: 0.5em;
-        margin-right: 0.8em;
-        border-radius: 5px;
-      }
+      
 
       .music-controls-left {
         display: flex;
-        width: 100%;
+        width: 52%;
         justify-content: space-between;
+        
 
-        .music-controls-text {
+        .music-controls-left-box {
           display: flex;
-          flex-flow: column nowrap;
-          text-align: left;
-  
-          #music-title {
-            font-size: medium;
-            font-weight: bold;
 
-            overflow: hidden !important;
-            text-overflow: ellipsis;
-            white-space: nowrap !important;
+          img {
+            width: 4.6em;
+            height: 4.6em;
+            margin-left: 0.5em;
+            margin-right: 0.8em;
+            border-radius: 5px;
           }
-  
-          #music-subtitle {
-            font-size: medium;
 
-            overflow: hidden !important;
-            text-overflow: ellipsis;
-            white-space: nowrap !important;
-          }
+          .music-controls-text {
+            display: flex;
+            flex-flow: column nowrap;
+            text-align: left;
+            max-width: 30em;
+    
+            #music-title {
+              font-size: medium;
+              font-weight: bold;
   
-          #music-time {
-            font-size: small;
+              overflow: hidden !important;
+              text-overflow: ellipsis;
+              white-space: nowrap !important;
+            }
+    
+            #music-subtitle {
+              font-size: medium;
+  
+              overflow: hidden !important;
+              text-overflow: ellipsis;
+              white-space: nowrap !important;
+            }
+    
+            #music-time {
+              font-size: small;
+            }
           }
         }
 
         .music-controls-btns {
           display: flex;
-
+          margin-left: 2em;
         }
       }
 
-      
+      .music-controls-right {
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        height: 100%;
+
+        #music-volume-slider {
+          margin-right: 1em;
+          height: 70%;
+        }
+      }
     }
   }
 

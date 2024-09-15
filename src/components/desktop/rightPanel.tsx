@@ -15,10 +15,9 @@ import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
 import ResolvedImage from '@components/Image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
 import MusicView from './MusicView';
-import { renderMusicPlayer } from './MusicPlayer';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -124,15 +123,9 @@ export const renderRightPanelContent = () => {
       dispatch(showMenu(show));
     }
 
-    const handleSeriesMenu = (series: SeriesData | null, show: boolean) => {
-      dispatch(showMenu(show));
-      if (series !== null)
-        dispatch(showSeriesMenu(series))
-    }
-
-    const toggleMenu = () => {
-        dispatch(toggleContextMenu());
-    };
+    function toggleMenu() {
+    dispatch(toggleContextMenu());
+  }
 
     useEffect(() => {
       const scroll = document.getElementById('scroll');

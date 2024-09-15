@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePause, setCurrentTime, setDuration, toggleControls, toggleInSettings, toggleInChapters, changeVolume } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
@@ -81,12 +81,16 @@ function Controls() {
     const inSettings = useSelector((state: RootState) => state.video.inSettings);
     const inChapters = useSelector((state: RootState) => state.video.inChapters);
     const [mouseOnUI, setMouseOnUi] = useState(false);
+    const hideControlsRef = useRef<() => void>(() => {});
     let timeout: NodeJS.Timeout;
 
-    const hideControls = () => {
-        console.log(inSettings);
-        dispatch(toggleControls(!inSettings && !mouseOnUI && !paused));
-    }
+    useEffect(() => {
+        hideControlsRef.current = () => {
+            if (!inSettings && !mouseOnUI && !paused) {
+                dispatch(toggleControls(false));
+            }
+        };
+    }, [inSettings, mouseOnUI, paused, dispatch]);
 
     const showControls = () => {
         if (!visible){
@@ -99,8 +103,7 @@ function Controls() {
         // Set a timeout to hide controls after a period of inactivity
         timeout = setTimeout(() => {
             
-
-            hideControls();
+            hideControlsRef.current();
         }, 3000); // 3 seconds of inactivity
     };
     //#endregion
@@ -166,9 +169,9 @@ function Controls() {
         });
 
         window.ipcRenderer.on('hide-controls', (_event) => {
-            hideControls();
+            hideControlsRef.current();
         });
-    }, [paused, mouseOnUI]);
+    }, [paused, mouseOnUI, inSettings]);
 
     const loadTracks = () => {
         //let audioTrackLanguage = currentSeason?.audioTrackLanguage || new Intl.Locale(await Configuration.loadConfig("preferAudioLan", "es-ES")).language;

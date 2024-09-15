@@ -10,14 +10,14 @@ import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
-import Configuration from '../src/data/objects/Configuration';
+import Configuration from '../src/data/utils/Configuration';
 import { LibraryData } from '@interfaces/LibraryData';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
-import { Utils } from '../src/data/objects/Utils';
+import { Utils } from '../src/data/utils/Utils';
 import { Library } from '../src/data/objects/Library';
-import { DataManager } from '../src/data/objects/DataManager';
+import { DataManager } from '../src/data/utils/DataManager';
 
 //#region PROPERTIES AND DATA READING
 
@@ -186,6 +186,7 @@ function createWindow() {
     alwaysOnTop: false,
     transparent: false,
     titleBarStyle: 'hidden',
+    backgroundColor: '#00FFFFFF',
     icon: "./src/assets/icon.ico",
     frame: true,
     webPreferences: {
