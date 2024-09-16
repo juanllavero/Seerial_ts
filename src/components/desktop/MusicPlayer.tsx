@@ -8,6 +8,7 @@ import { changeMenuSection } from 'redux/slices/menuSectionsSlice';
 import { Section } from 'data/enums/Section';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { Utils } from 'data/utils/Utils';
+import { extractColors } from 'extract-colors';
 
 export const renderMusicPlayer = () => {
     const dispatch = useDispatch();
@@ -41,8 +42,23 @@ export const renderMusicPlayer = () => {
         }
     }, [currentSong, songsList]);
 
+    const extractColorsFromImage = async (imgSrc: string) => {
+        try {
+            const extractedColors =  await extractColors(imgSrc);
+            
+            // Get first 3 colors
+            const dominantColors = extractedColors.slice(0, 2).map(color => color.hex);
+            return dominantColors;
+        } catch (error) {
+            console.error("Error al extraer colores:", error);
+            return undefined;
+        }
+    };
+
     const getDominantColors = async (imgSrc: string) => {
-        const dominantColors = await window.electronAPI.extractColorsFromImage(imgSrc);
+        const dominantColors = await extractColorsFromImage(imgSrc);
+
+        console.log(dominantColors);
             
         if (dominantColors)
             setColors(dominantColors);
@@ -113,7 +129,7 @@ export const renderMusicPlayer = () => {
 
     const getGradientBackground = () => {
         if (colors.length > 0) {
-            return `linear-gradient(45deg, ${colors.join(", ")})`;
+            return `linear-gradient(to bottom left, ${colors.join(", ")})`;
         }
         return "none";
     };
@@ -138,12 +154,13 @@ export const renderMusicPlayer = () => {
                 ) : null
             }
             <section className={`music-player-container ${songsList && currentSong !== -1 ? 'show-music-player' : ''}`}>
-                <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}>
-                    <div className={`left-panel ${showMore ? '' : 'expand-left-panel'}`}
-                        style={{
-                            background: getGradientBackground(),
-                        }}
-                    >
+                <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}
+                    style={{
+                        background: `${getGradientBackground()}, rgba(0, 0, 0, 0.7)`,
+                        backgroundBlendMode: 'multiply',
+                    }}
+                >
+                    <div className={`left-panel ${showMore ? '' : 'expand-left-panel'}`}>
                         <img
                             src={
                                 songsList && currentSong !== -1 ? (
@@ -155,6 +172,23 @@ export const renderMusicPlayer = () => {
                                 e.target.src = "./src/resources/img/songDefault.png";
                             }}
                         />
+                        <div className="left-panel-info">
+                            {songsList && currentSong !== -1 ? (
+                                    <>
+                                        <span id="left-panel-info-title">{songsList[currentSong].name}</span>
+                                        <span id="left-panel-info-subtitle">{
+                                            songsList[currentSong].album && songsList[currentSong].albumArtist ? (
+                                                `${songsList[currentSong].album} — ${songsList[currentSong].albumArtist}`
+                                            ) : songsList[currentSong].album ? (
+                                                songsList[currentSong].album
+                                            ) : (
+                                                songsList[currentSong].albumArtist
+                                            )
+                                        }</span>
+                                    </>
+                                ) : null
+                            }
+                        </div>
                     </div>
                     <div className={`right-panel ${showMore ? '' : 'hide-right-panel'}`}>
                             <div className="music-player-upper-btns">
@@ -266,13 +300,11 @@ export const renderMusicPlayer = () => {
                             </div>
                             <div className="music-controls-btns">
                                 <button className="svg-button-desktop-transparent" onClick={(e) => {
-                                    const currentTime = howlerRef.current?.seek(); // Obtener el tiempo actual de reproducción
+                                    const currentTime = howlerRef.current?.seek();
                                 
                                     if ((currentTime && currentTime >= 3) || currentSong === 0) {
-                                      // Si han pasado más de 3 segundos, reiniciar la canción
-                                      howlerRef.current?.seek(0); // Reinicia la canción al segundo 0
+                                      howlerRef.current?.seek(0);
                                     } else {
-                                      // Si han pasado menos de 3 segundos, reproducir la canción anterior
                                       dispatch(setCurrentSong(currentSong - 1));
                                     }
 
@@ -309,7 +341,7 @@ export const renderMusicPlayer = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="music-controls-right">
+                        <div className="music-controls-right" onClick={(e) => e.stopPropagation()}>
                             <button onClick={(e) => {
                                 setShowMore(!showMore);
                                 e.stopPropagation();

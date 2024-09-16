@@ -1850,7 +1850,6 @@ html, body {
       align-items: center;
       width: 60%;
       transition: width 0.3s;
-      background-color: #000;
 
       img {
         border-radius: 15px;
@@ -1858,11 +1857,28 @@ html, body {
         max-width: 90%;
         max-height: 60%;
       }
+
+      .left-panel-info {
+        margin-top: 2em;
+        display: flex;
+        flex-flow: column nowrap;
+
+        #left-panel-info-title {
+          font-size: larger;
+          font-weight: bold;
+          color: $color-text-primary;
+        }
+
+        #left-panel-info-subtitle {
+          font-size: medium;
+          margin-top: 0.5em;
+        }
+      }
     }
+    
 
     .right-panel {
       width: 40%;
-      background-color: $color-darker;
 
       transition: all 0.2s;
     }

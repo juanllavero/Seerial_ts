@@ -24,7 +24,6 @@ export interface ElectronAPI {
   getMediaInfo: (episode: EpisodeData) => EpisodeData;
   scanFiles: (library: LibraryData) => LibraryData;
   updateLibrary: (library: LibraryData) => void;
-  extractColorsFromImage: (imgSrc: string) => string[];
 }
   
 declare global {
