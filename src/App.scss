@@ -1955,6 +1955,56 @@ html, body {
     transform: translateY(+100%);
     transition: all 0.2s;
   }
+
+  .music-player-upper-btns {
+    margin-top: 200px;
+  }
+
+  .music-player-scroll {
+    padding: 2em 0.5em;
+    text-align: left;
+
+    .music-player-item {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+
+      margin-top: 0.8em;
+
+      .music-player-item-left {
+
+        display: flex;
+        flex-flow: row nowrap;
+
+        .music-player-item-text {
+          display: flex;
+          flex-flow: column nowrap;
+          margin-left: 0.8em;
+          margin-right: 0.8em;
+
+          font-size: medium;
+
+          overflow: hidden !important;
+          text-overflow: ellipsis;
+          white-space: nowrap !important;
+
+          #music-player-item-title {
+            color: $color-text-primary;
+          }
+        }
+
+        img {
+          width: 3em;
+          height: 3em;
+          border-radius: 5px;
+        }
+      }
+
+      
+    }
+
+    
+  }
 }
 
 .show-music-player {
