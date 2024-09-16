@@ -101,6 +101,10 @@ ipcMain.handle('get-images', async (_event, dirPath) => {
 });
 //#endregion
 
+ipcMain.handle('get-colors-from-image', async (_event, imgSrc: string) => {
+  return await Utils.extractColorsFromImage(imgSrc);
+});
+
 //#region DOWNLOAD IMAGES
 ipcMain.on('download-image-url', async (event, imageUrl: string, downloadDir: string) => {
   try {

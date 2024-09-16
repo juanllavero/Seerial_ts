@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import fsExtra from 'fs-extra';
 import { promisify } from 'util';
 import { Season } from '../objects/Season';
+import { extractColors } from "extract-colors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -487,6 +488,19 @@ export class Utils {
         }
     
         return null;
+    };
+
+    public static extractColorsFromImage = async (imgSrc: string) => {
+        try {
+            const extractedColors =  await extractColors(imgSrc);
+            
+            // Get first 3 colors
+            const dominantColors = extractedColors.slice(0, 3).map(color => color.hex);
+            return dominantColors;
+        } catch (error) {
+            console.error("Error al extraer colores:", error);
+            return undefined;
+        }
     };
 
     //#region BACKGROUND PROCESSING

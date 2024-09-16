@@ -1838,7 +1838,7 @@ html, body {
   .music-main {
     position: absolute;
     width: 100%;
-    height: 95%;
+    height: 92vh;
     background-color: rgb(18, 18, 18);
     pointer-events: auto;
 
@@ -1849,25 +1849,39 @@ html, body {
       justify-content: center;
       align-items: center;
       width: 60%;
+      transition: width 0.3s;
+      background-color: #000;
 
       img {
         border-radius: 15px;
         height: auto;
         max-width: 90%;
+        max-height: 60%;
       }
     }
 
     .right-panel {
       width: 40%;
-      
       background-color: $color-darker;
+
+      transition: all 0.2s;
+    }
+
+    .hide-right-panel {
+      transform: translateX(+100%);
+      width: 0;
+    }
+
+    .expand-left-panel {
+      width: 100%;
+
     }
   }
 
   .music-bottom-bar {
     position: absolute;
     bottom: 0;
-    height: 5%;
+    height: 8vh;
     min-height: 6em;
     width: 100%;
     background-color: #090909;
@@ -1957,7 +1971,28 @@ html, body {
   }
 
   .music-player-upper-btns {
-    margin-top: 200px;
+    margin-top: 8em;
+
+    display: flex;
+    flex-flow: row nowrap;
+
+    button {
+      padding: 2em;
+      width: 50%;
+
+      font-weight: bold;
+      font-size: small;
+
+      outline: none;
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid $color-text-dark;
+      cursor: pointer;
+    }
+
+    .button-selected {
+      border-bottom: 1px solid $color-text-primary;
+    }
   }
 
   .music-player-scroll {
@@ -1983,10 +2018,6 @@ html, body {
           margin-right: 0.8em;
 
           font-size: medium;
-
-          overflow: hidden !important;
-          text-overflow: ellipsis;
-          white-space: nowrap !important;
 
           #music-player-item-title {
             color: $color-text-primary;

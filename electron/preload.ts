@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openFolderDialog: () => ipcRenderer.invoke('dialog:openFolder'),
   getImages: (dirPath: string) => ipcRenderer.invoke('get-images', dirPath),
   getMediaInfo: (episode: EpisodeData) => ipcRenderer.invoke('get-video-data', episode),
+  extractColorsFromImage: (imgSrc: string) => ipcRenderer.invoke('get-colors-from-image', imgSrc),
 })
 
 // Mantén las otras exposiciones si es necesario

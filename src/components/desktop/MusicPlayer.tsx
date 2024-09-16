@@ -7,6 +7,7 @@ import { setCurrentSong, setSongs, toggleMusicPause } from 'redux/slices/musicPl
 import { changeMenuSection } from 'redux/slices/menuSectionsSlice';
 import { Section } from 'data/enums/Section';
 import { EpisodeData } from '@interfaces/EpisodeData';
+import { Utils } from 'data/utils/Utils';
 
 export const renderMusicPlayer = () => {
     const dispatch = useDispatch();
@@ -20,6 +21,8 @@ export const renderMusicPlayer = () => {
     const [volume, setVolume] = useState<number>(1); // Valor por defecto: 1 (100%)
     const howlerRef = useRef<ReactHowler>(null);
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
+    const [showMore, setShowMore] = useState<boolean>(false);
+    const [colors, setColors] = useState<string[]>([]);
 
     // Función para actualizar el tiempo de reproducción
     const updateTime = () => {
@@ -29,6 +32,21 @@ export const renderMusicPlayer = () => {
             setSliderValue((time / duration) * 100);  // Actualiza el slider proporcionalmente
         }
     };
+
+    useEffect(() => {
+        if (songsList && currentSong !== -1) {
+            const imgSrc = songsList[currentSong].imgSrc;
+
+            getDominantColors(imgSrc);
+        }
+    }, [currentSong, songsList]);
+
+    const getDominantColors = async (imgSrc: string) => {
+        const dominantColors = await window.electronAPI.extractColorsFromImage(imgSrc);
+            
+        if (dominantColors)
+            setColors(dominantColors);
+    }
 
     // Capturar la tecla "Espacio" y despachar la acción de pausar o reanudar la música
     useEffect(() => {
@@ -93,6 +111,13 @@ export const renderMusicPlayer = () => {
         localStorage.setItem('volume', value.toString()); // Guardar el volumen en localStorage
     };
 
+    const getGradientBackground = () => {
+        if (colors.length > 0) {
+            return `linear-gradient(45deg, ${colors.join(", ")})`;
+        }
+        return "none";
+    };
+
     const formatTime = (time: number) => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
@@ -114,7 +139,11 @@ export const renderMusicPlayer = () => {
             }
             <section className={`music-player-container ${songsList && currentSong !== -1 ? 'show-music-player' : ''}`}>
                 <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}>
-                    <div className="left-panel">
+                    <div className={`left-panel ${showMore ? '' : 'expand-left-panel'}`}
+                        style={{
+                            background: getGradientBackground(),
+                        }}
+                    >
                         <img
                             src={
                                 songsList && currentSong !== -1 ? (
@@ -127,13 +156,13 @@ export const renderMusicPlayer = () => {
                             }}
                         />
                     </div>
-                    <div className="right-panel">
+                    <div className={`right-panel ${showMore ? '' : 'hide-right-panel'}`}>
                             <div className="music-player-upper-btns">
-                                <button onClick={() => dispatch(changeMenuSection(Section.Advanced))}>
-                                    <span>Siguiente</span>
+                                <button className={menuSection === Section.Advanced ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(Section.Advanced))}>
+                                    <span>SIGUIENTE</span>
                                 </button>
-                                <button>
-                                    <span>Letas</span>
+                                <button className={menuSection === Section.Details ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(Section.Details))}>
+                                    <span>LETRAS</span>
                                 </button>
                             </div>
                             {
@@ -281,6 +310,12 @@ export const renderMusicPlayer = () => {
                             </div>
                         </div>
                         <div className="music-controls-right">
+                            <button onClick={(e) => {
+                                setShowMore(!showMore);
+                                e.stopPropagation();
+                            }}>
+                                <svg aria-hidden="true" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M42 9H11V12H42V9Z" fill="#FFFFFF"></path><path d="M42 18H19V21H42V18Z" fill="#FFFFFF"></path><path d="M10.5 27H42V30H10.5V27Z" fill="#FFFFFF"></path><path d="M42 36H10.5V39H42V36Z" fill="#FFFFFF"></path><path d="M2.17307 25.8291C2.28389 25.9385 2.43419 26 2.59091 26C2.69047 26 2.78842 25.9751 2.87567 25.9278L14.6938 19.5111C14.7865 19.4608 14.8639 19.3868 14.9177 19.2969C14.9716 19.207 15 19.1044 15 19C15 18.8955 14.9716 18.793 14.9177 18.7031C14.8639 18.6132 14.7865 18.5392 14.6938 18.4888L2.87567 12.0722C2.78569 12.0234 2.68437 11.9985 2.58169 12.0001C2.47901 12.0017 2.37853 12.0296 2.29014 12.0812C2.20174 12.1328 2.1285 12.2063 2.07762 12.2943C2.02675 12.3824 1.99999 12.482 2 12.5834V25.4167C2 25.5714 2.06226 25.7198 2.17307 25.8291Z" fill="#FFFFFF"></path></svg>
+                            </button>
                             <Slider
                                 id="music-volume-slider"
                                 orientation="vertical"
