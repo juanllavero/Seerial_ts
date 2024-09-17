@@ -232,17 +232,17 @@ export const renderRightPanelContent = () => {
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
-                            e.target.src = "./src/resources/img/fileNotFound.png";
+                            e.target.src = "./src/resources/img/fileNotFound.jpg";
                           }}/>
                         ) : series.seasons[0].coverSrc !== "" ? (
                           <ResolvedImage src={series.seasons[0].coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
                             e.target.onerror = null; // To avoid infinite loop
-                            e.target.src = "./src/resources/img/fileNotFound.png";
+                            e.target.src = "./src/resources/img/fileNotFound.jpg";
                           }}/>
                         ) : (
-                          <ResolvedImage src="resources/img/fileNotFound.png" alt="Poster"
+                          <ResolvedImage src="resources/img/fileNotFound.jpg" alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
                         )
                       }
@@ -344,20 +344,20 @@ export const renderRightPanelContent = () => {
                       <ResolvedImage src={selectedSeries.coverSrc} alt="Poster"
                       onError={(e: any) => {
                         e.target.onerror = null; // To avoid infinite loop
-                        e.target.src = "./src/resources/img/fileNotFound.png";
+                        e.target.src = "./src/resources/img/fileNotFound.jpg";
                       }}/>
                     ) : (
-                      <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
+                      <LazyLoadImage src={"./src/resources/img/fileNotFound.jpg"} alt="Poster"/>
                     )
                   ) : (
                     selectedSeason.coverSrc != "" ? (
                       <ResolvedImage src={selectedSeason.coverSrc} alt="Poster"
                       onError={(e: any) => {
                         e.target.onerror = null; // To avoid infinite loop
-                        e.target.src = "./src/resources/img/fileNotFound.png";
+                        e.target.src = "./src/resources/img/fileNotFound.jpg";
                       }}/>
                     ) : (
-                      <LazyLoadImage src={"./src/resources/img/fileNotFound.png"} alt="Poster"/>
+                      <LazyLoadImage src={"./src/resources/img/fileNotFound.jgp"} alt="Poster"/>
                     )
                   )
                 }

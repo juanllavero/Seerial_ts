@@ -1,21 +1,13 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { LibraryData } from '@interfaces/LibraryData';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { FilterMatchMode } from 'primereact/api';
-import { InputText } from 'primereact/inputtext';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
 import { ContextMenu } from 'primereact/contextmenu';
-import { selectEpisode, selectSeason, selectSeries, showMenu, showSeriesMenu, toggleEpisodeWindow, toggleSeriesWindow } from 'redux/slices/dataSlice';
-import { closeContextMenu, toggleEpisodeMenu, toggleSeriesMenu } from 'redux/slices/contextMenuSlice';
+import { selectSeason, selectSeries, showMenu, showSeriesMenu, toggleSeriesWindow } from 'redux/slices/dataSlice';
+import { closeContextMenu, toggleSeriesMenu } from 'redux/slices/contextMenuSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentSong, setSongs, toggleMusicPause } from 'redux/slices/musicPlayerSlice';
 import { SeriesData } from '@interfaces/SeriesData';
 import { RootState } from 'redux/store';
-import ResolvedImage from '@components/Image';
 import { SeasonData } from '@interfaces/SeasonData';
 
 interface MusicViewProps {

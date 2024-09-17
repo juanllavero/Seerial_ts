@@ -28,6 +28,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openFolderDialog: () => ipcRenderer.invoke('dialog:openFolder'),
   getImages: (dirPath: string) => ipcRenderer.invoke('get-images', dirPath),
   getMediaInfo: (episode: EpisodeData) => ipcRenderer.invoke('get-video-data', episode),
+  deleteLibrary: (library: LibraryData) => ipcRenderer.send('delete-library', library),
+  onUpdateLibraries: (callback: (event: any, libraries: LibraryData[]) => void) => {
+    ipcRenderer.on('update-libraries', callback);
+  },
 })
 
 // Mantén las otras exposiciones si es necesario

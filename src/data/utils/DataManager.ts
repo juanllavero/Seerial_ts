@@ -2,7 +2,7 @@ import propertiesReader from 'properties-reader';
 import { Episode, EpisodeGroupResponse, MovieDb, MovieResponse, ShowResponse, TvSeasonResponse } from 'moviedb-promise';
 import { Series } from '../objects/Series';
 import { Library } from '../objects/Library';
-import * as fs from 'fs';
+import fs from 'fs-extra';
 import * as path from 'path';
 import { Utils } from './Utils';
 import { Season } from '../objects/Season';
@@ -82,6 +82,76 @@ export class DataManager {
     };
     //#endregion
 
+    //#region DELETE DATA
+    public static async deleteLibrary(library: LibraryData) {
+        const libraryToFind = this.libraries.find(obj => obj.id === library.id);
+
+        if (!libraryToFind)
+            return;
+
+        for (const series of libraryToFind.series){
+            await this.deleteSeriesData(libraryToFind, series);
+        }
+
+        this.libraries = this.libraries.filter(obj => obj.id !== library.id);
+
+        if (this.library && this.library.id === library.id){
+            this.library = this.libraries[0] || undefined;
+        }
+
+        this.win?.webContents.send('update-libraries', this.libraries.map((library: Library) => library.toLibraryData()));
+    }
+
+    public static async deleteSeriesData(library: Library, series: Series) {
+        try {
+            await fs.remove(path.join('resources', 'img', 'posters', series.id));
+            await fs.remove(path.join('resources', 'img', 'logos', series.id));
+        } catch (error) {
+            console.error('deleteSeriesData: Error deleting cover images directory', error);
+        }
+
+        for (const season of series.seasons) {
+            await this.deleteSeasonData(library, season);
+        }
+
+        library.getAnalyzedFolders().delete(series.folder);
+    }
+
+    public static async deleteSeasonData(library: Library, season: Season) {
+        try {
+            await fs.remove(path.join('resources', 'img', 'backgrounds', season.id));
+            await fs.remove(path.join('resources', 'img', 'logos', season.id));
+            await fs.remove(path.join('resources', 'img', 'posters', season.id));
+
+            if (season.musicSrc) {
+                await fs.remove(season.musicSrc);
+            }
+            if (season.videoSrc) {
+                await fs.remove(season.videoSrc);
+            }
+        } catch (error) {
+            console.error('deleteSeasonData: Error deleting images files and directories', error);
+        }
+
+        for (const episode of season.episodes) {
+            await this.deleteEpisodeData(library, episode);
+        }
+
+        library.getSeasonFolders().delete(season.folder);
+    }
+
+    public static async deleteEpisodeData(library: Library, episode: EpisodeLocal) {
+        try {
+            await fs.remove(path.join('resources', 'img', 'thumbnails', 'video', episode.id));
+            await fs.remove(path.join('resources', 'img', 'thumbnails', 'chapters', episode.id));
+        } catch (error) {
+            console.error('deleteEpisodeData: Error deleting directory: resources/img/discCovers/' + episode.id, error);
+        }
+
+        library.getAnalyzedFiles().delete(episode.videoSrc);
+    }
+    //#endregion
+
     //#region METADATA DOWNLOAD
     public static initConnection = (window: BrowserWindow | null): boolean => {
         if (this.moviedb)
@@ -138,7 +208,7 @@ export class DataManager {
             }
         }
 
-        this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
+        this.win?.webContents.send('update-libraries', this.libraries.map((library: Library) => library.toLibraryData()));
 
         return newLibrary;
     };

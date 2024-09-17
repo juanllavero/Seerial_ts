@@ -153,8 +153,6 @@ ipcMain.handle('get-video-data', async (_event, episode: EpisodeData) => {
 DataManager.initFolders();
 
 ipcMain.handle('scan-files', async (_event, library: LibraryData) => {
-  DataManager.initConnection(win);
-
   let newLibrary: Library | undefined = new Library(library.name, library.language, library.type, library.order, library.folders);
   newLibrary = await DataManager.scanFiles(newLibrary);
 });
@@ -166,8 +164,14 @@ ipcMain.on('update-library', (_event, library: LibraryData) => {
 ipcMain.on('get-libraries', async (_event) => {
   let libraries = DataManager.getLibraries();
 
-  win?.webContents.send('send-libraries', libraries.map(library => library.toLibraryData()));
+  win?.webContents.send('send-libraries', libraries.map((library: Library) => library.toLibraryData()));
 });
+
+export function sendLibraries(libraries: LibraryData[]) {  
+  if (win){
+    win.webContents.send('send-libraries', libraries);
+  }
+};
 
 //#endregion
 
@@ -218,7 +222,8 @@ function createWindow() {
   });
 
   win.once('ready-to-show', () => {
-    win?.show()
+    win?.show();
+    DataManager.initConnection(win);
   })
 
   mpvController = new MPVController(win!);
@@ -344,7 +349,12 @@ ipcMain.handle('get-library-data', async () => {
 ipcMain.handle('save-library-data', async (_event, newData) => {
   return DataManager.saveData(newData);
 });
+//#endregion
 
+//#region DELETE ELEMENTS
+ipcMain.on('delete-library', async (_event, library) => {
+  DataManager.deleteLibrary(library);
+});
 //#endregion
 
 //#region WINDOW CONTROLS

@@ -42,17 +42,17 @@ function App() {
       }
     });
 
-    window.ipcRenderer.on('update-libraries', async (_event, newLibraries: LibraryData[]) => {
+    window.ipcRenderer.on('update-libraries', (_event, newLibraries: LibraryData[]) => {
       dispatch(setLibraries(newLibraries));
       saveLibraries(newLibraries);
     });
-
+  
     window.ipcRenderer.on('add-library', (_event, newLibrary: LibraryData, newLibraries: LibraryData[]) => {
       dispatch(setLibraries(newLibraries));
       dispatch(selectLibrary(newLibrary));
       saveLibraries(newLibraries);
     })
-
+  
     window.electronAPI.onWindowStateChange((state: string) => {
       dispatch(toggleMaximize(state === 'maximized'));
     });
@@ -60,7 +60,7 @@ function App() {
     window.ipcRenderer.on('video-stopped', (_event) => {
       dispatch(closeVideo());
     });
-  }, [dispatch]);
+  }, []);
 
   const showControls = () => {
     window.electronAPI.showControls();
@@ -72,7 +72,6 @@ function App() {
 
   // Save data function
   const saveLibraries = (newData: LibraryData[]) => {
-    console.log(newData);
     // @ts-ignore
     window.electronAPI.saveLibraryData(newData).then((success: boolean) => {
       if (success) {

@@ -24,6 +24,8 @@ export interface ElectronAPI {
   getMediaInfo: (episode: EpisodeData) => EpisodeData;
   scanFiles: (library: LibraryData) => LibraryData;
   updateLibrary: (library: LibraryData) => void;
+  deleteLibrary: (library: LibraryData) => void;
+  onUpdateLibraries: (callback: (libraries: LibraryData[]) => void) => void;
 }
   
 declare global {

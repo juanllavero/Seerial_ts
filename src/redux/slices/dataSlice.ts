@@ -47,6 +47,11 @@ const dataSlice = createSlice({
     // LIBRARY REDUCERS
     setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
+
+      console.log(state.libraries);
+
+      if (state.selectedLibrary && state.libraries.length > 0 && !state.libraries.includes(state.selectedLibrary))
+        state.selectedLibrary = state.libraries[0];
     },
     selectLibrary: (state, action: PayloadAction<LibraryData>) => {
       state.selectedLibrary = action.payload;

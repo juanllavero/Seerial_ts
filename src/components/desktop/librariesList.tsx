@@ -6,6 +6,7 @@ import { closeAllMenus, toggleLibraryMenu } from 'redux/slices/contextMenuSlice'
 import { useCallback, useEffect, useRef } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
 import { useTranslation } from 'react-i18next';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export const renderLibrariesList = () => {
     const { t } = useTranslation();
@@ -47,11 +48,29 @@ export const renderLibrariesList = () => {
         {
             label: t('removeButton'),
             command: () => {
+                showDeleteDialog();
                 dispatch(toggleLibraryMenu());
             }
         }
     ];
     //#endregion
+
+    const showDeleteDialog = () => {
+        confirmDialog({
+            message: 'Do you want to delete this record?',
+            header: 'Delete Confirmation',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept
+        });
+    };
+
+    const accept = () => {
+        if (libraryForMenu){
+            window.electronAPI.deleteLibrary(libraryForMenu);
+        }
+    }
 
     const handleSelectLibrary = useCallback((library: any) => {
         dispatch(selectLibrary(library));
@@ -60,7 +79,9 @@ export const renderLibrariesList = () => {
     }, [dispatch]);
 
     return (
-        <div className="libraries-list scroll">
+        <>
+            <ConfirmDialog />
+            <div className="libraries-list scroll">
             {libraries.map((library) => (
                 <button 
                     key={library.id} 
@@ -121,5 +142,6 @@ export const renderLibrariesList = () => {
             ))}
             <ContextMenu model={menuItems} ref={cm} className={`dropdown-menu ${libraryMenuOpen ? ' dropdown-menu-open' : ''}`}/>
         </div>
+        </>
     )
 };
