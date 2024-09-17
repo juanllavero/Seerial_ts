@@ -15,9 +15,12 @@ import { loadVideo } from 'redux/slices/videoSlice';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
 import ResolvedImage from '@components/Image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ContextMenu } from 'primereact/contextmenu';
 import MusicView from './MusicView';
+import MusicViewCards from './MusicViewCards';
+import { MusicSection } from 'data/enums/MusicSection';
+import { Dropdown } from 'primereact/dropdown';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -45,6 +48,8 @@ export const renderRightPanelContent = () => {
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
     const showCollectionPoster = useSelector((state: RootState) => state.data.showCollectionPoster);
     const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
+
+    const [musicSection, setMusicSection] = useState<MusicSection>(MusicSection.Collections);
 
     const cm = useRef<ContextMenu | null>(null);
     const cm2 = useRef<ContextMenu | null>(null);
@@ -153,7 +158,20 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedLibrary.type === "Music"){
       return (
         <>
-          <MusicView selectedLibrary={selectedLibrary} />
+        <Dropdown value={musicSection}
+          onChange={(e) => setMusicSection(e.value)} options={
+            [
+              { name: t('collections'), value: MusicSection.Collections },
+              { name: t('tracks'), value: MusicSection.Tracks }
+            ]
+          } optionLabel="name" className="music-section-selector" checkmark={true}  highlightOnSelect={false} />
+          {
+            musicSection === MusicSection.Tracks ? (
+              <MusicView selectedLibrary={selectedLibrary} />
+            ) : (
+              <MusicViewCards selectedLibrary={selectedLibrary} />
+            )
+          }
         </>
       )
     }

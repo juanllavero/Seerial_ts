@@ -195,5 +195,8 @@
     "album": "Album",
     "albumArtist": "Artiste de l'Album",
     "artist": "Artiste",
-    "duration": "Durée"
+    "duration": "Durée",
+    "collections": "Collections",
+    "albums": "Albums",
+    "tracks": "Pistes"
   }  

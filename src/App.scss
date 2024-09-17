@@ -1690,8 +1690,28 @@ html, body {
   box-shadow: none !important;
 }
 
+.music-section-selector {
+  margin-top: 10em;
+  margin-left: 3em;
+  width: fit-content;
+
+  outline: none;
+  border: none;
+  background-color: transparent;
+
+  font-size: medium;
+  color: $color-text-default;
+}
+
+.music-cards {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0.5em 3em;
+  padding-bottom: 5em;
+}
+
 .music-container {
-  margin: 160px 40px 0 40px;
+  margin: 1em 40px 0 40px;
   height: 80vh;
 
   table {

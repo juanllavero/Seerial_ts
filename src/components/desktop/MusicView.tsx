@@ -170,7 +170,7 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                         header={t('year')} 
                         sortable style={{ width: '10%' }}></Column>
                     <Column 
-                        field="runtime" 
+                        field="runtimeInSeconds" 
                         header={t('duration')} 
                         sortable style={{ width: '10%' }}></Column>
                     <Column 

@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import fsExtra from 'fs-extra';
 import { promisify } from 'util';
 import { Season } from '../objects/Season';
+import { Episode } from '@objects/Episode';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,6 +27,23 @@ export class Utils {
     static audioExtensions = ['.mp3', '.flac', '.wav', '.m4a', '.ogg', '.aac', '.wma'];
     
     //#region MEDIA INFO
+    public static async getOnlyRuntime(song: Episode, musicFile: string) {
+        ffmpeg.setFfprobePath(Utils.getInternalPath("lib/ffprobe.exe"));
+        ffmpeg.ffprobe(musicFile, async (err, data) => {
+            if (err) {
+                console.error('Error obtaining video metadata for music:', err);
+                return;
+            }
+
+            const format = data.format;
+
+            if (format.duration){
+                song.runtimeInSeconds = format.duration;
+                song.runtime = song.runtimeInSeconds / 60;
+            }
+        });
+    }
+
     public static getMediaInfo(episode: EpisodeData | undefined): Promise<EpisodeData> | undefined {
         if (!episode)
             return undefined;
@@ -448,7 +466,7 @@ export class Utils {
 
     public static getMusicFiles = async (folderPath: string): Promise<string[]> => {
         const musicFiles: string[] = [];
-        const searchDepth: number = 5;
+        const searchDepth: number = 4;
     
         // Recursive function to explore subfolders
         const exploreDirectory = async (currentPath: string, currentDepth: number): Promise<void> => {
@@ -481,7 +499,7 @@ export class Utils {
     
         for (const file of files) {
             const fileExt = path.extname(file).toLowerCase();
-            if (imageExtensions.includes(fileExt)) {
+            if (imageExtensions.includes(fileExt) && file.toLowerCase().includes("cover")) {
                 return path.join(folderPath, file);
             }
         }

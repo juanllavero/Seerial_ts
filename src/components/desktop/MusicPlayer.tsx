@@ -202,7 +202,7 @@ export const renderMusicPlayer = () => {
                             {
                                 menuSection === Section.Advanced ? (
                                     <div className="music-player-scroll scroll" id="scroll">
-                                        {songsList.map((song: EpisodeData, index: number) => (
+                                        {songsList.slice(0, 150).map((song: EpisodeData, index: number) => (
                                             <div className="music-player-item">
                                                 <div className="music-player-item-left song-row">
                                                     <div className="song-image-container">
@@ -234,7 +234,7 @@ export const renderMusicPlayer = () => {
                                                     </div>
                                                 </div>
                                                 <div className="music-player-item-left">
-                                                    <span>{song.runtime}</span>
+                                                    <span>{formatTime(song.runtimeInSeconds)}</span>
                                                 </div>
                                             </div>
                                         ))}
