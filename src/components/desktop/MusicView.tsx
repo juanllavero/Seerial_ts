@@ -107,6 +107,12 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
             setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
 
+    const formatTime = (time: number) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
     return (
         <>
             {selectionMode && selectedElements && (
@@ -173,7 +179,8 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                         sortable style={{ width: '10%' }}></Column>
                     <Column 
                         field="runtimeInSeconds" 
-                        header={t('duration')} 
+                        header={t('duration')}
+                        body={(rowData) => formatTime(rowData.runtimeInSeconds)}
                         sortable style={{ width: '10%' }}></Column>
                     <Column 
                         selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>

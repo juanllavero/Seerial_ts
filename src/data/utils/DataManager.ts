@@ -1300,72 +1300,80 @@ export class DataManager {
     };
 
     private static async processMusicFile(musicFile: string, collection: Series) {
-        ffmetadata.read(musicFile, async function(err, data) {
-            if (err) console.error("Error reading metadata", err);
-            else{
-                const artistName = data["album_artist"] ? data["album_artist"] : '';
-                const albumName = data.album ?? "Unknown";
-
-                console.log("\n- Processing music file: " + musicFile);
-
-                let album: Season | null = null;
-
-                for (const season of collection.seasons) {
-                    if (season.name === albumName) {
-                        album = season;
-                        break;
+        try {
+            const data = await new Promise<any>((resolve, reject) => {
+                ffmetadata.read(musicFile, (err, data) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(data);
                     }
+                });
+            });
+    
+            const artistName = data["album_artist"] ? data["album_artist"] : '';
+            const albumName = data.album ?? "Unknown";
+    
+            let album: Season | null = null;
+    
+            for (const season of collection.seasons) {
+                if (season.name === albumName) {
+                    album = season;
+                    break;
                 }
-
-                if (album === null){
-                    console.log("\n- Creating album for: " + albumName);
-                    album = new Season();
-                    album.setName(albumName ?? "Unknown");
-                    album.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
-                        data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
-                    album.setGenres(data.genre ? data.genre.split(',').map(genre => genre.trim()) : []);
-                    collection.seasons.push(album);
-                }
-
-                console.log("\n- Creating song for: " + musicFile);
-                let song = new EpisodeLocal();
-                song.setName(data.title ?? Utils.getFileName(musicFile));
-                song.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
-                    data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
-                song.setSeasonNumber(data["disc"] ? Number.parseInt(data["disc"]) : 0);
-                song.setEpisodeNumber(data.track ? Number.parseInt(data.track) : 0);
-                song.album = albumName ?? "Unknown";
-                song.albumArtist = artistName ?? "Unknown";
-                song.setDirectedBy(data.artist ? data.artist.split(',').map(artist => artist.trim()) : []);
-                song.setWrittenBy(data.composer ? data.composer.split(',').map(composer => composer.trim()) : []);
-                
-                // Search for image in the same folder
-                let imageSrc = await Utils.findImageInFolder(path.dirname(musicFile));
-
-                // If no image is found in the same folder, search in the parent folder
-                if (!imageSrc) {
-                    const parentFolder = path.resolve(path.dirname(musicFile), '..');
-                    imageSrc = await Utils.findImageInFolder(parentFolder);
-                }
-
-                if (imageSrc){
-                    song.setImgSrc(imageSrc);
-
-                    if (album.coverSrc === "")
-                        album.setCoverSrc(imageSrc);
-
-                    if (collection.coverSrc === "")
-                        collection.setCoverSrc(imageSrc);
-                }
-
-                // Get runtime
-                Utils.getOnlyRuntime(song, musicFile);
-
-                song.setVideoSrc(musicFile);
-                album.addEpisode(song);
-                DataManager.library.analyzedFiles.set(musicFile, song.id);
             }
-        });
+    
+            if (album === null) {
+                console.log("\n- Creating album for: " + albumName);
+                album = new Season();
+                album.setName(albumName ?? "Unknown");
+                album.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
+                    data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
+                album.setGenres(data.genre ? data.genre.split(',').map((genre: string) => genre.trim()) : []);
+                collection.seasons.push(album);
+            }
+    
+            console.log("\n- Creating song for: " + musicFile);
+            let song = new EpisodeLocal();
+            song.setName(data.title ?? Utils.getFileName(musicFile));
+            song.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
+                data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
+            song.setSeasonNumber(data["disc"] ? Number.parseInt(data["disc"]) : 0);
+            song.setEpisodeNumber(data.track ? Number.parseInt(data.track) : 0);
+            song.album = albumName ?? "Unknown";
+            song.albumArtist = artistName ?? "Unknown";
+            song.setDirectedBy(data.artist ? data.artist.split(',').map((artist: string) => artist.trim()) : []);
+            song.setWrittenBy(data.composer ? data.composer.split(',').map((composer: string) => composer.trim()) : []);
+    
+            // Search for image in the same folder
+            let imageSrc = await Utils.findImageInFolder(path.dirname(musicFile));
+    
+            // If no image is found in the same folder, search in the parent folder
+            if (!imageSrc) {
+                const parentFolder = path.resolve(path.dirname(musicFile), '..');
+                imageSrc = await Utils.findImageInFolder(parentFolder);
+            }
+    
+            if (imageSrc) {
+                song.setImgSrc(imageSrc);
+    
+                if (album.coverSrc === "")
+                    album.setCoverSrc(imageSrc);
+    
+                if (collection.coverSrc === "")
+                    collection.setCoverSrc(imageSrc);
+            }
+    
+            // Get runtime
+            await Utils.getOnlyRuntime(song, musicFile);
+    
+            song.setVideoSrc(musicFile);
+            album.addEpisode(song);
+            DataManager.library.analyzedFiles.set(musicFile, song.id);
+            
+        } catch (error) {
+            console.error("Error processing music file", error);
+        }
     };
     //#endregion
 

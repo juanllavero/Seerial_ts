@@ -48,8 +48,6 @@ const dataSlice = createSlice({
     setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
 
-      console.log(state.libraries);
-
       if (state.selectedLibrary && state.libraries.length > 0 && !state.libraries.includes(state.selectedLibrary))
         state.selectedLibrary = state.libraries[0];
     },
@@ -103,7 +101,7 @@ const dataSlice = createSlice({
         state.selectedSeries = action.payload;
         state.selectedSeason = action.payload.seasons[0];
     },
-    selectSeason: (state, action: PayloadAction<SeasonData>) => {
+    selectSeason: (state, action: PayloadAction<SeasonData | null>) => {
         state.selectedSeason = action.payload;
     },
     resetSelection: (state) => {

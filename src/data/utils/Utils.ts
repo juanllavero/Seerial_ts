@@ -27,20 +27,28 @@ export class Utils {
     static audioExtensions = ['.mp3', '.flac', '.wav', '.m4a', '.ogg', '.aac', '.wma'];
     
     //#region MEDIA INFO
-    public static async getOnlyRuntime(song: Episode, musicFile: string) {
-        ffmpeg.setFfprobePath(Utils.getInternalPath("lib/ffprobe.exe"));
-        ffmpeg.ffprobe(musicFile, async (err, data) => {
-            if (err) {
-                console.error('Error obtaining video metadata for music:', err);
-                return;
-            }
-
-            const format = data.format;
-
-            if (format.duration){
-                song.runtimeInSeconds = format.duration;
-                song.runtime = song.runtimeInSeconds / 60;
-            }
+    public static async getOnlyRuntime(song: Episode, musicFile: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            ffmpeg.setFfprobePath(Utils.getInternalPath("lib/ffprobe.exe"));
+            
+            ffmpeg.ffprobe(musicFile, (err, data) => {
+                if (err) {
+                    console.error('Error obtaining video metadata for music:', err);
+                    reject(err);
+                    return;
+                }
+    
+                const format = data?.format;
+    
+                if (format && format.duration) {
+                    song.runtimeInSeconds = format.duration;
+                    song.runtime = song.runtimeInSeconds / 60;
+                    resolve();  // Indicar que se ha completado correctamente
+                } else {
+                    console.warn(`Duration not found for file: ${musicFile}`);
+                    resolve();  // Resolver aunque no haya duración para continuar el flujo
+                }
+            });
         });
     }
 

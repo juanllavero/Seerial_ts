@@ -185,46 +185,41 @@ export const renderRightPanelContent = () => {
               <div className="episode-box" key={series.id}
                 style={{ maxWidth: `${seriesImageWidth}px`}}>
                   <div style={{cursor: "pointer"}}
-                  onMouseEnter={() => {
-                    dispatch(showMenu(true));
+                    onMouseEnter={() => {
+                      dispatch(showMenu(true));
 
-                    if (!seriesMenuOpen)
-                      dispatch(showSeriesMenu(series));
-                  }}
-                  onMouseLeave={() => {
-                    dispatch(showMenu(false));
-                  }}
-                  onAuxClick={(e) => {
-                    if (seriesMenu && series === seriesMenu){
-                      dispatch(toggleSeriesMenu());
-                      cm.current?.show(e);
-                    }
-                  }}>
-                    {
-                      series === seriesMenu && (showButtonMenu || seriesMenuOpen) ? (
-                        <>
-                          <div className="video-button-hover"
-                            style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
-                            >
-                              <div className="series-selection-div" onClick={() => handleSeriesSelection(series)}></div>
-                              <div className="bottom-btns">
-                                <button className="svg-button-desktop-transparent"
-                                onClick={() => dispatch(toggleSeriesWindow())}>
-                                  <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
-                                </button>
-                                <button className="svg-button-desktop-transparent"
-                                onClick={(e) => {
-                                  dispatch(toggleSeriesMenu());
-                                  cm.current?.show(e);
-                                }}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
-                                </button>
-                              </div>
-                          </div>
-                      </>
-                      ) : null
-                    }
-                    <div className="video-button"
+                      if (!seriesMenuOpen)
+                        dispatch(showSeriesMenu(series));
+                    }}
+                    onMouseLeave={() => {
+                      dispatch(showMenu(false));
+                    }}
+                    onAuxClick={(e) => {
+                      if (seriesMenu && series === seriesMenu){
+                        dispatch(toggleSeriesMenu());
+                        cm.current?.show(e);
+                      }
+                    }}>
+                    <div className="video-button-image-section">
+                      <div className="video-button-hover"
+                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
+                        >
+                        <div className="series-selection-div" onClick={() => handleSeriesSelection(series)}></div>
+                        <div className="bottom-btns">
+                          <button className="svg-button-desktop-transparent"
+                          onClick={() => dispatch(toggleSeriesWindow())}>
+                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
+                          </button>
+                          <button className="svg-button-desktop-transparent"
+                          onClick={(e) => {
+                            dispatch(toggleSeriesMenu());
+                            cm.current?.show(e);
+                          }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="video-button"
                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
                       {
                         series.coverSrc !== "" ? (
@@ -246,6 +241,7 @@ export const renderRightPanelContent = () => {
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}/>
                         )
                       }
+                      </div>
                     </div>
                   </div>
                 <a id="seriesName" title={series.name} onClick={() => handleSeriesSelection(series)}>
@@ -527,47 +523,43 @@ export const renderRightPanelContent = () => {
                         </div>
                       ) : null
                     }
-                    {
-                      (showButtonMenu || episodeMenuOpen) && episode == selectedEpisode ? (
-                        <>
-                          <div className="video-button-hover"
-                            style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
-                            >
-                              <button className="play-button-episode center-align" onClick={() => handleEpisodeSelection(episode)}>
-                                <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
-                              </button>
-                              <button className="svg-button-desktop-transparent left-corner-align" onClick={() => dispatch(toggleEpisodeWindow())}>
-                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
-                              </button>
-                              <button className="svg-button-desktop-transparent right-corner-align"
-                              onClick={(e) => {
-                                dispatch(toggleEpisodeMenu());
-                                cm2.current?.show(e);
-                              }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
-                              </button>
-                          </div>
-                      </>
-                      ) : null
-                    }
-                    <div className="video-button"
-                    style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
-                    >
-                      {
-                        episode.imgSrc != "" ? (
-                          <ResolvedImage src={episode.imgSrc}
-                            style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
-                            alt="Video Thumbnail"
-                            onError={(e: any) => {
-                              e.target.onerror = null; // To avoid infinite loop
-                              e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
-                            }}/>
-                        ) : (
-                          <LazyLoadImage src={"./src/resources/img/Default_video_thumbnail.jpg"}
-                            style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
-                            alt="Video Thumbnail"/>
-                        )
-                      }
+                    <div className="video-button-image-section">
+                      <div className="video-button-hover"
+                        style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                        >
+                          <button className="play-button-episode center-align" onClick={() => handleEpisodeSelection(episode)}>
+                            <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#1C1C1C"></path></svg>
+                          </button>
+                          <button className="svg-button-desktop-transparent left-corner-align" onClick={() => dispatch(toggleEpisodeWindow())}>
+                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
+                          </button>
+                          <button className="svg-button-desktop-transparent right-corner-align"
+                          onClick={(e) => {
+                            dispatch(toggleEpisodeMenu());
+                            cm2.current?.show(e);
+                          }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
+                          </button>
+                      </div>
+                      <div className="video-button"
+                        style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                        >
+                        {
+                          episode.imgSrc != "" ? (
+                            <ResolvedImage src={episode.imgSrc}
+                              style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                              alt="Video Thumbnail"
+                              onError={(e: any) => {
+                                e.target.onerror = null; // To avoid infinite loop
+                                e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
+                              }}/>
+                          ) : (
+                            <LazyLoadImage src={"./src/resources/img/Default_video_thumbnail.jpg"}
+                              style={{ width: `${episodeImageWidth}px`, height: `${episodeImageHeight}px` }}
+                              alt="Video Thumbnail"/>
+                          )
+                        }
+                      </div>
                     </div>
                   </div>
                   <span id="episodeName" title={episode.name}>{episode.name}</span>

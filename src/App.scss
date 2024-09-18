@@ -589,42 +589,51 @@ html, body {
   flex-flow: column wrap;
   text-align: left;
 
-  .video-button{
-    cursor: pointer;
-    border: 2px solid transparent;
-    background-color: transparent;
-    border-radius: 5px;
+  .video-button-image-section {
+    .video-button-hover {
+      position: absolute;
+      background-color: #00000092;
+  
+      border: 2px solid transparent;
+      border-radius: 5px;
+  
+      display:  none;
+      flex-flow: column nowrap;
+  
+      .series-selection-div {
+        width: 100%;
+        height: 100%;
+      }
+  
+      .bottom-btns {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0.3em 0.3em 0.3em;
+      }
+    }
+  
+    .video-button-hover:hover {
+      border-color: $app-color;
+      transition: border-color 0.3s ease-in;
+    }
+
+    .video-button{
+      cursor: pointer;
+      border: none;
+      background-color: transparent;
+      border-radius: 5px;
+
+      img {
+        border-radius: 5px;
+      }
+    }
   }
   
-  .video-button img {
-    border-radius: 5px;
-  }
+  .video-button-image-section:hover {
 
-  .video-button-hover {
-    position: absolute;
-    background-color: #00000092;
-
-    border: 2px solid transparent;
-    border-radius: 5px;
-
-    display:  flex;
-    flex-flow: column nowrap;
-
-    .series-selection-div {
-      width: 100%;
-      height: 100%;
-    }
-
-    .bottom-btns {
+    .video-button-hover {
       display: flex;
-      justify-content: space-between;
-      margin: 0 0.3em 0.3em 0.3em;
     }
-  }
-
-  .video-button-hover:hover {
-    border-color: $app-color;
-    transition: border-color 0.3s ease-in;
   }
 
   .play-button-episode {
@@ -1815,14 +1824,6 @@ html, body {
           fill: $color-text-primary;
         }
       }
-    }
-  
-    .visible {
-      display: flex;
-    }
-    
-    .hidden {
-      display: none;
     }
   }
 }
