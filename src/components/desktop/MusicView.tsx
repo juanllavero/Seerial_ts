@@ -33,13 +33,15 @@ const MusicView: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     const songList = useMemo(() => {
         let allSongs: EpisodeData[] = [];
 
-        selectedLibrary.series.forEach(serie =>
-            serie.seasons.forEach(season =>
-                season.episodes.forEach(episode => {
-                    allSongs.push(episode);
-                })
-            )
-        );
+        selectedLibrary.series.forEach(serie => {
+            if (serie.seasons && serie.seasons.length > 0){
+                serie.seasons.forEach(season =>
+                    season.episodes.forEach(episode => {
+                        allSongs.push(episode);
+                    })
+                )
+            }
+        });
 
         return allSongs;
     }, [selectedLibrary]);

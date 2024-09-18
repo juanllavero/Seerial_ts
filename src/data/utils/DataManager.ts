@@ -172,6 +172,8 @@ export class DataManager {
                 return false;
             }
 
+            ffmetadata.setFfmpegPath(Utils.getInternalPath("lib/ffmpeg.exe"));
+
             return true;
         } else {
             console.error('This App needs an API Key from TheMovieDB');
@@ -1264,46 +1266,35 @@ export class DataManager {
 
     //#region MUSIC METADATA EXTRACTION
     public static async scanMusic(folder: string) {
-        if (!Utils.isFolder(folder))
+        if (!await Utils.isFolder(folder))
             return;
 
-        ffmetadata.setFfmpegPath(Utils.getInternalPath("lib/ffmpeg.exe"));
+        let collection: Series | null;
 
-        // Get folders representing collections (need to filter files)
-        const filesInFolder = await Utils.getFilesInFolder(folder);
-
-        for (const file of filesInFolder) {
-            // If file then skip
-            if (!Utils.isFolder(file.parentPath + "\\" + file.name))
-                continue;
-
-            let collection: Series | null;
-
-            if (this.library.getAnalyzedFolders().get(file.parentPath + "\\" + file.name) === null){
-                collection = new Series();
-                collection.setName(file.name);
-                DataManager.library.series.push(collection);
-                this.library.analyzedFolders.set(file.parentPath + "\\" + file.name, collection.id);
-            }else {
-                collection = this.library.getSeriesById(this.library.getAnalyzedFolders().get(file.parentPath + "\\" + file.name) || "");
-            }
-
-            if (collection === null || !collection)
-                continue;
-
-            // Get music files inside folder (4 folders of depth)
-            const musicFiles = await Utils.getMusicFiles(folder);
-
-            // Process each file
-            const processPromises = musicFiles.map(async f => {
-                if (this.library.getAnalyzedFiles().get(f) === null) {
-                    await this.processMusicFile(f, collection);
-                }
-            });
-            
-            // Esperar a que todas las promesas se resuelvan
-            await Promise.all(processPromises);
+        if (!this.library.getAnalyzedFolders().get(folder)){
+            collection = new Series();
+            collection.setName(Utils.getFileName(folder));
+            this.library.series.push(collection);
+            this.library.analyzedFolders.set(folder, collection.id);
+        }else {
+            collection = this.library.getSeriesById(this.library.getAnalyzedFolders().get(folder) || "");
         }
+
+        if (collection === null || !collection)
+            return;
+
+        // Get music files inside folder (4 folders of depth)
+        const musicFiles = await Utils.getMusicFiles(folder);
+
+        // Process each file
+        const processPromises = musicFiles.map(async f => {
+            if (!this.library.getAnalyzedFiles().get(f)) {
+                await this.processMusicFile(f, collection);
+            }
+        });
+        
+        // Esperar a que todas las promesas se resuelvan
+        await Promise.all(processPromises);
 
         this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
     };
@@ -1315,6 +1306,8 @@ export class DataManager {
                 const artistName = data["album_artist"] ? data["album_artist"] : '';
                 const albumName = data.album ?? "Unknown";
 
+                console.log("\n- Processing music file: " + musicFile);
+
                 let album: Season | null = null;
 
                 for (const season of collection.seasons) {
@@ -1325,6 +1318,7 @@ export class DataManager {
                 }
 
                 if (album === null){
+                    console.log("\n- Creating album for: " + albumName);
                     album = new Season();
                     album.setName(albumName ?? "Unknown");
                     album.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
@@ -1333,6 +1327,7 @@ export class DataManager {
                     collection.seasons.push(album);
                 }
 
+                console.log("\n- Creating song for: " + musicFile);
                 let song = new EpisodeLocal();
                 song.setName(data.title ?? Utils.getFileName(musicFile));
                 song.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
