@@ -1,7 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState = {
     isImageLoaded: false,
+    gradientLoaded: false,
 };
 
 const imageLoadedSlice = createSlice({
@@ -14,8 +15,11 @@ reducers: {
     removeImage: (state) => {
         state.isImageLoaded = false;
     },
+    setGradientLoaded: (state, action: PayloadAction<boolean>) => {
+        state.gradientLoaded = action.payload;
+    }
 },
 });
 
-export const { loadImage, removeImage } = imageLoadedSlice.actions;
+export const { loadImage, removeImage, setGradientLoaded } = imageLoadedSlice.actions;
 export default imageLoadedSlice.reducer;

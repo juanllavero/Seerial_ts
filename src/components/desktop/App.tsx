@@ -19,6 +19,7 @@ import renderSeasonWindow from './seasonWindow';
 import { LibraryData } from '@interfaces/LibraryData';
 import renderSeriesWindow from './seriesWindow';
 import { renderMusicPlayer } from './MusicPlayer';
+import { ReactUtils } from 'data/utils/ReactUtils';
 
 function App() {
   const dispatch = useDispatch();
@@ -27,6 +28,8 @@ function App() {
   const isVideoLoaded = useSelector((state: RootState) => state.video.isLoaded);
   const isMaximized = useSelector((state: RootState) => state.windowState.isMaximized);
   const mainMenuOpen = useSelector((state: RootState) => state.contextMenu.mainMenu);
+
+  const gradientLoaded = useSelector((state: RootState) => state.imageLoaded.gradientLoaded);
 
   useEffect(() => {
     // @ts-ignore
@@ -103,7 +106,14 @@ function App() {
           {renderEpisodeWindow()}
         </>
       }
-      <section className="container blur-background-image" onClick={
+      <div className={`gradient-background ${gradientLoaded ? 'fade-in' : ''}`}
+        style={{
+            background: `${ReactUtils.getGradientBackground()}`,
+        }}/>
+      <section 
+        className="container blur-background-image"
+        
+        onClick={
           (event) => {
               const target = event.target as Element;
 

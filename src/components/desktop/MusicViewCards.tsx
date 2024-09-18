@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SeriesData } from '@interfaces/SeriesData';
 import { RootState } from 'redux/store';
 import { SeasonData } from '@interfaces/SeasonData';
+import { ReactUtils } from 'data/utils/ReactUtils';
+import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 
 interface MusicViewProps {
     selectedLibrary: LibraryData;
@@ -38,6 +40,29 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
         if (selectedElements)
             setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            dispatch(setGradientLoaded(false));
+            setTimeout(() => {
+                if (selectedCollection && !selectedAlbum) {
+                    if (selectedCollection.coverSrc !== ""){
+                        ReactUtils.getDominantColors(selectedCollection.coverSrc);
+                    } else {
+                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+                    }
+                } else if (selectedCollection && selectedAlbum) {
+                    if (selectedAlbum.coverSrc !== ""){
+                        ReactUtils.getDominantColors(selectedAlbum.coverSrc);
+                    } else if (selectedCollection.coverSrc !== "") {
+                        ReactUtils.getDominantColors(selectedCollection.coverSrc);
+                    } else {
+                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+                    }
+                }
+            }, 50);
+        }, 300);
+    }, [selectedCollection, selectedAlbum]);
 
     const handleSeriesSelection = (series: SeriesData) => {
         dispatch(selectSeries(series));
@@ -149,87 +174,87 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     } else if (selectedCollection && !selectedAlbum){
         return (
             <>
-                <div>
-                    
-                </div>
-                {selectionMode && selectedElements && (
-                    <div className="floating-box">
-                        {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
-                    </div>
-                )}
-                <div className="music-cards scroll" id="scroll">
-                    {selectedCollection.seasons.map((album: SeasonData) => (
-                        <div className="episode-box" key={album.id}
-                            style={{ maxWidth: `${seriesImageWidth}px`}}>
-                            <div style={{cursor: "pointer"}}
-                            onMouseEnter={() => {
-                                dispatch(showMenu(true));
-    
-                                if (!seriesMenuOpen)
-                                dispatch(toggleSeasonMenu());
-                            }}
-                            onMouseLeave={() => {
-                                dispatch(showMenu(false));
-                            }}
-                            onAuxClick={(e) => {
-                                if (selectedAlbum && album === selectedAlbum){
+                <div >
+                    {selectionMode && selectedElements && (
+                        <div className="floating-box">
+                            {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
+                        </div>
+                    )}
+                    <div className="music-cards scroll" id="scroll">
+                        {selectedCollection.seasons.map((album: SeasonData) => (
+                            <div className="episode-box" key={album.id}
+                                style={{ maxWidth: `${seriesImageWidth}px`}}>
+                                <div style={{cursor: "pointer"}}
+                                onMouseEnter={() => {
+                                    dispatch(showMenu(true));
+        
+                                    if (!seriesMenuOpen)
                                     dispatch(toggleSeasonMenu());
-                                    cm.current?.show(e);
-                                }
-                            }}>
-                                <div className="video-button-image-section">
-                                    <div className="video-button-hover"
-                                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
-                                        >
-                                        <div className="series-selection-div" onClick={() => handleSeasonSelection(album)}></div>
-                                        <div className="bottom-btns">
-                                            <button className="svg-button-desktop-transparent"
-                                            onClick={() => dispatch(toggleSeriesWindow())}>
-                                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
-                                            </button>
-                                            <button className="svg-button-desktop-transparent"
-                                            onClick={(e) => {
-                                            dispatch(toggleSeriesMenu());
-                                            cm.current?.show(e);
-                                            }}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
-                                            </button>
+                                }}
+                                onMouseLeave={() => {
+                                    dispatch(showMenu(false));
+                                }}
+                                onAuxClick={(e) => {
+                                    if (selectedAlbum && album === selectedAlbum){
+                                        dispatch(toggleSeasonMenu());
+                                        cm.current?.show(e);
+                                    }
+                                }}>
+                                    <div className="video-button-image-section">
+                                        <div className="video-button-hover"
+                                            style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
+                                            >
+                                            <div className="series-selection-div" onClick={() => handleSeasonSelection(album)}></div>
+                                            <div className="bottom-btns">
+                                                <button className="svg-button-desktop-transparent"
+                                                onClick={() => dispatch(toggleSeriesWindow())}>
+                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
+                                                </button>
+                                                <button className="svg-button-desktop-transparent"
+                                                onClick={(e) => {
+                                                dispatch(toggleSeriesMenu());
+                                                cm.current?.show(e);
+                                                }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" aria-hidden="true" width="16" height="16"><path d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70" fill="#FFFFFF"></path></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="video-button"
+                                            style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}>
+                                            <img loading='lazy' src={album.coverSrc} alt="Poster"
+                                                style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
+                                                onError={(e: any) => {
+                                                    e.target.onerror = null; // To avoid infinite loop
+                                                    e.target.src = "./src/resources/img/songDefault.png";
+                                            }}/>
                                         </div>
                                     </div>
-                                    <div className="video-button"
-                                        style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}>
-                                        <img loading='lazy' src={album.coverSrc} alt="Poster"
-                                            style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
-                                            onError={(e: any) => {
-                                                e.target.onerror = null; // To avoid infinite loop
-                                                e.target.src = "./src/resources/img/songDefault.png";
-                                        }}/>
-                                    </div>
                                 </div>
-                            </div>
-                            <a id="seriesName" title={album.name} onClick={() => handleSeasonSelection(album)}>
-                            {album.name}
-                            </a>
-                            {
-                                album.year !== "" ? (
-                                    <span id="episodeNumber">{new Date(album.year).getFullYear()}</span>
-                                ) : null
-                            }
-                            <ContextMenu 
-                            model={[
+                                <a id="seriesName" title={album.name} onClick={() => handleSeasonSelection(album)}>
+                                {album.name}
+                                </a>
                                 {
-                                label: t('updateMetadata'),
-                                command: () => dispatch(toggleSeasonMenu())
-                                },
-                                {
-                                label: t('removeButton'),
-                                command: () => dispatch(toggleSeasonMenu())
+                                    album.year !== "" ? (
+                                        <span id="episodeNumber">{new Date(album.year).getFullYear()}</span>
+                                    ) : null
                                 }
-                            ]}
-                            ref={cm} className="dropdown-menu"/>
-                        </div>
-                    ))}
-              </div>
+                                <ContextMenu 
+                                model={[
+                                    {
+                                    label: t('updateMetadata'),
+                                    command: () => dispatch(toggleSeasonMenu())
+                                    },
+                                    {
+                                    label: t('removeButton'),
+                                    command: () => dispatch(toggleSeasonMenu())
+                                    }
+                                ]}
+                                ref={cm} className="dropdown-menu"/>
+                            </div>
+                        ))}
+                </div>
+                </div>
+                
             </>
         );
     } else if (selectedCollection && selectedAlbum) {

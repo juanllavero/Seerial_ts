@@ -7,8 +7,8 @@ import { setCurrentSong, setSongs, toggleMusicPause } from 'redux/slices/musicPl
 import { changeMenuSection } from 'redux/slices/menuSectionsSlice';
 import { Section } from 'data/enums/Section';
 import { EpisodeData } from '@interfaces/EpisodeData';
-import { Utils } from 'data/utils/Utils';
-import { extractColors } from 'extract-colors';
+import { ReactUtils } from 'data/utils/ReactUtils';
+import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 
 export const renderMusicPlayer = () => {
     const dispatch = useDispatch();
@@ -23,7 +23,8 @@ export const renderMusicPlayer = () => {
     const howlerRef = useRef<ReactHowler>(null);
     const menuSection = useSelector((state: RootState) => state.sectionState.menuSection);
     const [showMore, setShowMore] = useState<boolean>(false);
-    const [colors, setColors] = useState<string[]>([]);
+
+    const gradientLoaded = useSelector((state: RootState) => state.imageLoaded.gradientLoaded);
 
     // Función para actualizar el tiempo de reproducción
     const updateTime = () => {
@@ -35,34 +36,24 @@ export const renderMusicPlayer = () => {
     };
 
     useEffect(() => {
-        if (songsList && currentSong !== -1) {
-            const imgSrc = songsList[currentSong].imgSrc;
+        
 
-            getDominantColors(imgSrc);
-        }
+        
+        setTimeout(() => {
+            dispatch(setGradientLoaded(false));
+            setTimeout(() => {
+                if (songsList && currentSong !== -1) {
+                    const imgSrc = songsList[currentSong].imgSrc;
+        
+                    if (imgSrc !== ""){
+                        ReactUtils.getDominantColors(imgSrc);
+                    } else {
+                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+                    }
+                }
+            }, 50);
+        }, 300);
     }, [currentSong, songsList]);
-
-    const extractColorsFromImage = async (imgSrc: string) => {
-        try {
-            const extractedColors =  await extractColors(imgSrc);
-            
-            // Get first 3 colors
-            const dominantColors = extractedColors.slice(0, 2).map(color => color.hex);
-            return dominantColors;
-        } catch (error) {
-            console.error("Error al extraer colores:", error);
-            return undefined;
-        }
-    };
-
-    const getDominantColors = async (imgSrc: string) => {
-        const dominantColors = await extractColorsFromImage(imgSrc);
-
-        console.log(dominantColors);
-            
-        if (dominantColors)
-            setColors(dominantColors);
-    }
 
     // Capturar la tecla "Espacio" y despachar la acción de pausar o reanudar la música
     useEffect(() => {
@@ -127,19 +118,6 @@ export const renderMusicPlayer = () => {
         localStorage.setItem('volume', value.toString()); // Guardar el volumen en localStorage
     };
 
-    const getGradientBackground = () => {
-        if (colors.length > 0) {
-            return `linear-gradient(to bottom left, ${colors.join(", ")})`;
-        }
-        return "none";
-    };
-
-    const formatTime = (time: number) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
-
     return (
         <>
             {
@@ -154,12 +132,11 @@ export const renderMusicPlayer = () => {
                 ) : null
             }
             <section className={`music-player-container ${songsList && currentSong !== -1 ? 'show-music-player' : ''}`}>
-                <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}
-                    style={{
-                        background: `${getGradientBackground()}, rgba(0, 0, 0, 0.7)`,
-                        backgroundBlendMode: 'multiply',
-                    }}
-                >
+                <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}>
+                    <div className={`gradient-background ${gradientLoaded ? 'fade-in' : ''}`}
+                        style={{
+                            background: `${ReactUtils.getGradientBackground()}`,
+                        }}/>
                     <div className={`left-panel ${showMore ? '' : 'expand-left-panel'}`}>
                         <img
                             src={
@@ -234,7 +211,7 @@ export const renderMusicPlayer = () => {
                                                     </div>
                                                 </div>
                                                 <div className="music-player-item-left">
-                                                    <span>{formatTime(song.runtimeInSeconds)}</span>
+                                                    <span>{ReactUtils.formatTime(song.runtimeInSeconds)}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -292,7 +269,7 @@ export const renderMusicPlayer = () => {
                                     <span id="music-time">
                                         {
                                             songsList && currentSong !== -1 ? (
-                                                `${formatTime(currentTime)} / ${formatTime(duration)}`
+                                                `${ReactUtils.formatTime(currentTime)} / ${ReactUtils.formatTime(duration)}`
                                             ) : ""
                                         }
                                     </span>
