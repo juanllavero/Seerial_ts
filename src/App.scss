@@ -1709,18 +1709,25 @@ html, body {
   box-shadow: none !important;
 }
 
-.music-section-selector {
+.music-section {
   margin-top: 10em;
-  margin-left: 3em;
-  width: fit-content;
+  display: flex;
+  flex-flow: column nowrap;
 
-  outline: none;
-  border: none;
-  background-color: transparent;
-
-  font-size: medium;
-  color: $color-text-default;
+  .music-section-selector {
+    margin-left: 3em;
+    width: fit-content;
+  
+    outline: none;
+    border: none;
+    background-color: transparent;
+  
+    font-size: medium;
+    color: $color-text-default;
+  }
 }
+
+
 
 .music-cards {
   display: flex;
@@ -2111,6 +2118,75 @@ html, body {
   font-size: larger;
   font-weight: bold;
 }
+
+.album-content {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  padding-bottom: 5em;
+
+  .info-container {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+
+    .poster-image img {
+      width: 250px;
+      height: 250px;
+    }
+
+    #seasonTitle {
+      margin-top: 0.5em;
+      max-width: 15em;
+      text-align: center;
+    }
+  }
+  
+  .song-list {
+    margin: 1em 3em 0 3em;
+    padding-bottom: 5em;
+    display: flex;
+    flex-flow: column wrap;
+    height: 100%;
+    background-color: #000;
+
+    .music-player-item {
+      margin-bottom: 1em;
+      width: 40em;
+      height: 2em;
+      flex-flow: row nowrap;
+
+      .music-player-item-left {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+
+        .song-image-container {
+          width: 2em;
+          justify-content: center;
+        
+          .song-btn-overlay {
+            width: 25px;
+            height: 25px;
+          }
+        }
+  
+        .music-player-item-text {
+          margin-left: 2em;
+          width: 100%;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+        }
+      }
+
+      
+      
+    }
+  }
+}
+
+
 
 @keyframes fadeIn {
   from {

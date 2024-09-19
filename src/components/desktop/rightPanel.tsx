@@ -158,20 +158,26 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedLibrary.type === "Music"){
       return (
         <>
-          <Dropdown value={musicSection}
-            onChange={(e) => setMusicSection(e.value)} options={
-            [
-              { name: t('collections'), value: MusicSection.Collections },
-              { name: t('tracks'), value: MusicSection.Tracks }
-            ]
-          } optionLabel="name" className="music-section-selector" checkmark={true}  highlightOnSelect={false} />
-          {
-            musicSection === MusicSection.Tracks ? (
-              <MusicView selectedLibrary={selectedLibrary} />
-            ) : (
-              <MusicViewCards selectedLibrary={selectedLibrary} />
-            )
-          }
+          <div className="music-section">
+            {
+              !selectedSeries ? (
+                <Dropdown value={musicSection}
+                  onChange={(e) => setMusicSection(e.value)} options={
+                  [
+                    { name: t('collections'), value: MusicSection.Collections },
+                    { name: t('tracks'), value: MusicSection.Tracks }
+                  ]
+                } optionLabel="name" className="music-section-selector" checkmark={true}  highlightOnSelect={false} />
+              ) : null
+            }
+            {
+              musicSection === MusicSection.Tracks ? (
+                <MusicView selectedLibrary={selectedLibrary} />
+              ) : (
+                <MusicViewCards selectedLibrary={selectedLibrary} />
+              )
+            }
+          </div>
         </>
       )
     }
