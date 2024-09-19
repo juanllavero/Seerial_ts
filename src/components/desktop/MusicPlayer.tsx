@@ -25,6 +25,29 @@ export const renderMusicPlayer = () => {
     const [showMore, setShowMore] = useState<boolean>(false);
 
     const gradientLoaded = useSelector((state: RootState) => state.imageLoaded.gradientLoaded);
+    const [gradientBackground, setGradientBackground] = useState<string>("");
+
+    /*useEffect(() => {
+        if (songsList && currentSong !== -1 && songsList[currentSong].imgSrc){
+            setTimeout(() => {
+                const newGradient = ReactUtils.getGradientBackground();
+
+                if (gradientBackground !== newGradient){
+                    dispatch(setGradientLoaded(false));
+                }
+
+                setTimeout(() => {
+                    setGradientBackground(newGradient);
+
+                    if (gradientBackground !== newGradient){
+                        dispatch(setGradientLoaded(true));
+                    }
+                }, 200);
+            }, 300);
+        } else {
+            setGradientBackground("none");
+        }
+    }, [songsList, currentSong]);*/
 
     // Función para actualizar el tiempo de reproducción
     const updateTime = () => {
@@ -36,23 +59,31 @@ export const renderMusicPlayer = () => {
     };
 
     useEffect(() => {
-        
+        if (songsList && currentSong !== -1) {
+            const imgSrc = songsList[currentSong].imgSrc;
 
-        
-        setTimeout(() => {
-            dispatch(setGradientLoaded(false));
+            if (imgSrc !== ""){
+                ReactUtils.getDominantColors(imgSrc);
+            } else {
+                ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+            }
+
             setTimeout(() => {
-                if (songsList && currentSong !== -1) {
-                    const imgSrc = songsList[currentSong].imgSrc;
-        
-                    if (imgSrc !== ""){
-                        ReactUtils.getDominantColors(imgSrc);
-                    } else {
-                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
-                    }
+                const newGradient = ReactUtils.getGradientBackground();
+
+                if (gradientBackground !== newGradient){
+                    dispatch(setGradientLoaded(false));
                 }
-            }, 50);
-        }, 300);
+
+                setTimeout(() => {
+                    setGradientBackground(newGradient);
+
+                    if (gradientBackground !== newGradient){
+                        dispatch(setGradientLoaded(true));
+                    }
+                }, 200);
+            }, 300);
+        }
     }, [currentSong, songsList]);
 
     // Capturar la tecla "Espacio" y despachar la acción de pausar o reanudar la música
@@ -135,7 +166,7 @@ export const renderMusicPlayer = () => {
                 <div className={`music-main ${hidePlayer ? 'music-main-hidden' : ''}`}>
                     <div className={`gradient-background ${gradientLoaded ? 'fade-in' : ''}`}
                         style={{
-                            background: `${ReactUtils.getGradientBackground()}`,
+                            background: `${gradientBackground}`,
                         }}/>
                     <div className={`left-panel ${showMore ? '' : 'expand-left-panel'}`}>
                         <img

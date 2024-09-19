@@ -1,10 +1,7 @@
 import { extractColors } from 'extract-colors';
-import { useDispatch } from 'react-redux';
-import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 
 export class ReactUtils {
     static colors: string[] = [];
-    static dispatch = useDispatch();
 
     public static extractColorsFromImage = async (imgSrc: string) => {
         try {
@@ -18,10 +15,7 @@ export class ReactUtils {
             };
     
             const extractedColors = await extractColors(imgSrc, options);
-
-            console.log(extractedColors);
             
-            // Obtener los primeros 2 colores principales
             const dominantColors = extractedColors.slice(0, 5).map(color => color.hex);
             return dominantColors;
         } catch (error) {
@@ -35,8 +29,6 @@ export class ReactUtils {
             
         if (dominantColors)
             this.colors = dominantColors;
-
-        this.dispatch(setGradientLoaded(true));
     }
 
     public static getGradientBackground = () => {

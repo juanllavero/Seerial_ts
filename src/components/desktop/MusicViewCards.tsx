@@ -12,6 +12,7 @@ import { SeasonData } from '@interfaces/SeasonData';
 import { ReactUtils } from 'data/utils/ReactUtils';
 import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 import ResolvedImage from '@components/Image';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 interface MusicViewProps {
     selectedLibrary: LibraryData;
@@ -43,35 +44,43 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
             setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
 
-    useEffect(() => {
-        setTimeout(() => {
-            dispatch(setGradientLoaded(false));
-            setTimeout(() => {
-                if (selectedCollection && !selectedAlbum) {
-                    if (selectedCollection.coverSrc !== ""){
-                        ReactUtils.getDominantColors(selectedCollection.coverSrc);
-                    } else {
-                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
-                    }
-                } else if (selectedCollection && selectedAlbum) {
-                    if (selectedAlbum.coverSrc !== ""){
-                        ReactUtils.getDominantColors(selectedAlbum.coverSrc);
-                    } else if (selectedCollection.coverSrc !== "") {
-                        ReactUtils.getDominantColors(selectedCollection.coverSrc);
-                    } else {
-                        ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
-                    }
-                }
-            }, 50);
-        }, 300);
-    }, [selectedCollection, selectedAlbum]);
+    /*useEffect(() => {
+        generateGradient();
+    }, [selectedCollection]);*/
+
+    /*useEffect(() => {
+        generateGradient();
+    }, [selectedAlbum]);*/
+
+    const generateGradient = (collection: SeriesData | null, album: SeasonData | null) => {
+        if (collection && !album) {
+            if (collection.coverSrc !== ""){
+                ReactUtils.getDominantColors(collection.coverSrc);
+            } else {
+                ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+            }
+        } else if (collection && album) {
+            if (album.coverSrc !== ""){
+                ReactUtils.getDominantColors(album.coverSrc);
+            } else if (collection.coverSrc !== "") {
+                ReactUtils.getDominantColors(collection.coverSrc);
+            } else {
+                ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+            }
+        }
+    }
 
     const handleSeriesSelection = (series: SeriesData) => {
+        generateGradient(series, null);
+
         dispatch(selectSeries(series));
         handleSeasonSelection(null);
     };
 
     const handleSeasonSelection = (season: SeasonData | null) => {
+        if (season)
+            generateGradient(null, season);
+        
         dispatch(selectSeason(season));
         dispatch(closeContextMenu());
     };
@@ -176,10 +185,15 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     } else if (selectedCollection && !selectedAlbum){
         return (
             <>
+                {selectionMode && selectedElements && (
+                    <div className="floating-box">
+                        {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
+                    </div>
+                )}
                 <section className="music-view-info-container">
                     <div className="info-container">
                         <div className="poster-image round-image">
-                            <ResolvedImage src={selectedCollection.coverSrc} alt="Poster"
+                            <LazyLoadImage src={selectedCollection.coverSrc} alt="Poster"
                                 onError={(e: any) => {
                                     e.target.onerror = null; // To avoid infinite loop
                                     e.target.src = "./src/resources/img/songDefault.png";
@@ -238,31 +252,33 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                                 ]}
                                 ref={cm} className="dropdown-menu"/>
                             </section>
-                            <div className="overview-container clamp-text">
-                                <span>{selectedCollection.overview || selectedCollection.overview || t("defaultOverview")}</span>
-                            </div>
-                            <button className="clamp-text-action">
-                                <div aria-hidden="true" className="clamp-text-more">
-                                    <span>
-                                    {t('moreButton')}
-                                    <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path></svg>
-                                    </span>
-                                </div>
-                                <div aria-hidden="true" className="clamp-text-less">
-                                    <span >
-                                    {t('lessButton')}
-                                    <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z" transform="rotate(180, 24, 24)"></path></svg>
-                                    </span>
-                                </div>
-                            </button>
+                            {
+                                selectedCollection.overview ? (
+                                    <>
+                                        <div className="overview-container clamp-text">
+                                            <span>{selectedCollection.overview}</span>
+                                        </div>
+                                        <button className="clamp-text-action">
+                                            <div aria-hidden="true" className="clamp-text-more">
+                                                <span>
+                                                {t('moreButton')}
+                                                <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path></svg>
+                                                </span>
+                                            </div>
+                                            <div aria-hidden="true" className="clamp-text-less">
+                                                <span >
+                                                {t('lessButton')}
+                                                <svg aria-hidden="true" height="16" viewBox="0 0 48 48" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z" transform="rotate(180, 24, 24)"></path></svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </>
+                                ) : null
+                            }
                         </section>
                     </div>
                 </section>
-                {selectionMode && selectedElements && (
-                    <div className="floating-box">
-                        {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
-                    </div>
-                )}
+                <span className="album-section-text">Álbumes</span>
                 <div className="music-cards scroll" id="scroll">
                     {selectedCollection.seasons.map((album: SeasonData) => (
                         <div className="episode-box" key={album.id}

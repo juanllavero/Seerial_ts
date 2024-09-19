@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import {renderLibrariesList} from "@components/desktop/librariesList";
@@ -20,6 +20,7 @@ import { LibraryData } from '@interfaces/LibraryData';
 import renderSeriesWindow from './seriesWindow';
 import { renderMusicPlayer } from './MusicPlayer';
 import { ReactUtils } from 'data/utils/ReactUtils';
+import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +31,32 @@ function App() {
   const mainMenuOpen = useSelector((state: RootState) => state.contextMenu.mainMenu);
 
   const gradientLoaded = useSelector((state: RootState) => state.imageLoaded.gradientLoaded);
+
+  const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
+  const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
+  const [gradientBackground, setGradientBackground] = useState<string>("");
+
+  useEffect(() => {
+    if (selectedSeries){
+      setTimeout(() => {
+        const newGradient = ReactUtils.getGradientBackground();
+
+        if (gradientBackground !== newGradient){
+          dispatch(setGradientLoaded(false));
+        }
+
+        setTimeout(() => {
+          setGradientBackground(newGradient);
+
+        if (gradientBackground !== newGradient){
+          dispatch(setGradientLoaded(true));
+        }
+        }, 200);
+      }, 300);
+    } else {
+      setGradientBackground("none");
+    }
+  }, [selectedSeries, selectedSeason]);
 
   useEffect(() => {
     // @ts-ignore
@@ -108,7 +135,7 @@ function App() {
       }
       <div className={`gradient-background ${gradientLoaded ? 'fade-in' : ''}`}
         style={{
-            background: `${ReactUtils.getGradientBackground()}`,
+            background: `${gradientBackground}`,
         }}/>
       <section 
         className="container blur-background-image"

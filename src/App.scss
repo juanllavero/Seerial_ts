@@ -2077,11 +2077,7 @@ html, body {
           border-radius: 5px;
         }
       }
-
-      
     }
-
-    
   }
 }
 
@@ -2091,8 +2087,29 @@ html, body {
 }
 
 .music-view-info-container {
-
+  margin: 0.5em 3.5em 0.5em 3.5em;
   
+  .info-container {
+    padding-left: 0;
+
+    .poster-image img {
+      width: 250px;
+      height: 250px;
+    }
+
+    .season-info {
+      .season-info-buttons-container {
+        margin-top: 0.5em;
+      }
+    }
+  }
+}
+
+.album-section-text {
+  text-align: left;
+  margin: 1em 3.5em 1em 3em;
+  font-size: larger;
+  font-weight: bold;
 }
 
 @keyframes fadeIn {

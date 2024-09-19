@@ -158,8 +158,8 @@ export const renderRightPanelContent = () => {
     if (selectedLibrary && selectedLibrary.type === "Music"){
       return (
         <>
-        <Dropdown value={musicSection}
-          onChange={(e) => setMusicSection(e.value)} options={
+          <Dropdown value={musicSection}
+            onChange={(e) => setMusicSection(e.value)} options={
             [
               { name: t('collections'), value: MusicSection.Collections },
               { name: t('tracks'), value: MusicSection.Tracks }
