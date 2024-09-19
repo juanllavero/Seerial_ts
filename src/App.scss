@@ -1713,6 +1713,7 @@ html, body {
   margin-top: 10em;
   display: flex;
   flex-flow: column nowrap;
+  height: 90%;
 
   .music-section-selector {
     margin-left: 3em;
@@ -2106,7 +2107,7 @@ html, body {
 
     .season-info {
       .season-info-buttons-container {
-        margin-top: 0.5em;
+        margin-top: 1em;
       }
     }
   }
@@ -2121,38 +2122,75 @@ html, body {
 
 .album-content {
   display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  padding-bottom: 5em;
+  flex-flow: column nowrap;
 
   .info-container {
+    margin: 0.5em 3.5em 0.5em 1.6em;
     display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
+    flex-flow: row nowrap;
 
     .poster-image img {
       width: 250px;
       height: 250px;
     }
 
+    #seriesTitle {
+      font-size: xx-large;
+    }
+
+    a {
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      width: fit-content;
+      transition: border-color .15s ease-in;
+    }
+
     #seasonTitle {
       margin-top: 0.5em;
       max-width: 15em;
-      text-align: center;
+      font-size: larger;
+      color:$color-text-default;
+    }
+
+    #seriesTitle::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1px;
+      background-color: white;
+      transition: width 0.2s ease;
+    }
+    
+    #seriesTitle:hover::after {
+      width: 100%;
+    }
+
+    .season-info-buttons-container {
+      margin-top: 1em;
     }
   }
   
   .song-list {
-    margin: 1em 3em 0 3em;
+    margin: 1em 0 0 3.5em;
+    padding-right: 3em;
     padding-bottom: 5em;
     display: flex;
-    flex-flow: column wrap;
-    height: 100%;
-    background-color: #000;
+    flex-flow: column nowrap;
+
+    .disc-text-title {
+      font-size: larger;
+      font-weight: bold;
+      margin-bottom: 1.5em;
+      text-align: left;
+    }
 
     .music-player-item {
       margin-bottom: 1em;
-      width: 40em;
+      margin-right: 2em;
+      width: 100%;
+      max-width: 60em;
       height: 2em;
       flex-flow: row nowrap;
 
@@ -2166,8 +2204,15 @@ html, body {
           justify-content: center;
         
           .song-btn-overlay {
-            width: 25px;
-            height: 25px;
+            width: 30px;
+            height: 30px;
+            background-color: #000;
+            border-radius: 5px;
+
+            svg {
+              width: 24px;
+              height: 24px;
+            }
           }
         }
   

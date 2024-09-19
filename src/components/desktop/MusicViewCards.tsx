@@ -88,6 +88,102 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
         dispatch(closeContextMenu());
     };
 
+    const getDiscs = () => {
+        let foundDiscs: number[] = [];
+
+        if (selectedAlbum){
+            for (const song of selectedAlbum?.episodes) {
+                if (song.seasonNumber !== 0 && !foundDiscs.includes(song.seasonNumber)){
+                    foundDiscs.push(song.seasonNumber);
+                }
+            }
+        }
+
+        return foundDiscs;
+    }
+
+    const handleRenderSongs = () => {
+        const discs = getDiscs();
+
+        if (!selectedAlbum)
+            return;
+
+        if (discs.length === 0) {
+            return (
+                <>
+                    <span className="disc-text-title">{selectedAlbum.episodes.length} {t('tracks').toLowerCase()}</span>
+                    {selectedAlbum.episodes.slice().sort((a, b) => {
+                        const episodeNumberA = a.episodeNumber ?? 0; // Si es undefined o null, usa 0 como valor por defecto
+                        const episodeNumberB = b.episodeNumber ?? 0;
+
+                        return episodeNumberA - episodeNumberB;
+                    }).map((song: EpisodeData, index: number) => (
+                        <div className="music-player-item">
+                            <div className="music-player-item-left song-row">
+                                <div className="song-image-container">
+                                    <span>{song.episodeNumber}</span>
+                                    <div className="song-btn-overlay">
+                                        <button onClick={
+                                            () => {
+                                                dispatch(setSongs(selectedAlbum.episodes));
+                                                dispatch(setCurrentSong(index));
+                                                
+                                                if (musicPaused)
+                                                    dispatch(toggleMusicPause());
+                                            }
+                                        }>
+                                            <svg aria-hidden="true" height="22" viewBox="0 0 48 48" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="music-player-item-text">
+                                    <span id="music-player-item-title">{song.name}</span>
+                                    <span>{ReactUtils.formatTime(song.runtimeInSeconds)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </>
+            );
+        } else {
+            return (
+                <>
+                    {discs.map((disc: number) => (
+                        <>
+                            <span className="disc-text-title">Disc {disc}</span>
+                            {selectedAlbum.episodes.filter(song => song.seasonNumber === disc).sort((a, b) => a.episodeNumber - b.episodeNumber).map((song: EpisodeData, index: number) => (
+                                <div className="music-player-item">
+                                    <div className="music-player-item-left song-row">
+                                        <div className="song-image-container">
+                                            <span>{song.episodeNumber}</span>
+                                            <div className="song-btn-overlay">
+                                                <button onClick={
+                                                    () => {
+                                                        dispatch(setSongs(selectedAlbum.episodes));
+                                                        dispatch(setCurrentSong(index));
+                                                        
+                                                        if (musicPaused)
+                                                            dispatch(toggleMusicPause());
+                                                    }
+                                                }>
+                                                    <svg aria-hidden="true" height="22" viewBox="0 0 48 48" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="music-player-item-text">
+                                            <span id="music-player-item-title">{song.name}</span>
+                                            <span>{ReactUtils.formatTime(song.runtimeInSeconds)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </>
+                    ))}
+                </>
+            );
+        }
+    }
+
     if (!selectedCollection){
         return (
             <>
@@ -366,7 +462,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                         {selectedElements.length} {selectedElements.length === 1 ? 'row' : 'rows'} selected
                     </div>
                 )}
-                <div className="album-content scroll">
+                <div className="album-content scroll" id="scroll">
                     <section className="album-info-container">
                         <div className="info-container">
                             <div className="poster-image round-image">
@@ -377,6 +473,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                             }}/>
                             </div>
                             <section className="season-info">
+                                <a id="seriesTitle" onClick={() => dispatch(selectSeason(null))}>{selectedCollection.name}</a>
                                 <span id="seasonTitle">{selectedAlbum.name}</span>
                                 {/*
                                 <section className="season-info-text">
@@ -432,33 +529,8 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                             </section>
                         </div>
                     </section>
-                    <div className="song-list scroll" id="scroll">
-                        {selectedAlbum.episodes.map((song: EpisodeData, index: number) => (
-                            <div className="music-player-item">
-                                <div className="music-player-item-left song-row">
-                                    <div className="song-image-container">
-                                        <span>{index + 1}</span>
-                                        <div className="song-btn-overlay">
-                                            <button onClick={
-                                                () => {
-                                                    dispatch(setSongs(selectedAlbum.episodes));
-                                                    dispatch(setCurrentSong(index));
-                                                    
-                                                    if (musicPaused)
-                                                        dispatch(toggleMusicPause());
-                                                }
-                                            }>
-                                                <svg aria-hidden="true" height="22" viewBox="0 0 48 48" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="music-player-item-text">
-                                        <span id="music-player-item-title">{song.name}</span>
-                                        <span>{ReactUtils.formatTime(song.runtimeInSeconds)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="song-list">
+                        {handleRenderSongs()}
                     </div>
                 </div>
             </>
