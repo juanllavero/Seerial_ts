@@ -947,7 +947,7 @@ html, body {
     background: #101010;
     box-shadow: 0 0 8px 1px black;
     color: $color-text-default;
-    position: fixed;
+    position: absolute;
     width: max-content;
     margin-top: 0.5em;
     opacity: 0;
