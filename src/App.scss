@@ -947,7 +947,7 @@ html, body {
     background: #101010;
     box-shadow: 0 0 8px 1px black;
     color: $color-text-default;
-    position: absolute;
+    position: fixed;
     width: max-content;
     margin-top: 0.5em;
     opacity: 0;
@@ -1710,35 +1710,20 @@ html, body {
 }
 
 .music-section {
-  margin-top: 10em;
+  margin: 10em 3em 0 3em;
   display: flex;
   flex-flow: column nowrap;
   height: 90%;
-
-  .music-section-selector {
-    margin-left: 3em;
-    width: fit-content;
-  
-    outline: none;
-    border: none;
-    background-color: transparent;
-  
-    font-size: medium;
-    color: $color-text-default;
-  }
 }
-
-
 
 .music-cards {
   display: flex;
   flex-flow: row wrap;
-  margin: 0.5em 3em;
+  margin-top: 1.5em;
   padding-bottom: 5em;
 }
 
 .music-container {
-  margin: 1em 40px 0 40px;
   height: 80vh;
 
   table {
@@ -1756,7 +1741,7 @@ html, body {
   }
 
   th, td {
-    padding: 0.5em;
+    padding: 0.8em;
     text-align: left;
     width: auto;
     border: none;
@@ -2095,8 +2080,7 @@ html, body {
 }
 
 .music-view-info-container {
-  margin: 0.5em 3.5em 0.5em 3.5em;
-  
+  margin-left: 1.9em;
   .info-container {
     padding-left: 0;
 
@@ -2115,9 +2099,10 @@ html, body {
 
 .album-section-text {
   text-align: left;
-  margin: 1em 3.5em 1em 3em;
   font-size: larger;
   font-weight: bold;
+
+  margin-top: 1em;
 }
 
 .album-content {
@@ -2125,7 +2110,6 @@ html, body {
   flex-flow: column nowrap;
 
   .info-container {
-    margin: 0.5em 3.5em 0.5em 1.6em;
     display: flex;
     flex-flow: row nowrap;
 
@@ -2173,7 +2157,7 @@ html, body {
   }
   
   .song-list {
-    margin: 1em 0 0 3.5em;
+    margin-top: 1em;
     padding-right: 3em;
     padding-bottom: 5em;
     display: flex;

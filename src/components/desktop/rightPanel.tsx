@@ -50,9 +50,12 @@ export const renderRightPanelContent = () => {
     const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
 
     const [musicSection, setMusicSection] = useState<MusicSection>(MusicSection.Collections);
+    const [musicSelect, setMusicSelect] = useState<boolean>(false);
 
     const cm = useRef<ContextMenu | null>(null);
     const cm2 = useRef<ContextMenu | null>(null);
+    const cm3 = useRef<ContextMenu | null>(null);
+    const cm4 = useRef<ContextMenu | null>(null);
 
     //#region TEXT CLAMP
     const clampTextRef = useRef<HTMLDivElement[]>([]);
@@ -161,13 +164,39 @@ export const renderRightPanelContent = () => {
           <div className="music-section">
             {
               !selectedSeries ? (
-                <Dropdown value={musicSection}
-                  onChange={(e) => setMusicSection(e.value)} options={
-                  [
-                    { name: t('collections'), value: MusicSection.Collections },
-                    { name: t('tracks'), value: MusicSection.Tracks }
-                  ]
-                } optionLabel="name" className="music-section-selector" checkmark={true}  highlightOnSelect={false} />
+                <>
+                  <ContextMenu 
+                    model={[
+                      {
+                        label: `${t('collections')} ${musicSection === MusicSection.Collections ? ' ✓' : ''}`,
+                        command: () => {
+                          setMusicSection(MusicSection.Collections);
+                          setMusicSelect(false);
+                        }
+                      },
+                      {
+                        label: `${t('tracks')} ${musicSection === MusicSection.Tracks ? ' ✓' : ''}`,
+                        command: () => {
+                          setMusicSection(MusicSection.Tracks);
+                          setMusicSelect(false);
+                        }
+                      }
+                  ]}
+                  ref={cm4} className="dropdown-menu"/>
+                  <div className="dropdown">
+                    <div className="select" onClick={(e) => {
+                        cm4.current?.show(e);
+                        setMusicSelect(true);
+                    }} onAuxClick={() => setMusicSelect(false)}>
+                        <span className="selected" style={{fontSize: 'medium'}}>{
+                          musicSection === MusicSection.Collections ? (
+                            t('collections')
+                          ) : t('tracks')
+                        }</span>
+                        <div className={`arrow ${musicSelect ? (' arrow-rotate'): ('')}`}></div>
+                    </div>
+                  </div>
+              </>
               ) : null
             }
             {
@@ -452,15 +481,41 @@ export const renderRightPanelContent = () => {
             {
               selectedSeries.seasons.length > 1 ? (
                 <section className="dropdown" style={{marginLeft: "30px"}}>
-                  <div className="select season-selector" onClick={() => {
+                  <div className="select season-selector" onClick={(e) => {
                       if (!isContextMenuShown)
                           dispatch(closeAllMenus());
+
                       toggleMenu();
+                      if (!isContextMenuShown)
+                        cm3.current?.show(e);
                   }} onAuxClick={() => {dispatch(closeAllMenus())}}>
                       <span className="selected">{selectedSeason.name}</span>
                       <div className={`arrow ${isContextMenuShown ? (' arrow-rotate'): ('')}`}></div>
                   </div>
-                  <ul id={selectedSeries.id + "dropdown"} className={`menu ${isContextMenuShown ? (' menu-open'): ('')}`}>
+                  <ContextMenu 
+                    model={[
+                      ...[...selectedSeries.seasons]
+                        .sort((a, b) => {
+                          if (a.order !== 0 && b.order !== 0) {
+                            return a.order - b.order;
+                          }
+                          if (a.order === 0 && b.order === 0) {
+                            return new Date(a.year).getTime() - new Date(b.year).getTime();
+                          }
+                          return a.order === 0 ? 1 : -1;
+                        })
+                        .map((season: SeasonData) => ({
+                          label: season.name,
+                          command: () => {
+                            toggleMenu();
+                            handleSeasonSelection(season);
+                          }
+                        }))
+                    ]}
+                    ref={cm3}
+                    className="dropdown-menu"
+                  />
+                  {/*<ul id={selectedSeries.id + "dropdown"} className={`menu ${isContextMenuShown ? (' menu-open'): ('')}`}>
                     {[...selectedSeries.seasons].sort((a, b) => {
                       if (a.order !== 0 && b.order !== 0) {
                         return a.order - b.order;
@@ -481,7 +536,7 @@ export const renderRightPanelContent = () => {
                         }}>{season.name}
                       </li>
                     ))}
-                  </ul>
+                  </ul>*/}
                 </section>
               ) : null
             }
