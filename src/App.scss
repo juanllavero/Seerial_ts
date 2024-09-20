@@ -2130,8 +2130,7 @@ html, body {
     }
 
     #seasonTitle {
-      margin-top: 0.5em;
-      max-width: 15em;
+      margin-top: 0.1em;
       font-size: larger;
       color:$color-text-default;
     }
@@ -2215,6 +2214,37 @@ html, body {
   }
 }
 
+.p-confirm-dialog {
+  .p-dialog-header {
+    background-color: $color-darker;
+  }
+  
+  .p-dialog-content {
+    background-color: $color-darker;
+    padding: 1.5em 2em;
+  }
+
+  .p-dialog-footer {
+    padding-top: 1em;
+    background-color: $color-darker;
+
+    .p-button {
+      background-color: $color-light;
+      color: rgb(255, 255, 255);
+      opacity: 0.9;
+    }
+
+    .p-button:hover {
+      opacity: 1;
+    }
+
+    .p-button-danger {
+      background-color: #e10000;
+      border: 1px solid #e10000;
+    }
+  }
+
+}
 
 
 @keyframes fadeIn {

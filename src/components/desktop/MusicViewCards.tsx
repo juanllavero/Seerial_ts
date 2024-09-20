@@ -377,7 +377,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                         </section>
                     </div>
                 </section>
-                <span className="album-section-text">Álbumes</span>
+                <span className="album-section-text">{t('albums')}</span>
                 <div className="music-cards scroll" id="scroll">
                     {selectedCollection.seasons.map((album: SeasonData) => (
                         <div className="episode-box" key={album.id}
@@ -475,6 +475,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                             <section className="season-info">
                                 <a id="seriesTitle" onClick={() => dispatch(selectSeason(null))}>{selectedCollection.name}</a>
                                 <span id="seasonTitle">{selectedAlbum.name}</span>
+                                <span id="date">{new Date(selectedAlbum.year).getFullYear() || null}</span>
                                 {/*
                                 <section className="season-info-text">
                                 {

@@ -57,8 +57,8 @@ export const renderLibrariesList = () => {
 
     const showDeleteDialog = () => {
         confirmDialog({
-            message: 'Do you want to delete this record?',
-            header: 'Delete Confirmation',
+            message: t('removeLibraryMessage'),
+            header: `${t('removeLibrary')}: ${libraryForMenu?.name}`,
             icon: 'pi pi-info-circle',
             defaultFocus: 'reject',
             acceptClassName: 'p-button-danger',
