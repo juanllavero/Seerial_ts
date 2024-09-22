@@ -44,7 +44,7 @@ const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
-    // LIBRARY REDUCERS
+    //#region LIBRARY REDUCERS
     setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
 
@@ -92,8 +92,9 @@ const dataSlice = createSlice({
 
       // Check if series, season, episode have been removed
     },
+    //#endregion
 
-    // SERIES AND SEASONS REDUCERS
+    //#region SERIES AND SEASONS REDUCERS
     showSeriesMenu: (state, action: PayloadAction<SeriesData | null>) => {
         state.seriesMenu = action.payload;
     },
@@ -114,26 +115,53 @@ const dataSlice = createSlice({
     toggleSeasonWindow: (state) => {
         state.seasonWindowOpen = !state.seasonWindowOpen;
     },
-    updateSeason: (state, action: PayloadAction<SeasonData>) => {
-      if (state.selectedSeason) {
-        state.selectedSeason = action.payload;
-      }
+    addSeries: (state, action: PayloadAction<{ libraryId: string; series: SeriesData }>) => {
+      const library = state.libraries.find(library => library.id === action.payload.libraryId);
+      if (library) {
+        library.series = [...library.series, action.payload.series];
 
-      const seasons = state.selectedSeries?.seasons;
-
-      if (seasons){
-        // Update Season in list
-        const seasonIndex = seasons.findIndex(
-          (season) => season.id === action.payload.id
-        );
-
-        if (seasonIndex >= 0) {
-          seasons[seasonIndex] = action.payload;
+        if (state.selectedLibrary && library.id === state.selectedLibrary.id){
+          state.selectedLibrary = library;
         }
       }
-  },
+    },
+    updateSeries: (state, action: PayloadAction<{ libraryId: string; series: SeriesData }>) => {
+      const library = state.libraries.find(library => library.id === action.payload.libraryId);
+      if (library) {
+        const seriesIndex = library.series.findIndex(series => series.id === action.payload.series.id);
+        if (seriesIndex >= 0) {
+          library.series[seriesIndex] = action.payload.series;
 
-    // EPISODES REDUCERS
+          // Update if selected
+          if (state.selectedSeries && state.selectedSeries.id === action.payload.series.id) {
+            state.selectedSeries = action.payload.series;
+          }
+        }
+      }
+    },
+    addSeason: (state, action: PayloadAction<SeasonData>) => {
+      const series = state.selectedLibrary?.series.find(series => series.id === action.payload.seriesID);
+      if (series) {
+        series.seasons = [...series.seasons, action.payload];
+      }
+    },
+    updateSeason: (state, action: PayloadAction<SeasonData>) => {
+      const series = state.selectedLibrary?.series.find(series => series.id === action.payload.seriesID);
+      if (series) {
+        const seasonIndex = series.seasons.findIndex(season => season.id === action.payload.id);
+        if (seasonIndex >= 0) {
+          series.seasons[seasonIndex] = action.payload;
+
+          // Update if selected
+          if (state.selectedSeason && state.selectedSeason.id === action.payload.id) {
+            state.selectedSeason = action.payload;
+          }
+        }
+      }
+    },
+    //#endregion
+
+    //#region EPISODES REDUCERS
     selectEpisode: (state, action) => {
         state.selectedEpisode = action.payload;
     },
@@ -143,28 +171,32 @@ const dataSlice = createSlice({
     toggleEpisodeWindow: (state) => {
         state.episodeWindowOpen = !state.episodeWindowOpen;
     },
+    addEpisode: (state, action: PayloadAction<EpisodeData>) => {
+      const season = state.selectedSeries?.seasons.find(season => season.id === action.payload.seasonID);
+      if (season) {
+        season.episodes = [...season.episodes, action.payload];
+      }
+    },
     updateEpisode: (state, action: PayloadAction<EpisodeData>) => {
-        if (state.selectedEpisode) {
-          state.selectedEpisode = action.payload;
-        }
+      const season = state.selectedSeries?.seasons.find(season => season.id === action.payload.seasonID);
+      if (season) {
+        const episodeIndex = season.episodes.findIndex(episode => episode.id === action.payload.id);
+        if (episodeIndex >= 0) {
+          season.episodes[episodeIndex] = action.payload;
 
-        const episodes = state.selectedSeason?.episodes;
-
-        if (episodes){
-          // Update Episode in list
-          const episodeIndex = episodes.findIndex(
-            (episode) => episode.id === action.payload.id
-          );
-
-          if (episodeIndex >= 0) {
-            episodes[episodeIndex] = action.payload;
+          // Si el episodio actualizado es el seleccionado, también actualiza el seleccionado
+          if (state.selectedEpisode && state.selectedEpisode.id === action.payload.id) {
+            state.selectedEpisode = action.payload;
           }
         }
+      }
     },
+    //#endregion
   }
 });
 
 export const { setLibraries, selectLibrary, clearLibrarySelection, setShowPoster, setLibraryForMenu, toggleLibraryEditWindow
     , showSeriesMenu, selectSeries, selectSeason, resetSelection, updateSeason, selectEpisode, showMenu, 
+    addEpisode, addSeason, updateSeries, addSeries, 
     toggleEpisodeWindow, updateEpisode, toggleSeriesWindow, toggleSeasonWindow, addLibrary, updateLibrary } = dataSlice.actions;
 export default dataSlice.reducer;

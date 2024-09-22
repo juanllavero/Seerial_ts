@@ -553,7 +553,7 @@ export class Utils {
 
     public static processBlurAndSave = async (imagePath: string, outputPath: string) => {
         return new Promise<void>(async (resolve, reject) => {
-            let imageMagickPath = await this.getExternalPath("resources/lib/magick.exe");
+            let imageMagickPath = await this.getInternalPath("lib/magick.exe");
             // Comando de ImageMagick usando la versión portable, añadiendo compresión
             const command = `"${imageMagickPath}" "${imagePath}" -blur 0x${25} -quality ${75} "${outputPath}"`;
 

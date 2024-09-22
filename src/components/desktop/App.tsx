@@ -5,7 +5,7 @@ import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
-import { selectLibrary, setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/dataSlice';
+import { addEpisode, addSeason, addSeries, selectLibrary, setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/dataSlice';
 import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
@@ -21,6 +21,9 @@ import renderSeriesWindow from './seriesWindow';
 import { renderMusicPlayer } from './MusicPlayer';
 import { ReactUtils } from 'data/utils/ReactUtils';
 import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
+import { SeriesData } from '@interfaces/SeriesData';
+import { SeasonData } from '@interfaces/SeasonData';
+import { EpisodeData } from '@interfaces/EpisodeData';
 
 function App() {
   const dispatch = useDispatch();
@@ -81,7 +84,19 @@ function App() {
       dispatch(setLibraries(newLibraries));
       dispatch(selectLibrary(newLibrary));
       saveLibraries(newLibraries);
-    })
+    });
+
+    window.ipcRenderer.on('series-added', (_event, libraryID: string, show: SeriesData) => {
+      dispatch(addSeries({libraryId: libraryID, series: show}));
+    });
+
+    window.ipcRenderer.on('season-added', (_event, season: SeasonData) => {
+      dispatch(addSeason(season));
+    });
+
+    window.ipcRenderer.on('episode-added', (_event, episode: EpisodeData) => {
+      dispatch(addEpisode(episode));
+    });
   
     window.electronAPI.onWindowStateChange((state: string) => {
       dispatch(toggleMaximize(state === 'maximized'));

@@ -82,7 +82,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
 
     const handleSeasonSelection = (season: SeasonData | null) => {
         if (season)
-            generateGradient(null, season);
+            generateGradient(selectedCollection, season);
         
         dispatch(selectSeason(season));
         dispatch(closeContextMenu());

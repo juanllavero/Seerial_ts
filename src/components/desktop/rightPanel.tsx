@@ -110,7 +110,9 @@ export const renderRightPanelContent = () => {
 
     const handleSeriesSelection = (series: SeriesData) => {
       dispatch(selectSeries(series));
-      handleSeasonSelection(series.seasons[0]);
+      
+      if (series.seasons && series.seasons.length > 0)
+        handleSeasonSelection(series.seasons[0]);
     };
 
     const handleSeasonSelection = (season: SeasonData) => {
@@ -264,7 +266,7 @@ export const renderRightPanelContent = () => {
                             e.target.onerror = null; // To avoid infinite loop
                             e.target.src = "./src/resources/img/fileNotFound.jpg";
                           }}/>
-                        ) : series.seasons[0].coverSrc !== "" ? (
+                        ) : series.seasons && series.seasons.length > 0 && series.seasons[0].coverSrc !== "" ? (
                           <ResolvedImage src={series.seasons[0].coverSrc} alt="Poster"
                           style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                           onError={(e: any) => {
@@ -283,7 +285,7 @@ export const renderRightPanelContent = () => {
                   {series.name}
                 </a>
                 {
-                  series.seasons.length > 1 ? (
+                  series.seasons && series.seasons.length > 1 ? (
                     <span id="episodeNumber">
                       {(() => {
                         const minYear = Math.min(...series.seasons.map((season: SeasonData) => Number.parseInt(season.year)));
@@ -291,9 +293,9 @@ export const renderRightPanelContent = () => {
                         return minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
                       })()}
                     </span>
-                  ) : (
+                  ) : series.seasons && series.seasons.length > 0 ? (
                     <span id="episodeNumber">{new Date(series.seasons[0].year).getFullYear()}</span>
-                  )
+                  ) : null
                 }
                 <ContextMenu 
                   model={[
@@ -368,7 +370,8 @@ export const renderRightPanelContent = () => {
                   onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}/>
               </div>) : (<div></div>)}
             <div className="info-container">
-              <div className={`poster-image ${selectedLibrary.type !== "Shows" && selectedSeries.seasons.length === 1 ? 'round-image' : ''}`}>
+              <div className={`poster-image ${selectedLibrary.type !== "Shows" 
+                  && selectedSeries.seasons && selectedSeries.seasons.length === 1 ? 'round-image' : ''}`}>
                 {
                   selectedLibrary.type == "Shows" || showCollectionPoster ? (
                     selectedSeries.coverSrc != "" ? (
@@ -397,7 +400,7 @@ export const renderRightPanelContent = () => {
                     <div className="continue-watching-info">
                       <span>{t('inProgress')} — {t('seasonLetter')}1 · {t('episodeLetter')}3</span>
                     </div>
-                  ) : selectedSeries.seasons.length > 1 ? (
+                  ) : selectedSeries.seasons && selectedSeries.seasons.length > 1 ? (
                     <button className="show-poster-button"
                       onClick={changePoster}>
                       <span>{showCollectionPoster ? (t('seasonPoster')) : (t('collectionPoster'))}</span>
@@ -407,7 +410,7 @@ export const renderRightPanelContent = () => {
               </div>
               <section className="season-info">
                 {
-                  selectedLibrary.type == "Shows" && selectedSeries.seasons.length > 1 ? (
+                  selectedLibrary.type == "Shows" && selectedSeries.seasons && selectedSeries.seasons.length > 1 ? (
                     <span id="seasonTitle">{selectedSeason.name}</span>
                   ) : null
                 }
@@ -479,7 +482,7 @@ export const renderRightPanelContent = () => {
               </section>
             </div>
             {
-              selectedSeries.seasons.length > 1 ? (
+              selectedSeries.seasons && selectedSeries.seasons.length > 1 ? (
                 <section className="dropdown" style={{marginLeft: "30px"}}>
                   <div className="select season-selector" onClick={(e) => {
                       if (!isContextMenuShown)

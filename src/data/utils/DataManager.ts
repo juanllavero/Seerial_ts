@@ -17,6 +17,8 @@ export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
     static libraries: Library[] = [];
 
+    private static wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
     // Metadata attributes
     static win: BrowserWindow | null;
     static moviedb: MovieDb | undefined;
@@ -80,6 +82,10 @@ export class DataManager {
             return false;
         }
     };
+    //#endregion
+
+    //#region ADD/UPDATE DATA
+    
     //#endregion
 
     //#region DELETE DATA
@@ -242,6 +248,12 @@ export class DataManager {
             show = new Series();
             show.setFolder(folder);
             this.library.getAnalyzedFolders().set(folder, show.getId());
+
+            // Add show to view
+            console.log("\n- Sending series to view...");
+            this.win?.webContents.send('series-added', this.library.id, show.toJSON());
+
+            await DataManager.wait(5000); // WAIT 5 SECONDS
         }
 
         let themdbID = show.getThemdbID();
@@ -321,7 +333,6 @@ export class DataManager {
             return undefined;
         }
 
-        this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
         this.library.series.push(show);
     };
 
@@ -513,6 +524,12 @@ export class DataManager {
 
             if (season.getSeasonNumber() === 0)
                 season.setOrder(100);
+
+            // Add season to view
+            console.log("\n- Sending season to view...");
+            this.win?.webContents.send('season-added', season.toJSON());
+
+            await DataManager.wait(5000); // WAIT 5 SECONDS
         }
     
         let episode: EpisodeLocal | undefined;
@@ -594,6 +611,12 @@ export class DataManager {
                     }
                 }
             }
+
+            // Add episode to view
+            console.log("\n- Sending episode to view...");
+            this.win?.webContents.send('episode-added', episode.toJSON());
+
+            await DataManager.wait(5000); // WAIT 5 SECONDS
         }
     };
 
