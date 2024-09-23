@@ -329,6 +329,42 @@ html, body {
   cursor: pointer;
 }
 
+.loading-element-hover {
+  position: absolute;
+  background-color: #00000092;
+
+  border: 2px solid transparent;
+  border-radius: 5px;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 3px solid $app-color;
+    border-right: 3px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+  
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  } 
+}
+
+.loading-visible {
+  display: flex;
+}
+
 /* SERIES CONTAINER */
 .series-container{
   margin: 160px 0 0 40px;

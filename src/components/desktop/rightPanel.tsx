@@ -20,7 +20,6 @@ import { ContextMenu } from 'primereact/contextmenu';
 import MusicView from './MusicView';
 import MusicViewCards from './MusicViewCards';
 import { MusicSection } from 'data/enums/MusicSection';
-import { Dropdown } from 'primereact/dropdown';
 
 export const renderRightPanelContent = () => {
     const dispatch = useDispatch();
@@ -238,6 +237,9 @@ export const renderRightPanelContent = () => {
                       }
                     }}>
                     <div className="video-button-image-section">
+                      <div className={`loading-element-hover ${series.analyzingFiles ? 'loading-visible' : ''}`}style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
+                        <span className="spinner"></span>
+                      </div>
                       <div className="video-button-hover"
                         style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}
                         >
@@ -370,6 +372,9 @@ export const renderRightPanelContent = () => {
                   onLoad={handleTransparentImageLoad} className={transparentImageLoaded ? 'imageLoaded' : ''}/>
               </div>) : (<div></div>)}
             <div className="info-container">
+              <div className={`loading-element-hover ${selectedSeries.analyzingFiles ? 'loading-visible' : ''}`}style={{ width: `${seriesImageWidth}px`, height: `${seriesImageHeight}px` }}>
+                <span className="spinner"></span>
+              </div>
               <div className={`poster-image ${selectedLibrary.type !== "Shows" 
                   && selectedSeries.seasons && selectedSeries.seasons.length === 1 ? 'round-image' : ''}`}>
                 {

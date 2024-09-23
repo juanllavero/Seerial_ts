@@ -10,8 +10,6 @@ import { SeriesData } from '@interfaces/SeriesData';
 import { RootState } from 'redux/store';
 import { SeasonData } from '@interfaces/SeasonData';
 import { ReactUtils } from 'data/utils/ReactUtils';
-import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
-import ResolvedImage from '@components/Image';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { setCurrentSong, setSongs, toggleMusicPause } from 'redux/slices/musicPlayerSlice';
 
@@ -25,6 +23,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedElements, setSelectedElements] = useState<EpisodeData[]>([]); 
     const [selectedElement, setSelectedElement] = useState(undefined);
+    const [playErrorDialog, setPlayErrorDialog] = useState<boolean>(false);
 
     //Reducers for images size
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
@@ -46,14 +45,6 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
         if (selectedElements)
             setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
-
-    /*useEffect(() => {
-        generateGradient();
-    }, [selectedCollection]);*/
-
-    /*useEffect(() => {
-        generateGradient();
-    }, [selectedAlbum]);*/
 
     const generateGradient = (collection: SeriesData | null, album: SeasonData | null) => {
         if (collection && !album) {
@@ -213,6 +204,9 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                                 }
                             }}>
                                 <div className="video-button-image-section">
+                                    <div className={`loading-element-hover ${series.analyzingFiles ? 'loading-visible' : ''}`}style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}>
+                                        <span className="spinner"></span>
+                                    </div>
                                     <div className="video-button-hover"
                                         style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
                                         >
@@ -291,6 +285,9 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                 )}
                 <section className="music-view-info-container">
                     <div className="info-container">
+                        <div className={`loading-element-hover ${selectedCollection.analyzingFiles ? 'loading-visible' : ''}`}style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}>
+                            <span className="spinner"></span>
+                        </div>
                         <div className="poster-image round-image">
                             <LazyLoadImage src={selectedCollection.coverSrc} alt="Poster"
                                 onError={(e: any) => {

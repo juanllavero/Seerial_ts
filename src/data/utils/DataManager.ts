@@ -17,8 +17,6 @@ export class DataManager {
     static DATA_PATH: string = "./src/data/data.json";
     static libraries: Library[] = [];
 
-    private static wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
     // Metadata attributes
     static win: BrowserWindow | null;
     static moviedb: MovieDb | undefined;
@@ -298,6 +296,8 @@ export class DataManager {
 
         await this.setSeriesMetadataAndImages(show, showData, exists);
 
+        show.setAnalyzingFiles(true);
+
         if (!exists){
             // Add show to view
             this.win?.webContents.send('series-added', this.library.id, show.toJSON());
@@ -332,7 +332,10 @@ export class DataManager {
             return undefined;
         }
 
+        show.setAnalyzingFiles(false);
         this.library.series.push(show);
+
+        // Update show in view
         this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
     };
 
@@ -793,7 +796,11 @@ export class DataManager {
             let show = new Series();
             show.setName(name);
             show.setFolder(root);
+            show.setAnalyzingFiles(true);
             this.library.getAnalyzedFolders().set(root, show.getId());
+
+            // Add show to view
+            this.win?.webContents.send('series-added', this.library.id, show.toJSON());
 
             let season = new Season();
             this.library.getAnalyzedFolders().set(root, season.getId());
@@ -809,14 +816,25 @@ export class DataManager {
                 season.setYear(year !== "1" ? year : "");
                 season.setSeasonNumber(show.getSeasons().length);
 
+                // Add season to view
+                this.win?.webContents.send('season-added', this.library.id, season.toJSON());
+
                 this.saveDiscWithoutMetadata(season, root);
                 this.library.getSeries().push(show);
                 return;
             }
 
+            // Add season to view
+            this.win?.webContents.send('season-added', this.library.id, season.toJSON());
+
             await this.processMovie(season, root);
+
+            show.setAnalyzingFiles(false);
             this.library.series.push(show);
             //#endregion
+
+            // Update show in view
+            this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
         }else {
             let show: Series | null;
 
@@ -833,6 +851,11 @@ export class DataManager {
                 show.setFolder(root);
                 this.library.getAnalyzedFolders().set(root, show.getId());
             }
+
+            show.setAnalyzingFiles(true);
+
+            // Add show to view
+            this.win?.webContents.send('series-added', this.library.id, show.toJSON());
 
             const filesInDir = await Utils.getFilesInFolder(root);
             const folders: string[] = [];
@@ -883,6 +906,9 @@ export class DataManager {
                         season.setYear(year !== "1" ? year : "");
                         season.setSeasonNumber(show.getSeasons().length);
 
+                        // Add season to view
+                        this.win?.webContents.send('season-added', this.library.id, season.toJSON());
+
                         const processPromises = files.map(async file => {
                             await this.saveDiscWithoutMetadata(season, file);
                         });
@@ -891,6 +917,9 @@ export class DataManager {
                         this.library.getSeries().push(show);
                         return;
                     }
+
+                    // Add season to view
+                    this.win?.webContents.send('season-added', this.library.id, season.toJSON());
 
                     const processPromises = files.map(async file => {
                         await this.processMovie(season, file);
@@ -930,14 +959,23 @@ export class DataManager {
                     season.setYear(year !== "1" ? year : "");
                     season.setSeasonNumber(show.getSeasons().length);
 
+                    // Add season to view
+                    this.win?.webContents.send('season-added', this.library.id, season.toJSON());
+
                     const processPromises = filesInRoot.map(async file => {
                         await this.saveDiscWithoutMetadata(season, file);
                     });
     
                     await Promise.all(processPromises);
                     this.library.getSeries().push(show);
+
+                    // Update show in view
+                    this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
                     return;
                 }
+
+                // Add season to view
+                this.win?.webContents.send('season-added', this.library.id, season.toJSON());
 
                 const processPromises = filesInRoot.map(async file => {
                     await this.processMovie(season, file);
@@ -947,6 +985,11 @@ export class DataManager {
                 this.library.series.push(show);
                 //#endregion
             }
+
+            show.setAnalyzingFiles(false);
+
+            // Update show in view
+            this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
         }
     };
 
@@ -1179,6 +1222,9 @@ export class DataManager {
         }
 
         await this.processMediaInfo(episode);
+
+        // Add episode to view
+        this.win?.webContents.send('episode-added', this.library.id, season.seriesID, episode.toJSON());
     };
 
     private static async processMovie(season: Season, filePath: string) {
@@ -1237,6 +1283,9 @@ export class DataManager {
                 count--;
             }
         }
+
+        // Add episode to view
+        this.win?.webContents.send('episode-added', this.library.id, season.seriesID, episode.toJSON());
     };
 
     private static async processMediaInfo(episode: EpisodeLocal) {
@@ -1292,14 +1341,20 @@ export class DataManager {
         if (!this.library.getAnalyzedFolders().get(folder)){
             collection = new Series();
             collection.setName(Utils.getFileName(folder));
+            collection.setAnalyzingFiles(true);
             this.library.series.push(collection);
             this.library.analyzedFolders.set(folder, collection.id);
+
+            // Add show to view
+            this.win?.webContents.send('series-added', this.library.id, collection.toJSON());
         }else {
             collection = this.library.getSeriesById(this.library.getAnalyzedFolders().get(folder) || "");
         }
 
         if (collection === null || !collection)
             return;
+
+        collection.setAnalyzingFiles(true);
 
         // Get music files inside folder (4 folders of depth)
         const musicFiles = await Utils.getMusicFiles(folder);
@@ -1314,7 +1369,10 @@ export class DataManager {
         // Esperar a que todas las promesas se resuelvan
         await Promise.all(processPromises);
 
-        this.win?.webContents.send('update-libraries', this.libraries.map(library => library.toLibraryData()));
+        collection.setAnalyzingFiles(false);
+
+        // Update show in view
+        this.win?.webContents.send('series-updated', this.library.id, collection.toJSON());
     };
 
     private static async processMusicFile(musicFile: string, collection: Series) {
@@ -1342,16 +1400,18 @@ export class DataManager {
             }
     
             if (album === null) {
-                console.log("\n- Creating album for: " + albumName);
                 album = new Season();
                 album.setName(albumName ?? "Unknown");
+                album.setSeriesID(collection.id);
                 album.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
                     data["TYER"] ? new Date(data["TYER"]).getFullYear().toString() : '');
                 album.setGenres(data.genre ? data.genre.split(',').map((genre: string) => genre.trim()) : []);
                 collection.seasons.push(album);
+
+                // Add season to view
+                this.win?.webContents.send('season-added', this.library.id, album.toJSON());
             }
     
-            console.log("\n- Creating song for: " + musicFile);
             let song = new EpisodeLocal();
             song.setName(data.title ?? Utils.getFileName(musicFile));
             song.setYear(data.date ? new Date(data.date).getFullYear().toString() : 
@@ -1389,6 +1449,8 @@ export class DataManager {
             album.addEpisode(song);
             DataManager.library.analyzedFiles.set(musicFile, song.id);
             
+            // Add episode to view
+            this.win?.webContents.send('episode-added', this.library.id, collection.id, song.toJSON());
         } catch (error) {
             console.error("Error processing music file", error);
         }
