@@ -250,17 +250,35 @@ const dataSlice = createSlice({
         }
       }
     },
-    updateEpisode: (state, action: PayloadAction<EpisodeData>) => {
-      const season = state.selectedSeries?.seasons.find(season => season.id === action.payload.seasonID);
-      if (season) {
-        const episodeIndex = season.episodes.findIndex(episode => episode.id === action.payload.id);
-        if (episodeIndex >= 0) {
-          season.episodes[episodeIndex] = action.payload;
+    updateEpisode: (state, action: PayloadAction<{libraryId: string, showId: string, episode: EpisodeData}>) => {
+      const library = state.libraries.find(library => library.id === action.payload.libraryId);
+      if (library) {
+        const series = library.series.find(series => series.id === action.payload.showId);
+        if (series) {
+          const season = series.seasons.find(season => season.id === action.payload.episode.seasonID);
+          if (season) {
+            const episodeIndex = season.episodes.findIndex(episode => episode.id === action.payload.episode.id);
+            if (episodeIndex >= 0) {
+              season.episodes[episodeIndex] = action.payload.episode;
 
-          // Si el episodio actualizado es el seleccionado, también actualiza el seleccionado
-          if (state.selectedEpisode && state.selectedEpisode.id === action.payload.id) {
-            state.selectedEpisode = action.payload;
+              // Update if selected
+              if (state.selectedEpisode && state.selectedEpisode.id === action.payload.episode.id) {
+                state.selectedEpisode = action.payload.episode;
+              }
+
+              if (state.selectedSeason && state.selectedSeason.id === action.payload.episode.seasonID) {
+                state.selectedSeason = season;
+              }
+
+              if (state.selectedSeries && series.id === state.selectedSeries.id){
+                state.selectedSeries = series;
+              }
+            }
           }
+        }
+
+        if (state.selectedLibrary && state.selectedLibrary.id === library.id){
+          state.selectedLibrary = library;
         }
       }
     },

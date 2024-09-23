@@ -67,38 +67,43 @@ const renderEpisodeWindow = () => {
 
             // @ts-ignore
             window.electronAPI.getMediaInfo(selectedEpisode).then((data) => {
-                if (data){
-                    //dispatch(updateMediaInfo(data));
+                if (data && selectedLibrary && selectedSeries){
                     dispatch(updateEpisode({
-                        mediaInfo: data.mediaInfo,
-                        videoTracks: data.videoTracks,
-                        audioTracks: data.audioTracks,
-                        subtitleTracks: data.subtitleTracks,
-                        chapters: data.chapters,
-                        id: selectedEpisode.id,
-                        name: selectedEpisode.name,
-                        overview: selectedEpisode.overview,
-                        year: selectedEpisode.year,
-                        order: selectedEpisode.order,
-                        score: selectedEpisode.score,
-                        imdbScore: selectedEpisode.imdbScore,
-                        runtime: selectedEpisode.runtime,
-                        runtimeInSeconds: selectedEpisode.runtimeInSeconds,
-                        episodeNumber: selectedEpisode.episodeNumber,
-                        seasonNumber: selectedEpisode.seasonNumber,
-                        videoSrc: selectedEpisode.videoSrc,
-                        imgSrc: selectedEpisode.imgSrc,
-                        seasonID: selectedEpisode.seasonID,
-                        watched: selectedEpisode.watched,
-                        timeWatched: selectedEpisode.timeWatched,
-                        directedBy: selectedEpisode.directedBy,
-                        writtenBy: selectedEpisode.writtenBy,
-                        nameLock: selectedEpisode.nameLock,
-                        yearLock: selectedEpisode.yearLock,
-                        overviewLock: selectedEpisode.overviewLock,
-                        directedLock: selectedEpisode.directedLock,
-                        writtenLock: selectedEpisode.writtenLock
-                    }))
+                        libraryId: selectedLibrary.id,
+                        showId: selectedSeries.id,
+                        episode: {
+                            mediaInfo: data.mediaInfo,
+                            videoTracks: data.videoTracks,
+                            audioTracks: data.audioTracks,
+                            subtitleTracks: data.subtitleTracks,
+                            chapters: data.chapters,
+                            id: selectedEpisode.id,
+                            name: selectedEpisode.name,
+                            overview: selectedEpisode.overview,
+                            year: selectedEpisode.year,
+                            order: selectedEpisode.order,
+                            score: selectedEpisode.score,
+                            imdbScore: selectedEpisode.imdbScore,
+                            runtime: selectedEpisode.runtime,
+                            runtimeInSeconds: selectedEpisode.runtimeInSeconds,
+                            episodeNumber: selectedEpisode.episodeNumber,
+                            seasonNumber: selectedEpisode.seasonNumber,
+                            videoSrc: selectedEpisode.videoSrc,
+                            imgSrc: selectedEpisode.imgSrc,
+                            seasonID: selectedEpisode.seasonID,
+                            watched: selectedEpisode.watched,
+                            timeWatched: selectedEpisode.timeWatched,
+                            directedBy: selectedEpisode.directedBy,
+                            writtenBy: selectedEpisode.writtenBy,
+                            nameLock: selectedEpisode.nameLock,
+                            yearLock: selectedEpisode.yearLock,
+                            overviewLock: selectedEpisode.overviewLock,
+                            directedLock: selectedEpisode.directedLock,
+                            writtenLock: selectedEpisode.writtenLock,
+                            album: "",
+                            albumArtist: ""
+                        }
+                    }));
                 }
             });
 
@@ -113,6 +118,8 @@ const renderEpisodeWindow = () => {
             setOverviewLock(selectedEpisode.overviewLock || false);
             setDirectedLock(selectedEpisode.directedLock || false);
             setWrittenLock(selectedEpisode.writtenLock || false);
+
+            selectImage(undefined);
         }
     }, [episodeMenuOpen]);
 
@@ -214,35 +221,41 @@ const renderEpisodeWindow = () => {
     };
 
     const handleSavingChanges = () => {
-        if (selectedEpisode) {
+        if (selectedEpisode && selectedSeries && selectedLibrary) {
             dispatch(updateEpisode({
-                name: name,
-                overview: overview,
-                year: year,
-                order: selectedEpisode.order,
-                imgSrc: selectedImage ? ("resources/img/thumbnails/video/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
-                directedBy: directedBy,
-                writtenBy: writtenBy,
-                nameLock: nameLock,
-                yearLock: yearLock,
-                overviewLock: overviewLock,
-                directedLock: directedLock,
-                writtenLock: writtenLock,
-                id: selectedEpisode.id,
-                score: selectedEpisode.score,
-                imdbScore: selectedEpisode.imdbScore,
-                runtime: selectedEpisode.runtime,
-                runtimeInSeconds: selectedEpisode.runtimeInSeconds,
-                episodeNumber: selectedEpisode.episodeNumber,
-                seasonNumber: selectedEpisode.seasonNumber,
-                videoSrc: selectedEpisode.videoSrc,
-                seasonID: selectedEpisode.seasonID,
-                watched: selectedEpisode.watched,
-                timeWatched: selectedEpisode.timeWatched,
-                chapters: selectedEpisode.chapters,
-                videoTracks: selectedEpisode.videoTracks,
-                audioTracks: selectedEpisode.audioTracks,
-                subtitleTracks: selectedEpisode.subtitleTracks
+                libraryId: selectedLibrary.id,
+                showId: selectedSeries.id,
+                episode: {
+                    name: name,
+                    overview: overview,
+                    year: year,
+                    order: selectedEpisode.order,
+                    imgSrc: selectedImage ? ("resources/img/thumbnails/video/" + selectedEpisode?.id + "/" + selectedImage) : selectedEpisode.imgSrc,
+                    directedBy: directedBy,
+                    writtenBy: writtenBy,
+                    nameLock: nameLock,
+                    yearLock: yearLock,
+                    overviewLock: overviewLock,
+                    directedLock: directedLock,
+                    writtenLock: writtenLock,
+                    id: selectedEpisode.id,
+                    score: selectedEpisode.score,
+                    imdbScore: selectedEpisode.imdbScore,
+                    runtime: selectedEpisode.runtime,
+                    runtimeInSeconds: selectedEpisode.runtimeInSeconds,
+                    episodeNumber: selectedEpisode.episodeNumber,
+                    seasonNumber: selectedEpisode.seasonNumber,
+                    videoSrc: selectedEpisode.videoSrc,
+                    seasonID: selectedEpisode.seasonID,
+                    watched: selectedEpisode.watched,
+                    timeWatched: selectedEpisode.timeWatched,
+                    chapters: selectedEpisode.chapters,
+                    videoTracks: selectedEpisode.videoTracks,
+                    audioTracks: selectedEpisode.audioTracks,
+                    subtitleTracks: selectedEpisode.subtitleTracks,
+                    album: "",
+                    albumArtist: ""
+                }
             }));
         }
 
