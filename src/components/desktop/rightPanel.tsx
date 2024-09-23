@@ -544,7 +544,7 @@ export const renderRightPanelContent = () => {
               ) : null
             }
             <div className="episodes-container">
-              {[...selectedSeason.episodes].sort((a, b) => a.episodeNumber - b.episodeNumber).map((episode: EpisodeData) => (
+              {selectedSeason.episodes && [...selectedSeason.episodes].sort((a, b) => a.episodeNumber - b.episodeNumber).map((episode: EpisodeData) => (
                 <div key={episode.id} className="episode-box" 
                 style={{ maxWidth: `${episodeImageWidth}px`}}>
                   <ContextMenu 

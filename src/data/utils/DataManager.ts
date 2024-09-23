@@ -248,12 +248,6 @@ export class DataManager {
             show = new Series();
             show.setFolder(folder);
             this.library.getAnalyzedFolders().set(folder, show.getId());
-
-            // Add show to view
-            console.log("\n- Sending series to view...");
-            this.win?.webContents.send('series-added', this.library.id, show.toJSON());
-
-            await DataManager.wait(5000); // WAIT 5 SECONDS
         }
 
         let themdbID = show.getThemdbID();
@@ -304,6 +298,11 @@ export class DataManager {
 
         await this.setSeriesMetadataAndImages(show, showData, exists);
 
+        if (!exists){
+            // Add show to view
+            this.win?.webContents.send('series-added', this.library.id, show.toJSON());
+        }
+
         // Descargar metadatos de cada temporada
         let seasonsMetadata: TvSeasonResponse[] = [];
         if (showData.seasons) {
@@ -334,6 +333,7 @@ export class DataManager {
         }
 
         this.library.series.push(show);
+        this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
     };
 
     private static async processEpisodes(videoFiles: string[], show: Series, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined, exists: boolean) {
@@ -497,6 +497,7 @@ export class DataManager {
             season = new Season();
             show.addSeason(season);
     
+            season.setSeriesID(show.id);
             season.setName(seasonMetadata.name ?? "");
             season.setOverview(seasonMetadata.overview ?? show.getOverview());
             season.setYear(seasonMetadata.episodes && seasonMetadata.episodes[0] && seasonMetadata.episodes[0].air_date ? seasonMetadata.episodes[0].air_date : "");
@@ -526,10 +527,7 @@ export class DataManager {
                 season.setOrder(100);
 
             // Add season to view
-            console.log("\n- Sending season to view...");
-            this.win?.webContents.send('season-added', season.toJSON());
-
-            await DataManager.wait(5000); // WAIT 5 SECONDS
+            this.win?.webContents.send('season-added', this.library.id, season.toJSON());
         }
     
         let episode: EpisodeLocal | undefined;
@@ -613,10 +611,7 @@ export class DataManager {
             }
 
             // Add episode to view
-            console.log("\n- Sending episode to view...");
-            this.win?.webContents.send('episode-added', episode.toJSON());
-
-            await DataManager.wait(5000); // WAIT 5 SECONDS
+            this.win?.webContents.send('episode-added', this.library.id, show.id, episode.toJSON());
         }
     };
 
@@ -685,7 +680,7 @@ export class DataManager {
             credits.crew.forEach(person => {
                 if (person.job && (person.job === "Author" || person.job === "Novel" || person.job === "Original Series Creator"
                         || person.job === "Comic Book" || person.job === "Idea" || person.job === "Original Story" || person.job === "Story"
-                        || person.job === "Story by" || person.job === "Book"))
+                        || person.job === "Story by" || person.job === "Book" || person.job === "Original Concept"))
                     if (person.name && !show.creatorLock) show.creator.push(person.name);
                 
                 if (person.job && person.job === "Original Music Composer")
@@ -1045,7 +1040,7 @@ export class DataManager {
                 credits.crew.forEach(person => {
                     if (!season.creatorLock && person.job && (person.job === "Author" || person.job === "Novel" || person.job === "Original Series Creator"
                             || person.job === "Comic Book" || person.job === "Idea" || person.job === "Original Story" || person.job === "Story"
-                            || person.job === "Story by" || person.job === "Book"))
+                            || person.job === "Story by" || person.job === "Book" || person.job === "Original Concept"))
                         if (person.name && !season.creatorLock) season.creator.push(person.name);
                     
                     if (!season.musicLock && person.job && person.job === "Original Music Composer")

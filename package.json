@@ -8,7 +8,8 @@
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "dependencies": {
     "@jimp/types": "^1.6.0",
@@ -19,7 +20,7 @@
     "@types/react-i18next": "^7.8.3",
     "@types/react-window": "^1.8.8",
     "axios": "^1.7.7",
-    "canvas": "^2.11.2",
+    "better-sqlite3": "^11.3.0",
     "cheerio": "^1.0.0",
     "electron-window-manager": "^1.0.6",
     "extract-colors": "^4.0.8",
@@ -48,6 +49,7 @@
     "react-virtualized": "^9.22.5",
     "react-virtualized-auto-sizer": "^1.0.24",
     "react-window": "^1.8.10",
+    "uninstall": "^0.0.0",
     "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {

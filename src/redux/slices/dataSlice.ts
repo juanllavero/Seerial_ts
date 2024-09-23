@@ -48,8 +48,18 @@ const dataSlice = createSlice({
     setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
 
-      if (state.selectedLibrary && state.libraries.length > 0 && !state.libraries.includes(state.selectedLibrary))
+      if (state.selectedLibrary){
+        let index = state.libraries.findIndex(library => library.id === state.selectedLibrary?.id);
+
+        if (index < 0){
+          index = 0;
+        }
+
+        state.selectedLibrary = state.libraries[index];
+      } else if (state.libraries.length > 0) {
         state.selectedLibrary = state.libraries[0];
+      }
+      
     },
     selectLibrary: (state, action: PayloadAction<LibraryData>) => {
       state.selectedLibrary = action.payload;
@@ -96,30 +106,34 @@ const dataSlice = createSlice({
 
     //#region SERIES AND SEASONS REDUCERS
     showSeriesMenu: (state, action: PayloadAction<SeriesData | null>) => {
-        state.seriesMenu = action.payload;
+      state.seriesMenu = action.payload;
     },
     selectSeries: (state, action: PayloadAction<SeriesData>) => {
-        state.selectedSeries = action.payload;
+      state.selectedSeries = action.payload;
+      
+      if (state.selectedSeries.seasons && state.selectedSeries.seasons.length > 0){
         state.selectedSeason = action.payload.seasons[0];
+      }
     },
     selectSeason: (state, action: PayloadAction<SeasonData | null>) => {
-        state.selectedSeason = action.payload;
+      state.selectedSeason = action.payload;
     },
     resetSelection: (state) => {
-        state.selectedSeries = null;
-        state.selectedSeason = null;
+      state.selectedSeries = null;
+      state.selectedSeason = null;
     },
     toggleSeriesWindow: (state) => {
-        state.seriesWindowOpen = !state.seriesWindowOpen;
+      state.seriesWindowOpen = !state.seriesWindowOpen;
     },
     toggleSeasonWindow: (state) => {
-        state.seasonWindowOpen = !state.seasonWindowOpen;
+      state.seasonWindowOpen = !state.seasonWindowOpen;
     },
     addSeries: (state, action: PayloadAction<{ libraryId: string; series: SeriesData }>) => {
       const library = state.libraries.find(library => library.id === action.payload.libraryId);
-      if (library) {
+      if (library && !library.series.find(series => series.id === action.payload.series.id)) {
         library.series = [...library.series, action.payload.series];
 
+        // Update if selected
         if (state.selectedLibrary && library.id === state.selectedLibrary.id){
           state.selectedLibrary = library;
         }
@@ -135,14 +149,48 @@ const dataSlice = createSlice({
           // Update if selected
           if (state.selectedSeries && state.selectedSeries.id === action.payload.series.id) {
             state.selectedSeries = action.payload.series;
+
+            if (state.selectedSeason){
+              const season = state.selectedSeries.seasons.find(season => season.id === state.selectedSeason?.id);
+              if (season){
+                state.selectedSeason = season;
+              }
+            }
+          }
+
+          if (state.selectedLibrary && library.id === state.selectedLibrary.id){
+            state.selectedLibrary = library;
           }
         }
       }
     },
-    addSeason: (state, action: PayloadAction<SeasonData>) => {
-      const series = state.selectedLibrary?.series.find(series => series.id === action.payload.seriesID);
-      if (series) {
-        series.seasons = [...series.seasons, action.payload];
+    addSeason: (state, action: PayloadAction<{ libraryId: string; season: SeasonData }>) => {
+      const library = state.libraries.find(library => library.id === action.payload.libraryId);
+      if (library && library.series) {
+        const series = library.series.find(series => series.id === action.payload.season.seriesID);
+
+        if (series) {
+          if (!series.seasons){
+            series.seasons = [];
+          }
+
+          if (!series.seasons.find(season => season.id === action.payload.season.id)){
+            series.seasons = [...series.seasons, action.payload.season];
+      
+            // Update if selected
+            if (state.selectedSeries && state.selectedSeries.id === action.payload.season.seriesID) {
+              state.selectedSeries = series;
+
+              if (!state.selectedSeason){
+                state.selectedSeason = state.selectedSeries.seasons[0];
+              }
+            }
+          }
+        }
+
+        if (state.selectedLibrary && state.selectedLibrary.id === library.id){
+          state.selectedLibrary = library;
+        }
       }
     },
     updateSeason: (state, action: PayloadAction<SeasonData>) => {
@@ -163,18 +211,43 @@ const dataSlice = createSlice({
 
     //#region EPISODES REDUCERS
     selectEpisode: (state, action) => {
-        state.selectedEpisode = action.payload;
+      state.selectedEpisode = action.payload;
     },
     showMenu: (state, action) => {
-        state.showEpisodeMenu = action.payload;
+      state.showEpisodeMenu = action.payload;
     },
     toggleEpisodeWindow: (state) => {
-        state.episodeWindowOpen = !state.episodeWindowOpen;
+      state.episodeWindowOpen = !state.episodeWindowOpen;
     },
-    addEpisode: (state, action: PayloadAction<EpisodeData>) => {
-      const season = state.selectedSeries?.seasons.find(season => season.id === action.payload.seasonID);
-      if (season) {
-        season.episodes = [...season.episodes, action.payload];
+    addEpisode: (state, action: PayloadAction<{libraryId: string, showId: string, episode: EpisodeData}>) => {
+      const library = state.libraries.find(library => library.id === action.payload.libraryId);
+      if (library) {
+        const series = library.series.find(series => series.id === action.payload.showId);
+        if (series) {
+          const season = series.seasons.find(season => season.id === action.payload.episode.seasonID);
+          if (season) {
+            if (!season.episodes){
+              season.episodes = [];
+            }
+
+            if (!season.episodes.find(episode => episode.id === action.payload.episode.id)){
+              season.episodes = [...season.episodes, action.payload.episode];
+
+              // Update if selected
+              if (state.selectedSeason && state.selectedSeason.id === action.payload.episode.seasonID) {
+                state.selectedSeason = season;
+              }
+
+              if (state.selectedSeries && series.id === state.selectedSeries.id){
+                state.selectedSeries = series;
+              }
+            }
+          }
+        }
+
+        if (state.selectedLibrary && state.selectedLibrary.id === library.id){
+          state.selectedLibrary = library;
+        }
       }
     },
     updateEpisode: (state, action: PayloadAction<EpisodeData>) => {

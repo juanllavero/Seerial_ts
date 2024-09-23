@@ -5,7 +5,7 @@ import {renderLibrariesList} from "@components/desktop/librariesList";
 import {renderRightPanelContent} from "@components/desktop/rightPanel";
 import {renderLibraryAndSlider} from "@components/desktop/libraryAndSlider";
 import {renderMainBackgroundImage} from "@components/desktop/mainBackgroundImage";
-import { addEpisode, addSeason, addSeries, selectLibrary, setLibraries, setLibraryForMenu, toggleLibraryEditWindow } from 'redux/slices/dataSlice';
+import { addEpisode, addSeason, addSeries, selectLibrary, setLibraries, setLibraryForMenu, toggleLibraryEditWindow, updateSeries } from 'redux/slices/dataSlice';
 import { useTranslation } from 'react-i18next';
 import '../../App.scss';
 import '../../i18n';
@@ -79,6 +79,10 @@ function App() {
       dispatch(setLibraries(newLibraries));
       saveLibraries(newLibraries);
     });
+
+    window.ipcRenderer.on('series-updated', (_event, libraryID: string, show: SeriesData) => {
+      dispatch(updateSeries({libraryId: libraryID, series: show}));
+    });
   
     window.ipcRenderer.on('add-library', (_event, newLibrary: LibraryData, newLibraries: LibraryData[]) => {
       dispatch(setLibraries(newLibraries));
@@ -90,12 +94,12 @@ function App() {
       dispatch(addSeries({libraryId: libraryID, series: show}));
     });
 
-    window.ipcRenderer.on('season-added', (_event, season: SeasonData) => {
-      dispatch(addSeason(season));
+    window.ipcRenderer.on('season-added', (_event, libraryID: string, season: SeasonData) => {
+      dispatch(addSeason({libraryId: libraryID, season: season}));
     });
 
-    window.ipcRenderer.on('episode-added', (_event, episode: EpisodeData) => {
-      dispatch(addEpisode(episode));
+    window.ipcRenderer.on('episode-added', (_event, libraryID: string, showID: string, episode: EpisodeData) => {
+      dispatch(addEpisode({libraryId: libraryID, showId: showID, episode: episode}));
     });
   
     window.electronAPI.onWindowStateChange((state: string) => {
