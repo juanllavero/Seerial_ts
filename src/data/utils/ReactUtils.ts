@@ -8,7 +8,6 @@ export class ReactUtils {
             const options = {
                 pixels: 50000, // Reducimos el número de píxeles a analizar para centrarnos más en colores prominentes
                 distance: 0.15, // Reducimos la distancia entre colores para obtener menos variedad
-                colorValidator: (red: number, green: number, blue: number, alpha: number = 255) => alpha > 240, // Solo colores muy opacos
                 saturationDistance: 0.5, // Reducimos la distancia de saturación para colores menos vibrantes
                 lightnessDistance: 0.12, // Reducimos la distancia de brillo para obtener colores más oscuros
                 hueDistance: 0.05, // Reducimos la distancia del matiz para que los colores estén más cercanos entre sí

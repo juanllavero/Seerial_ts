@@ -389,18 +389,22 @@ export class Utils {
     }
 
     public static downloadImage = async (url: string, filePath: string) => {
-        const response = await axios({
-          url,
-          method: 'GET',
-          responseType: 'stream'
-        });
-      
-        return new Promise<void>((resolve, reject) => {
-          const writer = fs.createWriteStream(filePath);
-          response.data.pipe(writer);
-          writer.on('finish', resolve);
-          writer.on('error', reject);
-        });
+        try {
+            const response = await axios({
+                url,
+                method: 'GET',
+                responseType: 'stream'
+            });
+        
+            return new Promise<void>((resolve, reject) => {
+                const writer = fs.createWriteStream(filePath);
+                response.data.pipe(writer);
+                writer.on('finish', resolve);
+                writer.on('error', reject);
+            });
+        } catch (error: any) {
+            console.error(`Error downloading image: ${error.message}`);
+        }
     }
 
     public static getFileName(filePath: string) {
@@ -516,38 +520,19 @@ export class Utils {
     };
 
     //#region BACKGROUND PROCESSING
-    private static async copyAndRenameImage(srcImagePath: string, destDirPath: string, imageName: string) {
-        const srcPath = path.join(srcImagePath, imageName);
-        const destDir = path.join(destDirPath, imageName);
-    
-        try {
-            await fsExtra.copy(srcPath, destDir);
-        } catch (e) {
-            console.error(`copyAndRenameImage: image ${srcImagePath}/${imageName} could not be copied to ${destDirPath}`);
-        }
-    }
-    
-    public static async saveBackground(season: Season, imageToCopy: string, copyImages: boolean) {
+    public static async saveBackground(season: Season, imageToCopy: string) {
         const baseDir = `resources/img/backgrounds/${season.getId()}/`;
         await fsExtra.ensureDir(baseDir);
     
-        if (copyImages) {
-            const directoryPath = path.dirname(imageToCopy);
-            await this.copyAndRenameImage(directoryPath, baseDir, 'background.jpg');
-            await this.copyAndRenameImage(directoryPath, baseDir, 'fullBlur.jpg');
-    
+        try {
+            // Copy the original image
+            await fsExtra.copy(imageToCopy, path.join(baseDir, 'background.jpg'));
             season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
-        } else {
-            try {
-                // Copy the original image
-                await fsExtra.copy(imageToCopy, path.join(baseDir, 'background.jpg'));
-                season.setBackgroundSrc(path.join(baseDir, 'background.jpg'));
-        
-                // Process blur and save
-                this.processBlurAndSave(this.getExternalPath(season.getBackgroundSrc()), path.join(baseDir, 'fullBlur.jpg'));
-            } catch (e) {
-                console.error('saveBackground: error processing image with blur');
-            }
+    
+            // Process blur and save
+            this.processBlurAndSave(this.getExternalPath(season.getBackgroundSrc()), path.join(baseDir, 'fullBlur.jpg'));
+        } catch (e) {
+            console.error('saveBackground: error processing image with blur');
         }
     }
 

@@ -1,4 +1,4 @@
-import { spawn, execFile, ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'node:url'
 import * as path from 'path';
@@ -7,11 +7,11 @@ import * as fs from 'fs';
 
 export class MPVController {
   private mpvProcess: ChildProcessWithoutNullStreams | null = null;
-  private videoLoaded: boolean = false;
+  //private videoLoaded: boolean = false;
   private paused: boolean = false;
   private static ipcSocketPath: string = '//./pipe/mpv-pipe';
   private clientSocket: net.Socket | null = null;
-  private connectionEstablished: boolean = false;
+  //private connectionEstablished: boolean = false;
 
   constructor(private window: BrowserWindow) {}
 
@@ -46,10 +46,10 @@ export class MPVController {
 
     this.mpvProcess.on('close', (code) => {
       console.log(`MPV process exited with code ${code}`);
-      this.videoLoaded = true;
+      //this.videoLoaded = true;
     });
 
-    this.videoLoaded = true;
+    //this.videoLoaded = true;
 
     // Esperar hasta que el socket esté disponible antes de conectar
     this.waitForSocketAndConnect();
@@ -127,7 +127,7 @@ export class MPVController {
 
   // Detener el video
   public stop(): void {
-    this.videoLoaded = false;
+    //this.videoLoaded = false;
     this.sendCommand(['stop']);
   }
 

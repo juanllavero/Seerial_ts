@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePause, setCurrentTime, setDuration, toggleControls, toggleInSettings, toggleInChapters, changeVolume } from 'redux/slices/videoSlice';
 import { RootState } from 'redux/store';
@@ -175,7 +175,7 @@ function Controls() {
 
     const loadTracks = () => {
         //let audioTrackLanguage = currentSeason?.audioTrackLanguage || new Intl.Locale(await Configuration.loadConfig("preferAudioLan", "es-ES")).language;
-        let selectedAudioTrack = currentSeason?.selectedAudioTrack;
+        //let selectedAudioTrack = currentSeason?.selectedAudioTrack;
 
         setSelectedAudioTrack(episode?.audioTracks[0]);
         setSelectedSubtitleTrack(episode?.subtitleTracks[0]);

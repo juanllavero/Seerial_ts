@@ -5,9 +5,8 @@ import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
 import { useTranslation } from "react-i18next";
-import { toggleSeasonWindow, toggleSeriesWindow, updateSeason } from "redux/slices/dataSlice";
+import { toggleSeasonWindow, toggleSeriesWindow } from "redux/slices/dataSlice";
 import { TagsInput } from "react-tag-input-component";
-import ResolvedImage from "@components/Image";
 
 const renderSeriesWindow = () => {
     const dispatch = useDispatch();
@@ -17,7 +16,6 @@ const renderSeriesWindow = () => {
     const seriesMenuOpen = useSelector((state: RootState) => state.data.seriesWindowOpen);
     const library = useSelector((state: RootState) => state.data.selectedLibrary);
     const series = useSelector((state: RootState) => state.data.seriesMenu);
-    const season = useSelector((state: RootState) => state.data.selectedSeason);
 
     const [pasteUrl, setPasteUrl] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>('');
@@ -75,9 +73,9 @@ const renderSeriesWindow = () => {
                 selectPoster(series?.coverSrc.split('/').pop());
         }
 
-        if (menuSection === Section.Logos){
+        if (menuSection === Section.Logos && series){
             fetchLogos().then(() => setImageDownloaded(false));
-        }else if (menuSection === Section.Posters){
+        }else if (menuSection === Section.Posters && series){
             fetchPosters().then(() => setImageDownloaded(false));
         }
     }, [menuSection, imageDownloaded]);

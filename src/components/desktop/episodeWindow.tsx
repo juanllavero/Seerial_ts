@@ -54,7 +54,7 @@ const renderEpisodeWindow = () => {
                 selectImage(selectedEpisode?.imgSrc.split('/').pop());
         }
 
-        if (menuSection === Section.Thumbnails){
+        if (menuSection === Section.Thumbnails && selectedEpisode){
             fetchImages().then(() => setImageDownloaded(false));
         }
     }, [menuSection, imageDownloaded]);
@@ -283,10 +283,16 @@ const renderEpisodeWindow = () => {
                     <div className="dialog-center-left">
                     <button className={`desktop-dialog-side-btn ${menuSection === Section.General ? ' desktop-dialog-side-btn-active' : ''}`}
                     onClick={() => dispatch(changeMenuSection(Section.General))}>{t('generalButton')}</button>
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.Thumbnails ? ' desktop-dialog-side-btn-active' : ''}`}
-                    onClick={() => dispatch(changeMenuSection(Section.Thumbnails))}>{t('thumbnailsButton')}</button>
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.Details ? ' desktop-dialog-side-btn-active' : ''}`}
-                    onClick={() => dispatch(changeMenuSection(Section.Details))}>{t('details')}</button>
+                    {
+                        selectedLibrary?.type !== "Music" ? (
+                            <>
+                                <button className={`desktop-dialog-side-btn ${menuSection === Section.Thumbnails ? ' desktop-dialog-side-btn-active' : ''}`}
+                                onClick={() => dispatch(changeMenuSection(Section.Thumbnails))}>{t('thumbnailsButton')}</button>
+                                <button className={`desktop-dialog-side-btn ${menuSection === Section.Details ? ' desktop-dialog-side-btn-active' : ''}`}
+                                onClick={() => dispatch(changeMenuSection(Section.Details))}>{t('details')}</button>
+                            </>
+                        ) : null
+                    }
                     </div>
                     <div className="dialog-center-right scroll">
                     {
@@ -480,7 +486,7 @@ const renderEpisodeWindow = () => {
                                         </div>
                                     </section>
                                     <section className="right-media-info">
-                                        {selectedEpisode?.videoTracks.map((track: VideoTrackData, index: number) => (
+                                        {selectedEpisode?.videoTracks.map((track: VideoTrackData) => (
                                             <div key={track.id + "-video"}>
                                                 <span id="media-info-title">Video</span>
                                                 {getVideoInfo(track)}

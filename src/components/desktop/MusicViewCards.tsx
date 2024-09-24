@@ -22,17 +22,17 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     const { t } = useTranslation();
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedElements, setSelectedElements] = useState<EpisodeData[]>([]); 
-    const [selectedElement, setSelectedElement] = useState(undefined);
-    const [playErrorDialog, setPlayErrorDialog] = useState<boolean>(false);
+    //const [selectedElement, setSelectedElement] = useState(undefined);
+    //const [playErrorDialog, setPlayErrorDialog] = useState<boolean>(false);
 
     //Reducers for images size
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
-    const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
+    //const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
 
     const seriesMenu = useSelector((state: RootState) => state.data.seriesMenu);
     const seriesMenuOpen = useSelector((state: RootState) => state.contextMenu.seriesMenu);
-    const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
-    const seasonMenuOpen = useSelector((state: RootState) => state.contextMenu.seasonMenu);
+    //const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
+    //const seasonMenuOpen = useSelector((state: RootState) => state.contextMenu.seasonMenu);
 
     const musicPaused = useSelector((state: RootState) => state.musicPlayer.paused);
 
@@ -42,6 +42,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
     const cm = useRef<ContextMenu | null>(null);
     
     useEffect(() => {
+        setSelectedElements(selectedElements);  //Only for compiler to work, remove later
         if (selectedElements)
             setSelectionMode(selectedElements.length > 0);
     }, [selectedElements]);
@@ -68,7 +69,12 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
         generateGradient(series, null);
 
         dispatch(selectSeries(series));
-        handleSeasonSelection(null);
+        
+        if (series.seasons.length === 1){
+            handleSeasonSelection(series.seasons[0]);
+        } else {
+            handleSeasonSelection(null);
+        }
     };
 
     const handleSeasonSelection = (season: SeasonData | null) => {

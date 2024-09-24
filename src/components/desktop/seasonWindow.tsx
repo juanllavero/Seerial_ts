@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
 import ResolvedImage from "@components/Image";
 import { TagsInput } from "react-tag-input-component";
-import { dirname } from "path";
 
 const renderSeasonWindow = () => {
     const dispatch = useDispatch();
@@ -80,9 +79,9 @@ const renderSeasonWindow = () => {
                 selectPoster(season?.coverSrc.split('/').pop());
         }
 
-        if (menuSection === Section.Logos){
+        if (menuSection === Section.Logos && season){
             fetchLogos().then(() => setImageDownloaded(false));
-        }else if (menuSection === Section.Posters){
+        }else if (menuSection === Section.Posters  && season){
             fetchPosters().then(() => setImageDownloaded(false));
         }
     }, [menuSection, imageDownloaded, season]);

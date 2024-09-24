@@ -83,7 +83,25 @@ export class DataManager {
     //#endregion
 
     //#region ADD/UPDATE DATA
-    
+    public static updateEpisode(libraryId: string, seriesId: string, episode: EpisodeData) {
+        const library = this.libraries.find(library => library.id === libraryId);
+
+        if (library) {
+            const series = library.getSeries().find(series => series.id === seriesId);
+
+            if (series) {
+                const season = series.getSeasons().find(season => season.id === episode.seasonID);
+
+                if (season) {
+                    season.getEpisodes().forEach(item => {
+                        if (item.id === episode.id) {
+                            item = EpisodeLocal.fromJSON(episode);
+                        }
+                    });
+                }
+            }
+        }
+    }
     //#endregion
 
     //#region DELETE DATA
@@ -294,7 +312,7 @@ export class DataManager {
 
         showData = await this.moviedb.tvInfo({ id: `${themdbID}`, language: this.library.getLanguage() });
 
-        await this.setSeriesMetadataAndImages(show, showData, exists);
+        await this.setSeriesMetadataAndImages(show, showData);
 
         show.setAnalyzingFiles(true);
 
@@ -325,7 +343,7 @@ export class DataManager {
         if (show.episodeGroupID !== "")
             episodesGroup = await this.moviedb?.episodeGroup({ id: show.themdbID});
 
-        await this.processEpisodes(videoFiles, show, seasonsMetadata, episodesGroup, exists);
+        await this.processEpisodes(videoFiles, show, seasonsMetadata, episodesGroup);
         
         if (show.getSeasons().length === 0){
             this.library.getAnalyzedFolders().delete(show.getFolder());
@@ -339,11 +357,11 @@ export class DataManager {
         this.win?.webContents.send('series-updated', this.library.id, show.toJSON());
     };
 
-    private static async processEpisodes(videoFiles: string[], show: Series, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined, exists: boolean) {
+    private static async processEpisodes(videoFiles: string[], show: Series, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined) {
         // Process each episode
         const processPromises = videoFiles.map(async video => {
             if (this.library.getAnalyzedFiles().get(video) == null) {
-                await this.processEpisode(show, video, seasonsMetadata, episodesGroup, exists);
+                await this.processEpisode(show, video, seasonsMetadata, episodesGroup);
             }
         });
         
@@ -372,7 +390,7 @@ export class DataManager {
         }
     }
 
-    private static async processEpisode(show: Series, video: string, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined, exists: boolean) {
+    private static async processEpisode(show: Series, video: string, seasonsMetadata: TvSeasonResponse[], episodesGroup: EpisodeGroupResponse | undefined) {
         //SeasonMetadataBasic and episode metadata to find for the current file
         let seasonMetadata: TvSeasonResponse | null = null;
         let episodeMetadata: Episode | null = null;
@@ -506,25 +524,11 @@ export class DataManager {
             season.setYear(seasonMetadata.episodes && seasonMetadata.episodes[0] && seasonMetadata.episodes[0].air_date ? seasonMetadata.episodes[0].air_date : "");
             season.setSeasonNumber(realEpisode !== -1 ? realSeason ?? 0 : (seasonMetadata.season_number ?? 0));
 
-            if (!season.getBackgroundSrc() || season.getBackgroundSrc() === 'resources/img/DefaultBackground.png') {
-                if (show.getSeasons().length > 1) {
-                    let s: any = undefined;
-
-                    show.seasons.forEach(seasonToFind => {
-                        if (seasonToFind.getBackgroundSrc() !== "")
-                            s = seasonToFind;
-                    });
-
-                    if (s)
-                        await Utils.saveBackground(season, s.getBackgroundSrc(), true);
-                } else {
-                    const filePath: string = "resources/img/DownloadCache/" + show.getThemdbID() + ".jpg";
-                    if (Utils.fileExists(filePath))
-                        await Utils.saveBackground(season, filePath, false);
-                    else
-                        await Utils.saveBackground(season, "resources/img/DefaultBackground.png", false);
-                }
-            }
+            const filePath: string = "resources/img/DownloadCache/" + show.getThemdbID() + ".jpg";
+            if (Utils.fileExists(filePath))
+                await Utils.saveBackground(season, filePath);
+            else
+                await Utils.saveBackground(season, "resources/img/DefaultBackground.png");
 
             if (season.getSeasonNumber() === 0)
                 season.setOrder(100);
@@ -603,7 +607,7 @@ export class DataManager {
                         const url = `${imageBaseURL}${thumbnail.file_path}`;
                         const imageFilePath = path.join(outputDir, index + ".jpg");
 
-                        if (index === 0) {
+                        if (episode.imgSrc === "") {
                             await Utils.downloadImage(url, imageFilePath);
                             episode.imgSrc = `resources/img/thumbnails/video/${episode.id}/${index}.jpg`;
                         } else {
@@ -650,7 +654,7 @@ export class DataManager {
         return [NaN]; // Return NaN if no episode found
     };
 
-    private static async setSeriesMetadataAndImages(show: Series, showData: ShowResponse, exists: boolean) {
+    private static async setSeriesMetadataAndImages(show: Series, showData: ShowResponse) {
         show.name = !show.nameLock ? showData.name ?? "" : "";
         show.year = !show.yearLock ? showData.first_air_date ?? "" : "";
         show.overview = !show.overviewLock ? showData.overview ?? "" : "";
@@ -838,14 +842,14 @@ export class DataManager {
         }else {
             let show: Series | null;
 
-            let exists: boolean = false;
+            //let exists: boolean = false;
             if (this.library.getAnalyzedFolders().get(root)){
                 show = this.library.getSeriesById(this.library.getAnalyzedFolders().get(root) ?? "");
 
                 if (show === null)
                     return;
 
-                exists = true;
+                //exists = true;
             }else{
                 show = new Series();
                 show.setFolder(root);
@@ -1051,9 +1055,9 @@ export class DataManager {
         season.setGenres(season.genresLock ? season.genres : movieMetadata.genres ? movieMetadata.genres.map(genre => genre.name ?? "") : []);
         season.productionStudios = season.studioLock ? season.productionStudios : movieMetadata.production_companies ? movieMetadata.production_companies.map(company => company.name ?? "") : [];
 
-        if (season.getImdbID() !== "-1" && season.getImdbID() !== ""){
+        /*if (season.getImdbID() !== "-1" && season.getImdbID() !== ""){
             await this.setIMDBScore(season.imdbID, season);
-        }
+        }*/
 
         //#region GET TAGS
         const credits = await this.moviedb?.movieCredits({ id: season.getThemdbID(), language: this.library.language });
@@ -1193,9 +1197,9 @@ export class DataManager {
 
         const filePath: string = "resources/img/DownloadCache/" + season.getThemdbID() + ".jpg";
         if (Utils.fileExists(filePath))
-            await Utils.saveBackground(season, filePath, false);
+            await Utils.saveBackground(season, filePath);
         else
-            await Utils.saveBackground(season, "resources/img/DefaultBackground.png", false);
+            await Utils.saveBackground(season, "resources/img/DefaultBackground.png");
         //#endregion
     };
 
@@ -1309,8 +1313,8 @@ export class DataManager {
         }
     };
 
-    private static async setIMDBScore(imdbID: string, season: Season): Promise<void> {
-        /*try {
+    /*private static async setIMDBScore(imdbID: string, season: Season): Promise<void> {
+        try {
             const url = `https://www.imdb.com/title/${imdbID}`;
             const { data } = await axios.get(url, { timeout: 6000 });
     
@@ -1326,8 +1330,8 @@ export class DataManager {
     
         } catch (error) {
             console.error('setIMDBScore: IMDB connection lost');
-        }*/
-    };
+        }
+    };*/
 
     //#endregion
 
@@ -1360,14 +1364,11 @@ export class DataManager {
         const musicFiles = await Utils.getMusicFiles(folder);
 
         // Process each file
-        const processPromises = musicFiles.map(async f => {
-            if (!this.library.getAnalyzedFiles().get(f)) {
-                await this.processMusicFile(f, collection);
+        for (const file of musicFiles){
+            if (!this.library.getAnalyzedFiles().get(file)) {
+                await this.processMusicFile(file, collection);
             }
-        });
-        
-        // Esperar a que todas las promesas se resuelvan
-        await Promise.all(processPromises);
+        }
 
         collection.setAnalyzingFiles(false);
 

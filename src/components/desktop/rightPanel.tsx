@@ -32,11 +32,9 @@ export const renderRightPanelContent = () => {
     const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
     const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
     const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
-    const selectedEpisode = useSelector((state: RootState) => state.data.selectedEpisode);
 
     const seriesMenu = useSelector((state: RootState) => state.data.seriesMenu);
     const seriesMenuOpen = useSelector((state: RootState) => state.contextMenu.seriesMenu);
-    const episodeMenuOpen = useSelector((state: RootState) => state.contextMenu.episodeMenu);
 
     //Reducers for images size
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
@@ -46,7 +44,6 @@ export const renderRightPanelContent = () => {
 
     const transparentImageLoaded = useSelector((state: RootState) => state.transparentImageLoaded.isTransparentImageLoaded);
     const showCollectionPoster = useSelector((state: RootState) => state.data.showCollectionPoster);
-    const showButtonMenu = useSelector((state: RootState) => state.data.showEpisodeMenu);
 
     const [musicSection, setMusicSection] = useState<MusicSection>(MusicSection.Collections);
     const [musicSelect, setMusicSelect] = useState<boolean>(false);

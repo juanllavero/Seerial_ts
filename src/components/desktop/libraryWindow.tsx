@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import '../../App.scss';
-import { addLibrary, toggleLibraryEditWindow } from "redux/slices/dataSlice";
+import { toggleLibraryEditWindow } from "redux/slices/dataSlice";
 import { useTranslation } from "react-i18next";
 import { Library } from "@objects/Library";
 
