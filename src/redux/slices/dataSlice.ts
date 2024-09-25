@@ -61,8 +61,14 @@ const dataSlice = createSlice({
       }
       
     },
-    selectLibrary: (state, action: PayloadAction<LibraryData>) => {
+    selectLibrary: (state, action: PayloadAction<LibraryData | null>) => {
       state.selectedLibrary = action.payload;
+
+      if (state.selectedLibrary === null){
+        state.selectedSeries = null;
+        state.selectedSeason = null;
+        state.selectedEpisode = null;
+      }
     },
     clearLibrarySelection: (state) => {
       state.selectedLibrary = null;
@@ -121,6 +127,7 @@ const dataSlice = createSlice({
     resetSelection: (state) => {
       state.selectedSeries = null;
       state.selectedSeason = null;
+      state.selectedEpisode = null;
     },
     toggleSeriesWindow: (state) => {
       state.seriesWindowOpen = !state.seriesWindowOpen;
