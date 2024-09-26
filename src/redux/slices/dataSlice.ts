@@ -48,7 +48,7 @@ const dataSlice = createSlice({
     setLibraries: (state, action: PayloadAction<LibraryData[]>) => {
       state.libraries = action.payload;
 
-      if (state.selectedLibrary){
+      if (state.selectedLibrary !== null){
         let index = state.libraries.findIndex(library => library.id === state.selectedLibrary?.id);
 
         if (index < 0){
@@ -57,7 +57,7 @@ const dataSlice = createSlice({
 
         state.selectedLibrary = state.libraries[index];
       } else if (state.libraries.length > 0) {
-        state.selectedLibrary = state.libraries[0];
+        state.selectedLibrary = null;
       }
       
     },

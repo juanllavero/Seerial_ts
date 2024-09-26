@@ -19,12 +19,6 @@ export const renderLibrariesList = () => {
 
     const cm = useRef<ContextMenu | null>(null);
 
-    /*useEffect(() => {
-        if (libraries !== null && libraries.length > 0 && !selectedLibrary) {
-            handleSelectLibrary(libraries[0]);
-        }
-    }, [libraries, selectedLibrary]);*/
-
     //#region CONTEXT MENU ITEMS
     const menuItems = [
         {
