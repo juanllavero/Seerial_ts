@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
 import ResolvedImage from "@components/Image";
 import { TagsInput } from "react-tag-input-component";
+import ReactPlayer from 'react-player'
 
 const renderSeasonWindow = () => {
     const dispatch = useDispatch();
@@ -418,32 +419,32 @@ const renderSeasonWindow = () => {
                         ) : menuSection === Section.Details ? (
                             <>
                                 <div className="dialog-horizontal-box">
-                                    <div className="dialog-input-box">
-                                        <span>{t('backgroundVideo')}</span>
-                                        <div className="media-input">
-                                            <input type="text" value={name} onChange={(e) => {
-                                                setNameLock(true);
-                                                setName(e.target.value);
-                                            }}/>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('loadButton')}</button>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('downloadButton')}</button>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('removeButton')}</button>
+                                    <div className="dialog-background-buttons">
+                                        <span>{t('backgroundImage')}</span>
+                                        <div>
+                                            <button className="desktop-dialog-btn" title={t('loadButton')} onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 16 16" width="20" height="20"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z" fill="#FFFFFF"></path><path d="M11.78 4.72a.749.749 0 1 1-1.06 1.06L8.75 3.811V9.5a.75.75 0 0 1-1.5 0V3.811L5.28 5.78a.749.749 0 1 1-1.06-1.06l3.25-3.25a.749.749 0 0 1 1.06 0l3.25 3.25Z" fill="#FFFFFF"></path></svg>
+                                            </button>
+                                            <button className="desktop-dialog-btn" title={t('fromURLButton')} onClick={() => setPasteUrl(true)}>
+                                                <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z" fill="#FFFFFF"></path></svg>
+                                            </button>
+                                            <button className="desktop-dialog-btn" title={t('downloadButton')} onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" height="20" viewBox="0 0 16 16" width="20" data-view-component="true">
+                                                    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM5.78 8.75a9.64 9.64 0 0 0 1.363 4.177c.255.426.542.832.857 1.215.245-.296.551-.705.857-1.215A9.64 9.64 0 0 0 10.22 8.75Zm4.44-1.5a9.64 9.64 0 0 0-1.363-4.177c-.307-.51-.612-.919-.857-1.215a9.927 9.927 0 0 0-.857 1.215A9.64 9.64 0 0 0 5.78 7.25Zm-5.944 1.5H1.543a6.507 6.507 0 0 0 4.666 5.5c-.123-.181-.24-.365-.352-.552-.715-1.192-1.437-2.874-1.581-4.948Zm-2.733-1.5h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.507 6.507 0 0 0-4.666 5.5Zm10.181 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.507 6.507 0 0 0 4.666-5.5Zm2.733-1.5a6.507 6.507 0 0 0-4.666-5.5c.123.181.24.365.353.552.714 1.192 1.436 2.874 1.58 4.948Z" fill="#FFFFFF"></path>
+                                                </svg>
+                                            </button>
                                         </div>
+                                        <span>{resolution.width}x{resolution.height}</span>
                                     </div>
-                                </div>
-                                <div className="dialog-horizontal-box">
-                                    <div className="dialog-input-box">
-                                        <span>{t('backgroundMusic')}</span>
-                                        <div className="media-input">
-                                            <input type="text" value={name} onChange={(e) => {
-                                                setNameLock(true);
-                                                setName(e.target.value);
-                                            }}/>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('loadButton')}</button>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('downloadButton')}</button>
-                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>{t('removeButton')}</button>
-                                        </div>
-                                    </div>
+                                    <ResolvedImage src={season?.backgroundSrc ? season.backgroundSrc : ''}
+                                        id="seasonBackgroundImage"
+                                        alt="Video Thumbnail"
+                                        onError={(e: any) => {
+                                            e.target.onerror = null; // To avoid infinite loop
+                                            e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
+                                        } }
+                                        onLoad={handleImageLoad}
+                                    />
                                 </div>
                                 {
                                     pasteUrl ? (
@@ -464,32 +465,55 @@ const renderSeasonWindow = () => {
                                         </div>
                                     ) : null
                                 }
-                                <div className="dialog-horizontal-box">
-                                    <div className="dialog-background-buttons">
-                                        <span>{t('backgroundImage')}</span>
-                                        <div>
-                                            <button className="desktop-dialog-btn" title={t('loadButton')} onClick={() => dispatch(toggleSeasonWindow())}>
+                                <div className="dialog-horizontal-box" style={{justifyContent: 'start'}}>
+                                    <div className="dialog-background-buttons" style={{width: '40%'}}>
+                                        <span>{t('backgroundMusic')}</span>
+                                        <div className="media-input">
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 16 16" width="20" height="20"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z" fill="#FFFFFF"></path><path d="M11.78 4.72a.749.749 0 1 1-1.06 1.06L8.75 3.811V9.5a.75.75 0 0 1-1.5 0V3.811L5.28 5.78a.749.749 0 1 1-1.06-1.06l3.25-3.25a.749.749 0 0 1 1.06 0l3.25 3.25Z" fill="#FFFFFF"></path></svg>
                                             </button>
-                                            <button className="desktop-dialog-btn" title={t('fromURLButton')} onClick={() => setPasteUrl(true)}>
-                                                <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z" fill="#FFFFFF"></path></svg>
-                                            </button>
-                                            <button className="desktop-dialog-btn" title={t('downloadButton')} onClick={() => dispatch(toggleSeasonWindow())}>
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" height="20" viewBox="0 0 16 16" width="20" data-view-component="true">
                                                     <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM5.78 8.75a9.64 9.64 0 0 0 1.363 4.177c.255.426.542.832.857 1.215.245-.296.551-.705.857-1.215A9.64 9.64 0 0 0 10.22 8.75Zm4.44-1.5a9.64 9.64 0 0 0-1.363-4.177c-.307-.51-.612-.919-.857-1.215a9.927 9.927 0 0 0-.857 1.215A9.64 9.64 0 0 0 5.78 7.25Zm-5.944 1.5H1.543a6.507 6.507 0 0 0 4.666 5.5c-.123-.181-.24-.365-.352-.552-.715-1.192-1.437-2.874-1.581-4.948Zm-2.733-1.5h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.507 6.507 0 0 0-4.666 5.5Zm10.181 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.507 6.507 0 0 0 4.666-5.5Zm2.733-1.5a6.507 6.507 0 0 0-4.666-5.5c.123.181.24.365.353.552.714 1.192 1.436 2.874 1.58 4.948Z" fill="#FFFFFF"></path>
                                                 </svg>
                                             </button>
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#E3E3E3"></path></svg>
+                                            </button>
                                         </div>
-                                        <span>{resolution.width}x{resolution.height}</span>
+                                        
                                     </div>
-                                    <ResolvedImage src={season?.backgroundSrc ? season.backgroundSrc : ''}
-                                    id="seasonBackgroundImage"
-                                    alt="Video Thumbnail"
-                                    onError={(e: any) => {
-                                        e.target.onerror = null; // To avoid infinite loop
-                                        e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
-                                    } }
-                                    onLoad={handleImageLoad}/>
+                                    <div style={{width: '60%', height: '100%', display: 'flex', justifyContent: 'end', alignItems: 'center'}}>
+                                        <ReactPlayer 
+                                            url={season?.musicSrc !== "" ? season?.musicSrc : "H:\\Music\\[Música]\\Nier Collection\\Nier Replicant\\120 Yonah (Piano Version).mp3"}
+                                            controls
+                                            height="50px"
+                                            width="100%" />
+                                    </div>
+                                </div>
+                                <div className="dialog-horizontal-box">
+                                    <div className="dialog-background-buttons">
+                                        <span>{t('backgroundVideo')}</span>
+                                        <div>
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 16 16" width="20" height="20"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z" fill="#FFFFFF"></path><path d="M11.78 4.72a.749.749 0 1 1-1.06 1.06L8.75 3.811V9.5a.75.75 0 0 1-1.5 0V3.811L5.28 5.78a.749.749 0 1 1-1.06-1.06l3.25-3.25a.749.749 0 0 1 1.06 0l3.25 3.25Z" fill="#FFFFFF"></path></svg>
+                                            </button>
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" height="20" viewBox="0 0 16 16" width="20" data-view-component="true">
+                                                    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM5.78 8.75a9.64 9.64 0 0 0 1.363 4.177c.255.426.542.832.857 1.215.245-.296.551-.705.857-1.215A9.64 9.64 0 0 0 10.22 8.75Zm4.44-1.5a9.64 9.64 0 0 0-1.363-4.177c-.307-.51-.612-.919-.857-1.215a9.927 9.927 0 0 0-.857 1.215A9.64 9.64 0 0 0 5.78 7.25Zm-5.944 1.5H1.543a6.507 6.507 0 0 0 4.666 5.5c-.123-.181-.24-.365-.352-.552-.715-1.192-1.437-2.874-1.581-4.948Zm-2.733-1.5h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.507 6.507 0 0 0-4.666 5.5Zm10.181 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.507 6.507 0 0 0 4.666-5.5Zm2.733-1.5a6.507 6.507 0 0 0-4.666-5.5c.123.181.24.365.353.552.714 1.192 1.436 2.874 1.58 4.948Z" fill="#FFFFFF"></path>
+                                                </svg>
+                                            </button>
+                                            <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#E3E3E3"></path></svg>
+                                            </button>
+                                            
+                                        </div>
+                                    </div>
+                                    <ReactPlayer 
+                                        url='H:\\Re Zero S3  01.mkv' 
+                                        controls
+                                        width="60%"
+                                        height="auto" />
                                 </div>
                             </>
                         ) : menuSection === Section.Logos ? (

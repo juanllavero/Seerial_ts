@@ -1335,17 +1335,14 @@ html, body {
           justify-content: space-between;
 
           #seasonBackgroundImage {
-            width: 65%;
+            width: 60%;
           }
 
           .media-input {
             display: flex;
             flex-flow: row nowrap;
 
-            input {
-              margin-right: 0.6em;
-              width: 100%;
-            }
+            margin-bottom: 0.8em;
           }
 
           .dialog-background-buttons {
