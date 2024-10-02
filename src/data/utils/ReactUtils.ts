@@ -49,4 +49,19 @@ export class ReactUtils {
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
+
+    public static formatTimeForView = (time: number) => {
+        const hours = Math.floor(time / 60);
+        const minutes = Math.floor(time % 60);
+
+        if (hours > 0){
+            if (minutes > 0) {
+                return `${hours}h ${minutes}m`
+            } else {
+                return `${hours}h`
+            }
+        } else {
+            return `${minutes}m`
+        }
+    }
 }

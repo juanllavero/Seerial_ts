@@ -12,6 +12,13 @@ $color-lighter: #5e5e5e;
 $color-more-lighter: #707070;
 $color-bright: #EDF2F4;
 
+$font-x-small: 0.625em;
+$font-small: 0.812em;
+$font-medium: 1em;
+$font-large: 1.125em;
+$font-x-large: 1.5em;
+$font-xx-large: 2em;
+
 #root {
   margin: 0 auto;
   text-align: center;
@@ -232,6 +239,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  z-index: 10;
   height: 100%;
 }
 
@@ -873,7 +881,7 @@ html, body {
 }
 
 .main-background {
-  filter: brightness(0.6); //blur(10px);
+  filter: brightness(0.6);
   position: absolute;
   top: 0;
   left: 0;

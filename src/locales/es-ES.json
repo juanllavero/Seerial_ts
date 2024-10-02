@@ -199,5 +199,7 @@
     "collections": "Colecciones",
     "albums": "Álbumes",
     "tracks": "Pistas",
-    "home": "Inicio"
+    "home": "Inicio",
+    "noVideoFound": "No hay ningún vídeo cargado",
+    "noMusicFound": "No hay ninguna canción cargada"
   }

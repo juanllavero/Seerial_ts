@@ -199,5 +199,7 @@
     "collections": "Sammlungen",
     "albums": "Alben",
     "tracks": "Titel",
-    "home": "Startseite"
+    "home": "Startseite",
+    "noVideoFound": "Es wurde kein Video geladen",
+    "noMusicFound": "Es wurde kein Lied geladen"
 }  

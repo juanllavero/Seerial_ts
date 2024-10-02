@@ -199,5 +199,7 @@
     "collections": "Collections",
     "albums": "Albums",
     "tracks": "Tracks",
-    "home": "Home"
+    "home": "Home",
+    "noVideoFound": "There is no video loaded",
+    "noMusicFound": "There is no song loaded"
   }

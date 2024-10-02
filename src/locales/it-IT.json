@@ -199,5 +199,7 @@
     "collections": "Collezioni",
     "albums": "Album",
     "tracks": "Tracce",
-    "home": "Home"
-}  
+    "home": "Home",
+    "noVideoFound": "Nessun video caricato",
+    "noMusicFound": "Nessuna canzone caricata"
+}

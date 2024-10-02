@@ -135,8 +135,8 @@ const renderSeasonWindow = () => {
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.currentTarget;
         setResolution({
-        width: img.naturalWidth,
-        height: img.naturalHeight,
+            width: img.naturalWidth,
+            height: img.naturalHeight,
         });
     };
 
@@ -478,17 +478,23 @@ const renderSeasonWindow = () => {
                                                 </svg>
                                             </button>
                                             <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#E3E3E3"></path></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#FFFFFF"></path></svg>
                                             </button>
                                         </div>
                                         
                                     </div>
                                     <div style={{width: '60%', height: '100%', display: 'flex', justifyContent: 'end', alignItems: 'center'}}>
-                                        <ReactPlayer 
+                                    {
+                                        season?.videoSrc !== "" ? (
+                                            <ReactPlayer 
                                             url={season?.musicSrc !== "" ? season?.musicSrc : "H:\\Music\\[Música]\\Nier Collection\\Nier Replicant\\120 Yonah (Piano Version).mp3"}
                                             controls
                                             height="50px"
                                             width="100%" />
+                                        ) : (
+                                            <span>{t('noMusicFound')}</span>
+                                        )
+                                    } 
                                     </div>
                                 </div>
                                 <div className="dialog-horizontal-box">
@@ -504,16 +510,21 @@ const renderSeasonWindow = () => {
                                                 </svg>
                                             </button>
                                             <button className="desktop-dialog-btn" onClick={() => dispatch(toggleSeasonWindow())}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#E3E3E3"></path></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000" focusable="false"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z" fill="#FFFFFF"></path></svg>
                                             </button>
-                                            
                                         </div>
                                     </div>
-                                    <ReactPlayer 
-                                        url='H:\\Re Zero S3  01.mkv' 
-                                        controls
-                                        width="60%"
-                                        height="auto" />
+                                    {
+                                        season?.videoSrc !== "" ? (
+                                            <ReactPlayer 
+                                            url='H:\\Re Zero S3  01.mkv'
+                                            controls
+                                            width="60%"
+                                            height="auto" />
+                                        ) : (
+                                            <span>{t('noVideoFound')}</span>
+                                        )
+                                    }
                                 </div>
                             </>
                         ) : menuSection === Section.Logos ? (
