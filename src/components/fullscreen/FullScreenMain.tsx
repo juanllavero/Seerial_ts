@@ -11,6 +11,7 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
+import { Utils } from 'data/utils/Utils';
 
 function FullScreenMain() {
     const dispatch = useDispatch();
@@ -37,40 +38,52 @@ function FullScreenMain() {
       season: SeasonData,
       episode: EpisodeData }[]>([]);
 
+    const [backgroundPath, setBackgroundPath] = useState<string>('');
+    const [gradient, setGradient] = useState<string>('none');
+    const [gradientLeft, setGradientLeft] = useState<string>('none');
+    const [homeImageLoaded, setHomeImageLoaded] = useState(false);
+
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
     const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
 
     useEffect(() => {
         setCurrentlyWatchingShows([]);
         for (const library of librariesList) {
-          for (const show of library.series) {
-            const season = show.seasons[0];
-  
-              if (season) {
-                const episode = season.episodes[0];
-  
-                if (episode){
-                  setCurrentlyWatchingShows(prevElements => [...prevElements, {
-                    library, show, season, episode
-                  }]);
+            if (library.type !== "Music"){
+                for (const show of library.series) {
+                    const season = show.seasons[0];
+          
+                      if (season) {
+                        const episode = season.episodes[0];
+          
+                        if (episode){
+                          setCurrentlyWatchingShows(prevElements => [...prevElements, {
+                            library, show, season, episode
+                          }]);
+                        }
+                      }
+                    /*
+                    if (show.currentlyWatchingSeason !== -1){
+                      const season = show.seasons[show.currentlyWatchingSeason];
+          
+                      if (season) {
+                        const episode = season.episodes[season.currentlyWatchingEpisode];
+          
+                        if (episode){
+                          setCurrentlyWatchingShows([...currentlyWatchingShows, {
+                            library, show, season, episode
+                          }]);
+                        }
+                      }
+                    }
+                    */
                 }
-              }
-            /*
-            if (show.currentlyWatchingSeason !== -1){
-              const season = show.seasons[show.currentlyWatchingSeason];
-  
-              if (season) {
-                const episode = season.episodes[season.currentlyWatchingEpisode];
-  
-                if (episode){
-                  setCurrentlyWatchingShows([...currentlyWatchingShows, {
-                    library, show, season, episode
-                  }]);
-                }
-              }
             }
-            */
-          }
+        }
+
+        if (currentlyWatchingShows.length > 0) {
+            setHomeInfoElement(currentlyWatchingShows[0]);
+            setCurrentlyWatchingShows(currentlyWatchingShows);
         }
       }, [librariesList, selectedLibrary]);
 
@@ -99,8 +112,55 @@ function FullScreenMain() {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
+    useEffect(() => {
+        const generateGradient = async (path: string) => {
+            if (path !== 'none'){
+                const extPath = await window.electronAPI.getExternalPath(path);
+                
+                if (extPath !== '') {
+                    await ReactUtils.getDominantColors(extPath);
+    
+                    const dominantColor = ReactUtils.colors[0];
+        
+                    if (dominantColor){
+                        setGradient(`radial-gradient(135% 103% at 97% 39%, #073AFF00 41%, ${dominantColor} 68%)`);
+                        setGradientLeft(`linear-gradient(90deg, ${dominantColor} 0%, ${dominantColor} 100%)`);
+                    }
+                }
+            } else {
+                setGradient(`radial-gradient(135% 103% at 97% 39%, #073AFF00 41%, #000000FF 68%)`);
+                setGradientLeft(`linear-gradient(90deg, #000000FF 0%, #000000FF 100%)`);
+            }
+        }
+
+        if (homeInfoElement && homeInfoElement.season.backgroundSrc && homeInfoElement.season.backgroundSrc !== "") {
+            setHomeImageLoaded(false);
+            setTimeout(() => {
+                generateGradient(homeInfoElement.season.backgroundSrc);
+                setHomeImageLoaded(true);
+            }, 600);
+        } else if (homeInfoElement) {
+            setTimeout(() => {
+                generateGradient('none');
+            }, 100);
+        }
+    }, [homeInfoElement]);
+
     return (
         <>
+            <div className={`background-image ${homeImageLoaded ? 'loaded' : ''}`}>
+                {
+                    homeInfoElement && homeInfoElement.season.backgroundSrc !== "" ? (
+                        <ResolvedImage
+                            src={homeInfoElement.season.backgroundSrc}
+                            //className={imageLoaded ? 'loaded' : ''}
+                            alt="Background"
+                        />
+                    ) : null
+                }
+            </div>
+            <div className={`gradient-left ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradientLeft}`}}></div>
+            <div className={`gradient ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradient}`}}></div>
             <section className="top">
                 <button id="home" onClick={() => dispatch(selectLibrary(null))}>
                     <svg
@@ -238,7 +298,9 @@ function FullScreenMain() {
                                     ) : null
                                 }
                             </div>
-                            <span id="continue-watching-title">{t('continueWatching')}</span>
+                            <div className="continue-watching-title">
+                                <span>{t('continueWatching')}</span>
+                            </div>
                             <div className="continue-watching-list">
                                 {[...currentlyWatchingShows].splice(0, 75).map((value: {
                                     library: LibraryData, 

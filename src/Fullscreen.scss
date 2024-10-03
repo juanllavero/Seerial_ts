@@ -12,14 +12,14 @@ $color-lighter: #5e5e5e;
 $color-more-lighter: #707070;
 $color-bright: #EDF2F4;
 
-$font-x-small: 0.625em;
-$font-small: 0.812em;
-$font-medium: 1em;
-$font-large: 1.125em;
-$font-x-large: 1.5em;
-$font-xx-large: 2em;
-$font-xxx-large: 2.5em;
-$font-xxx-larger: 3em;
+$font-x-small: calc(0.625 * 1.5vh);  // ≈ 0.9375vh
+$font-small: calc(0.812 * 1.5vh);    // ≈ 1.218vh
+$font-medium: calc(1 * 1.5vh);       // 1.5vh
+$font-large: calc(1.125 * 1.5vh);    // ≈ 1.6875vh
+$font-x-large: calc(1.5 * 1.5vh);    // 2.25vh
+$font-xx-large: calc(2 * 1.5vh);     // 3vh
+$font-xxx-large: calc(2.5 * 1.5vh);  // 3.75vh
+$font-xxx-larger: calc(3 * 1.5vh);   // 4.5vh
 
 #root {
   margin: 0 auto;
@@ -50,6 +50,7 @@ html, body {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
+    z-index: 10;
 
     -webkit-app-region: drag;
 
@@ -131,9 +132,11 @@ html, body {
 .content {
     width: 100%;
     height: 100%;
-    padding: 2em 4em;
+    padding: 2em 4em 2em 4em;
     overflow-y: auto;
     text-align: left;
+
+    z-index: 10;
 
     .shows-container {
         display: flex;
@@ -166,26 +169,29 @@ html, body {
             gap: 1em;
 
             img {
-                height: auto;
-                max-width: 40%;
-                max-height: 80%;
+                width: auto;
+                max-width: 40vh;
             }
 
             #home-title {
                 font-size: $font-xxx-large;
                 font-weight: bold;
                 color: $color-text-primary;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
             }
 
             #home-subtitle {
                 font-size: $font-xxx-larger;
                 font-weight: bold;
                 color: $color-text-primary;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
             }
 
             #home-overview {
                 font-size: $font-x-large;
                 color: $color-text-default;
+
+                max-width: 100vh;
 
                 box-sizing: border-box;
 
@@ -196,6 +202,7 @@ html, body {
                 text-overflow: ellipsis;
                 line-clamp: var(--line-clamp-amount);
                 -webkit-line-clamp: var(--line-clamp-amount);
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
             }
 
             .home-info-horizontal {
@@ -203,26 +210,33 @@ html, body {
                 gap: 1em;
 
                 font-size: $font-x-large;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.472));
             }
         }
 
-        #continue-watching-title {
-            font-size: $font-xx-large;
-            font-weight: bold;
-            color: white;
-            margin-left: 2em;
+        .continue-watching-title {
+            margin-left: 4em;
+            margin-bottom: .5em;
+
+            span {
+                font-size: $font-xx-large;
+                font-weight: bold;
+                color: white;
+            }
         }
 
         .continue-watching-list {
             padding: 1.5em 0;
             padding-left: 4em;
+            padding-right: 4em;
+            margin-right: 4em;
             display: flex;
             gap: 2em;
             overflow-y: hidden;
             overflow-x: hidden;
 
             .element {
-                border: 2px solid transparent;
+                border: .3em solid transparent;
                 transition: all .15s ease;
 
                 img {
@@ -236,5 +250,84 @@ html, body {
                 border-color: white;
             }
         }
+    }
+}
+
+.gradient-left {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    width: 20vw;
+    height: 100%;
+    z-index: 1;
+    filter: brightness(30%);
+}
+
+.gradient {
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    width: 80vw;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background-size: 100% 100%;
+    background-position: 0px 0px;
+    filter: brightness(30%);
+}
+
+.background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+
+    opacity: 0;
+
+    display: flex;
+    justify-content: right;
+
+    img {
+        min-width: 80%;
+        object-fit: cover;
+        mask-image:
+        linear-gradient(to left, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
+    }
+}
+
+.loaded {
+    animation: fadeIn 3.5s forwards;
+}
+
+.loadedFull {
+    animation: fadeIn 3s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.8;
+    }
+}
+
+@keyframes fadeInFull {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+}
+  
+@keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
     }
 }
