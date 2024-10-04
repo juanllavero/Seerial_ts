@@ -11,7 +11,6 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
-import { Utils } from 'data/utils/Utils';
 
 function FullScreenMain() {
     const dispatch = useDispatch();
@@ -23,6 +22,8 @@ function FullScreenMain() {
     const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
     const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
     const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
+
+    const [currentShow, setCurrentShow] = useState<SeriesData | undefined>();
 
     const [homeInfoElement, setHomeInfoElement] = useState<
     { 
@@ -42,6 +43,7 @@ function FullScreenMain() {
     const [gradient, setGradient] = useState<string>('none');
     const [gradientLeft, setGradientLeft] = useState<string>('none');
     const [homeImageLoaded, setHomeImageLoaded] = useState(false);
+    const [showImageLoaded, setShowImageLoaded] = useState(false);
 
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
     const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
@@ -82,8 +84,12 @@ function FullScreenMain() {
         }
 
         if (currentlyWatchingShows.length > 0) {
-            setHomeInfoElement(currentlyWatchingShows[0]);
+            
             setCurrentlyWatchingShows(currentlyWatchingShows);
+
+            if (!selectedLibrary) {
+                setHomeInfoElement(currentlyWatchingShows[0]);
+            }
         }
       }, [librariesList, selectedLibrary]);
 
@@ -146,35 +152,77 @@ function FullScreenMain() {
         }
     }, [homeInfoElement]);
 
+    const handleSelectLibrary = (library: LibraryData | null) => {
+        if (library) {
+            setHomeInfoElement(undefined);
+            setHomeImageLoaded(false);
+        }
+
+        dispatch(selectLibrary(library));
+    };
+
+    const handleSelectShow = (show: SeriesData | null) => {
+        if (show) {
+            setShowImageLoaded(false);
+            setTimeout(() => {
+                setCurrentShow(show);
+                setShowImageLoaded(true);
+            }, 200);
+        }
+    }
+
     return (
         <>
-            <div className={`background-image ${homeImageLoaded ? 'loaded' : ''}`}>
+            <div className={`background-image-blur ${showImageLoaded ? 'loaded-blur-in' : 'loaded-blur-out'}`}>
                 {
-                    homeInfoElement && homeInfoElement.season.backgroundSrc !== "" ? (
+                    selectedLibrary && currentShow && currentShow.seasons && currentShow.seasons.length > 0 ? (
                         <ResolvedImage
-                            src={homeInfoElement.season.backgroundSrc}
-                            //className={imageLoaded ? 'loaded' : ''}
+                            src={`/resources/img/backgrounds/${currentShow.seasons[0].id}/fullBlur.jpg`}
                             alt="Background"
                         />
                     ) : null
                 }
             </div>
-            <div className={`gradient-left ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradientLeft}`}}></div>
-            <div className={`gradient ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradient}`}}></div>
+            <div className="noise-background">
+                <ResolvedImage
+                    src="resources/img/noise.png"
+                    alt="Background noise"
+                />
+            </div>
+            {
+                homeInfoElement !== undefined ? (
+                    <>
+                        <div className={`background-image ${homeImageLoaded ? 'loaded' : ''}`}>
+                            {
+                                homeInfoElement.season.backgroundSrc !== "" ? (
+                                    <ResolvedImage
+                                        src={homeInfoElement.season.backgroundSrc}
+                                        alt="Background"
+                                    />
+                                ) : null
+                            }
+                        </div>
+                        <div className={`gradient-left ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradientLeft}`}}></div>
+                        <div className={`gradient ${homeImageLoaded ? 'loadedFull' : ''}`} style={{background: `${gradient}`}}></div>
+                    </>
+                ) : null
+            }
             <section className="top">
-                <button id="home" onClick={() => dispatch(selectLibrary(null))}>
-                    <svg
-                        id="libraries-button-svg" 
-                        aria-hidden="true" height="32" viewBox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M23.9864 4.00009C24.3242 4.00009 24.6522 4.11294 24.9185 4.32071L45 20V39.636C44.9985 40.4312 44.5623 41.4377 44 42C43.4377 42.5623 42.4311 42.9985 41.6359 43H27V28H21V43H6.5C5.70485 42.9984 4.56226 42.682 4 42.1197C3.43774 41.5575 3.00163 40.7952 3 40V21L23.0544 4.32071C23.3207 4.11294 23.6487 4.00009 23.9864 4.00009ZM30 28V40H42V21.4314L24 7.40726L6 22V40L18 40V28C18.0008 27.2046 18.3171 26.442 18.8796 25.8796C19.442 25.3171 20.2046 25.0008 21 25H27C27.7954 25.0009 28.5579 25.3173 29.1203 25.8797C29.6827 26.4421 29.9991 27.2046 30 28Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
+                <button id="home" onClick={() => handleSelectLibrary(null)}>
+                    {selectedLibrary ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 15 15"><path fill="currentColor" d="m7.5.5l.325-.38a.5.5 0 0 0-.65 0zm-7 6l-.325-.38L0 6.27v.23zm5 8v.5a.5.5 0 0 0 .5-.5zm4 0H9a.5.5 0 0 0 .5.5zm5-8h.5v-.23l-.175-.15zM1.5 15h4v-1h-4zm13.325-8.88l-7-6l-.65.76l7 6zm-7.65-6l-7 6l.65.76l7-6zM6 14.5v-3H5v3zm3-3v3h1v-3zm.5 3.5h4v-1h-4zm5.5-1.5v-7h-1v7zm-15-7v7h1v-7zM7.5 10A1.5 1.5 0 0 1 9 11.5h1A2.5 2.5 0 0 0 7.5 9zm0-1A2.5 2.5 0 0 0 5 11.5h1A1.5 1.5 0 0 1 7.5 10zm6 6a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zm-12-1a.5.5 0 0 1-.5-.5H0A1.5 1.5 0 0 0 1.5 15z"></path></svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 15 15"><path fill="currentColor" d="M7.825.12a.5.5 0 0 0-.65 0L0 6.27v7.23A1.5 1.5 0 0 0 1.5 15h4a.5.5 0 0 0 .5-.5v-3a1.5 1.5 0 0 1 3 0v3a.5.5 0 0 0 .5.5h4a1.5 1.5 0 0 0 1.5-1.5V6.27z"></path></svg>
+                    )}
                 </button>
                 <div className="libraries-list">
                     
                     {librariesList.map((library) => (
                         <button 
                             key={library.id} 
-                            className={`libraries-button ${library === selectedLibrary ? 'selected' : ''}`} 
+                            className={`libraries-button ${library === selectedLibrary ? 'active' : ''}`} 
                             title={library.name}
-                            onClick={() => dispatch(selectLibrary(library))}
+                            onClick={() => handleSelectLibrary(library)}
                         >
                             <span className="library-name">
                                 {library.name}
@@ -185,7 +233,7 @@ function FullScreenMain() {
                 <div className="right-options">
                     <span id="time">{formatTime(time)}</span>
                     <button id="options-btn">
-                        <svg aria-hidden="true" fill="currentColor" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M42 14H6V17H42V14Z" fill="#FFFFFF" fillOpacity="0.8"></path><path d="M42 32H6V35H42V32Z" fill="#FFFFFF"></path><path d="M6 23H42V26H6V23Z" fill="#FFFFFF"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1M3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1"></path></svg>
                     </button>
                 </div>
             </section>
@@ -196,8 +244,10 @@ function FullScreenMain() {
                             {selectedLibrary.series.map((element) => (
                                 <button
                                     key={element.id} 
-                                    className={`libraries-button`} 
-                                    title={element.name}>
+                                    className={`shows-button ${currentShow === element ? 'selected' : ''}`} 
+                                    title={element.name}
+                                    onClick={() => handleSelectShow(element)}
+                                    >
                                     {
                                         selectedLibrary.type === "Music" ? (
                                             <img loading='lazy' src={element.coverSrc} alt="Poster"
@@ -215,7 +265,6 @@ function FullScreenMain() {
                                             }}/>
                                         )
                                     }
-                                    
                                 </button>
                             ))}
                         </div>
