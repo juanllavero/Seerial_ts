@@ -26,7 +26,7 @@ $font-xxx-larger: calc(3 * 1.5vh);   // 4.5vh
   text-align: center;
 
   font-family: 'Verdana', sans-serif;
-  background-color: #101010;
+  background-color: #000000;
 
   display: flex;
   flex-direction: column;
@@ -109,6 +109,7 @@ html, body {
             background-color: transparent;
             outline: none;
             border: none;
+            border-bottom: 2px solid transparent;
             filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.747));
         }
 
@@ -123,6 +124,8 @@ html, body {
 
         .active {
             opacity: 1;
+            border-bottom: 2px solid $app-color;
+            border-radius: 0;
         }
     }
 
@@ -154,9 +157,9 @@ html, body {
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
-        gap: 1em;
 
         #time {
+            margin-right: 1.5em;
             color: white;
             font-size: $font-large;
             filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.747));
@@ -227,10 +230,12 @@ html, body {
             align-items: center;
 
             border: .3em solid transparent;
+            transition: all .15s ease;
         }
 
         .selected {
             border-color: white;
+            transform: scale(1.07);
         }
     }
 
@@ -378,6 +383,7 @@ html, body {
                 font-size: $font-x-large;
 
                 max-width: 100vh;
+                height: 8vh;
 
                 box-sizing: border-box;
 
@@ -397,6 +403,7 @@ html, body {
 
             .season-overview-container:hover {
                 background-color: #3a3a3a8a;
+                cursor: pointer;
             }
 
             .season-info-horizontal {
@@ -439,42 +446,52 @@ html, body {
             display: flex;
             gap: 1em;
 
-            .season-btn {
-                padding: 1.3em;
-                border-radius: 50px;
-                outline: none;
-                border: none;
-                background-color: #101010;
-                
+            .btns-container {
+                margin-right: 4em;
                 display: flex;
-                align-items: center;
                 gap: 1em;
 
-                transition: all .15s ease;
-                
-                svg {
-                    width: 3em;
-                    height: 3em;
+                .season-btn {
+                    padding: 1.3em;
+                    border-radius: 50px;
+                    outline: none;
+                    border: none;
+                    background-color: #101010;
                     
+                    display: flex;
+                    align-items: center;
+                    gap: 1em;
+    
+                    transition: all .15s ease;
+                    
+                    svg {
+                        width: 3vh;
+                        height: 3vh;
+                    }
+    
+                    span {
+                        display: none;
+                        font-size: $font-medium;
+                        color: $color-text-primary;
+                    }
+                }
+    
+                .season-btn:hover {
+                    background-color: #080808;
+                    
+                    span {
+                        display: block;
+                    }
                 }
 
-                span {
-                    display: none;
-                    font-size: $font-medium;
-                    color: $color-text-primary;
-                }
-            }
-
-            .season-btn:hover {
-                background-color: #080808;
-                
-                span {
-                    display: block;
+                #playButton {
+                    span {
+                        display: block;
+                    }
                 }
             }
 
             .tracks-info {
-                margin-left: 4em;
                 gap: 1.5em;
                 display: flex;
                 align-items: center;
@@ -500,6 +517,51 @@ html, body {
                 }
             }
         }
+    }
+}
+
+.main-menu {
+    background-color: black;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+
+    align-items: center;
+
+    padding-top: 20vh;
+    gap: 0.7em;
+
+    span {
+        margin-bottom: 2vh;
+        font-size: $font-xx-large;
+        color: $color-text-primary;
+    }
+
+    button {
+        width: 80vh;
+        outline: none;
+        border: none;
+
+        color: white;
+
+        font-size: $font-large;
+        padding: 1em;
+        border-radius: 5px;
+        background-color:#282828;
+        transition: all .15s ease;
+    }
+
+    button:hover {
+        background-color: #707070;
+        color: #000000;   
+    }
+
+    button:focus {
+        background-color: white;
+        color: black; 
     }
 }
 
@@ -600,7 +662,7 @@ html, body {
     width: 100%;
     height: 100%;
     z-index: 2;
-    opacity: 0.05;
+    opacity: 0.02;
 }
 
 .loaded {

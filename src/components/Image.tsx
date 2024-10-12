@@ -30,7 +30,10 @@ const ResolvedImage: React.FC<ResolvedImageProps> = ({ src, alt = '', ...props }
     fetchResolvedPath();
   }, [src]);
 
-  return resolvedPath ? <LazyLoadImage src={resolvedPath} alt={alt} {...props} /> : null;
+  return resolvedPath ? <LazyLoadImage src={resolvedPath} alt={alt} {...props} onError={(e: any) => {
+    e.target.onerror = null; // To avoid infinite loop
+    e.target.src = "../resources/img/backgroundDefault.png";
+  }}/> : null;
 };
 
 export default ResolvedImage;

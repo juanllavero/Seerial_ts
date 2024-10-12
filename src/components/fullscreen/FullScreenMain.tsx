@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { RootState } from 'redux/store';
 import { selectLibrary, setLibraries } from 'redux/slices/dataSlice';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../../i18n';
 import '../../Fullscreen.scss';
 import ResolvedImage from '@components/Image';
@@ -11,12 +11,16 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { SeasonData } from '@interfaces/SeasonData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
+import MainMenu from './mainMenu';
+import { toggleMainMenu } from 'redux/slices/contextMenuSlice';
 
 function FullScreenMain() {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
     const [time, setTime] = useState(new Date());
+
+    const [useImageAsBackground, setUseImageAsBackground] = useState<boolean>(false);
 
     const librariesList = useSelector((state: RootState) => state.data.libraries);
     const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
@@ -52,7 +56,12 @@ function FullScreenMain() {
     const seriesImageWidth = useSelector((state: RootState) => state.seriesImage.width);
     const seriesImageHeight = useSelector((state: RootState) => state.seriesImage.height);
 
+    const [homeView, setHomeView] = useState(false);
     const [seasonView, setSeasonView] = useState(false);
+
+    const [dominantColor, setDominantColor] = useState<string>('000000');
+
+    const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!selectedLibrary) {
@@ -138,7 +147,7 @@ function FullScreenMain() {
                 if (extPath !== '') {
                     await ReactUtils.getDominantColors(extPath);
     
-                    const dominantColor = ReactUtils.colors[0];
+                    setDominantColor(ReactUtils.colors[0]);
         
                     if (dominantColor){
                         setGradient(`radial-gradient(135% 103% at 97% 39%, #073AFF00 41%, ${dominantColor} 68%)`);
@@ -174,6 +183,10 @@ function FullScreenMain() {
         if (library) {
             setHomeInfoElement(undefined);
             setHomeImageLoaded(false);
+            setHomeView(false);
+            setDominantColor('000000');
+        }else {
+            setHomeView(true);
         }
 
         dispatch(selectLibrary(library));
@@ -199,7 +212,6 @@ function FullScreenMain() {
                 if (show.currentlyWatchingSeason && show.currentlyWatchingSeason !== -1) {
                     setCurrentSeason(show.seasons[show.currentlyWatchingSeason]);
                     
-                    console.log(show.currentlyWatchingSeason);
                     if (currentSeason && currentSeason.currentlyWatchingEpisode && currentSeason.currentlyWatchingEpisode !== -1) {
                         setCurrentEpisode(currentSeason.episodes[currentSeason.currentlyWatchingEpisode]);
                     } else if (currentSeason && currentSeason.episodes && currentSeason.episodes.length > 0) {
@@ -217,10 +229,81 @@ function FullScreenMain() {
                 setSeasonImageLoaded(true);
             }
         }
-    }
+    };
+
+    const handleEpisodeClick = (episode: EpisodeData, index: number) => {
+        setCurrentEpisode(episode);
+    
+        const episodeButton = listRef.current?.children[index] as HTMLElement;
+        if (episodeButton && listRef.current) {
+            const listRect = listRef.current.getBoundingClientRect();
+            const buttonRect = episodeButton.getBoundingClientRect();
+    
+            const buttonCenter = buttonRect.left + buttonRect.width / 2;
+            const listCenter = listRect.left + listRect.width / 2;
+    
+            if (buttonCenter !== listCenter) {
+                const scrollOffset = buttonCenter - listCenter;
+                scrollToCenter(listRef.current, scrollOffset, 300); // Ajusta la duración a 300ms
+            }
+        }
+    };
+
+    const scrollToCenter = (scrollElement: HTMLElement, scrollOffset: number, duration: number) => {
+        const start = scrollElement.scrollLeft;
+        const startTime = performance.now();
+    
+        const animateScroll = (currentTime: number) => {
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1); // Limitar al 100%
+    
+            scrollElement.scrollLeft = start + scrollOffset * progress;
+    
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animateScroll); // Continuar la animación
+            }
+        };
+    
+        requestAnimationFrame(animateScroll);
+    };
+
+    // Manejador de eventos de teclado
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (!currentSeason){
+            return;
+        }
+
+        const currentIndex = currentSeason.episodes.findIndex((episode) => episode === currentEpisode);
+
+        if (event.key === 'ArrowRight') {
+            // Mover al siguiente episodio si existe
+            const nextIndex = currentIndex + 1;
+            if (nextIndex < currentSeason.episodes.length) {
+                handleEpisodeClick(currentSeason.episodes[nextIndex], nextIndex);
+            }
+        }
+
+        if (event.key === 'ArrowLeft') {
+            // Mover al episodio anterior si existe
+            const prevIndex = currentIndex - 1;
+            if (prevIndex >= 0) {
+                handleEpisodeClick(currentSeason.episodes[prevIndex], prevIndex);
+            }
+        }
+    };
+
+    // Usar useEffect para añadir y limpiar el evento de teclado
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [currentEpisode, currentSeason?.episodes]);
 
     return (
         <>
+            {MainMenu()}
             <div className={`season-image ${seasonImageLoaded ? 'loaded-blur-in' : 'loaded-blur-out'}`}>
                 {
                     selectedLibrary && currentSeason && currentSeason.backgroundSrc !== "" ? (
@@ -232,22 +315,32 @@ function FullScreenMain() {
                 }
             </div>
             <div className={`season-gradient ${seasonImageLoaded ? 'loaded-blur-in' : 'loaded-blur-out'}`}></div>
-            <div className={`background-image-blur ${showImageLoaded ? 'loaded-blur-in' : 'loaded-blur-out'}`}>
-                {
-                    selectedLibrary && currentShowForBackground && currentShowForBackground.seasons && currentShowForBackground.seasons.length > 0 ? (
+            {
+                useImageAsBackground ? (
+                    <>
+                        <div className={`background-image-blur ${showImageLoaded ? 'loaded-blur-in' : 'loaded-blur-out'}`}>
+                            {
+                                selectedLibrary && currentShowForBackground && currentShowForBackground.seasons && currentShowForBackground.seasons.length > 0 ? (
+                                    <ResolvedImage
+                                        src={`/resources/img/backgrounds/${currentShowForBackground.seasons[0].id}/fullBlur.jpg`}
+                                        alt="Background"
+                                    />
+                                ) : null
+                            }
+                        </div>
+                    </>
+                ) : null
+            }
+            {
+                homeView ? (
+                    <div className="noise-background">
                         <ResolvedImage
-                            src={`/resources/img/backgrounds/${currentShowForBackground.seasons[0].id}/fullBlur.jpg`}
-                            alt="Background"
+                            src="resources/img/noise.png"
+                            alt="Background noise"
                         />
-                    ) : null
-                }
-            </div>
-            <div className="noise-background">
-                <ResolvedImage
-                    src="resources/img/noise.png"
-                    alt="Background noise"
-                />
-            </div>
+                    </div>
+                ) : null
+            }
             {
                 homeInfoElement !== undefined ? (
                     <>
@@ -307,7 +400,9 @@ function FullScreenMain() {
                     <span id="time">{formatTime(time)}</span>
                     {
                         !seasonView && (
-                            <button id="options-btn">
+                            <button id="options-btn" onClick={() => {
+                                dispatch(toggleMainMenu())
+                            }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1M3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1"></path></svg>
                             </button>
                         )
@@ -532,11 +627,11 @@ function FullScreenMain() {
                             </div>
                             {
                                 currentSeason.episodes && currentSeason.episodes.length > 1 ? (
-                                    <div className="episodes-list">
-                                        {currentSeason.episodes.map((episode: EpisodeData) => (
+                                    <div className="episodes-list" ref={listRef}>
+                                        {currentSeason.episodes.map((episode: EpisodeData, index: number) => (
                                             <div className={`element ${episode === currentEpisode ? 'element-selected' : null}`} key={episode.id}
                                                 onClick={() => {
-                                                    setCurrentEpisode(episode);
+                                                    handleEpisodeClick(episode, index);
                                                 }}
                                                 >
                                                 {
@@ -559,40 +654,46 @@ function FullScreenMain() {
                                 )
                             }
                             <div className="season-btns">
-                                <button className="season-btn">
-                                    <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
-                                    <span>{t('playButton')}</span>
-                                </button>
-                                <button className="season-btn">
-                                    {
-                                        true ? (
-                                            <>
-                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 24.6195L21 32.121L34.5 18.6225L32.3775 16.5L21 27.879L15.6195 22.5L13.5 24.6195Z" fill="#FFFFFF"></path><path clipRule="evenodd" d="M12.333 6.53914C15.7865 4.23163 19.8466 3 24 3C29.5696 3 34.911 5.21249 38.8493 9.15076C42.7875 13.089 45 18.4305 45 24C45 28.1534 43.7684 32.2135 41.4609 35.667C39.1534 39.1204 35.8736 41.812 32.0364 43.4015C28.1991 44.9909 23.9767 45.4068 19.9031 44.5965C15.8295 43.7862 12.0877 41.7861 9.15077 38.8492C6.21386 35.9123 4.21381 32.1705 3.40352 28.0969C2.59323 24.0233 3.0091 19.8009 4.59854 15.9636C6.18798 12.1264 8.8796 8.84665 12.333 6.53914ZM13.9997 38.9665C16.9598 40.9443 20.4399 42 24 42C28.7739 42 33.3523 40.1036 36.7279 36.7279C40.1036 33.3523 42 28.7739 42 24C42 20.4399 40.9443 16.9598 38.9665 13.9997C36.9886 11.0397 34.1774 8.73255 30.8883 7.37017C27.5992 6.00779 23.98 5.65133 20.4884 6.34586C16.9967 7.0404 13.7894 8.75473 11.2721 11.2721C8.75474 13.7894 7.04041 16.9967 6.34587 20.4884C5.65134 23.98 6.0078 27.5992 7.37018 30.8883C8.73256 34.1774 11.0397 36.9886 13.9997 38.9665Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
-                                                <span>{t('markWatched')}</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M12.333 6.53914C15.7865 4.23163 19.8466 3 24 3C29.5696 3 34.911 5.21249 38.8493 9.15076C42.7875 13.089 45 18.4305 45 24C45 28.1534 43.7684 32.2135 41.4609 35.667C39.1534 39.1204 35.8736 41.812 32.0364 43.4015C28.1991 44.9909 23.9767 45.4068 19.9031 44.5965C15.8295 43.7862 12.0877 41.7861 9.15077 38.8492C6.21386 35.9123 4.21381 32.1705 3.40352 28.0969C2.59323 24.0233 3.0091 19.8009 4.59854 15.9636C6.18798 12.1264 8.8796 8.84665 12.333 6.53914ZM12.793 24.6194L21 32.8281L35.2072 18.6225L32.3775 15.7928L21 27.1719L15.6195 21.7929L12.793 24.6194Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
-                                                <span>{t('markUnwatched')}</span>
-                                            </>
-                                        )
-                                    }
-                                </button>
-                                <button className="season-btn">
-                                    {
-                                        true ? (
-                                            <>
-                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>
-                                                <span>Marcar como visto</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>
-                                                <span>Marcar como no visto</span>
-                                            </>
-                                        )
-                                    }
-                                </button>
+                                {
+                                    currentSeason.episodes && currentSeason.episodes.length == 1 ? (
+                                        <div className="btns-container">
+                                            <button className="season-btn" id="playButton">
+                                                <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 42C13.1022 42 12.7206 41.842 12.4393 41.5607C12.158 41.2794 12 40.8978 12 40.5V7.49999C12 7.23932 12.0679 6.98314 12.197 6.75671C12.3262 6.53028 12.5121 6.34141 12.7365 6.20873C12.9609 6.07605 13.216 6.00413 13.4766 6.00006C13.7372 5.99599 13.9944 6.05992 14.2229 6.18554L44.2228 22.6855C44.4582 22.815 44.6545 23.0052 44.7912 23.2364C44.9279 23.4676 45.0001 23.7313 45.0001 23.9999C45.0001 24.2685 44.9279 24.5322 44.7912 24.7634C44.6545 24.9946 44.4582 25.1849 44.2228 25.3143L14.2229 41.8143C14.0014 41.9361 13.7527 41.9999 13.5 42Z" fill="#FFFFFF"></path></svg>
+                                                <span>{t('playButton')}</span>
+                                            </button>
+                                            <button className="season-btn">
+                                                {
+                                                    true ? (
+                                                        <>
+                                                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 24.6195L21 32.121L34.5 18.6225L32.3775 16.5L21 27.879L15.6195 22.5L13.5 24.6195Z" fill="#FFFFFF"></path><path clipRule="evenodd" d="M12.333 6.53914C15.7865 4.23163 19.8466 3 24 3C29.5696 3 34.911 5.21249 38.8493 9.15076C42.7875 13.089 45 18.4305 45 24C45 28.1534 43.7684 32.2135 41.4609 35.667C39.1534 39.1204 35.8736 41.812 32.0364 43.4015C28.1991 44.9909 23.9767 45.4068 19.9031 44.5965C15.8295 43.7862 12.0877 41.7861 9.15077 38.8492C6.21386 35.9123 4.21381 32.1705 3.40352 28.0969C2.59323 24.0233 3.0091 19.8009 4.59854 15.9636C6.18798 12.1264 8.8796 8.84665 12.333 6.53914ZM13.9997 38.9665C16.9598 40.9443 20.4399 42 24 42C28.7739 42 33.3523 40.1036 36.7279 36.7279C40.1036 33.3523 42 28.7739 42 24C42 20.4399 40.9443 16.9598 38.9665 13.9997C36.9886 11.0397 34.1774 8.73255 30.8883 7.37017C27.5992 6.00779 23.98 5.65133 20.4884 6.34586C16.9967 7.0404 13.7894 8.75473 11.2721 11.2721C8.75474 13.7894 7.04041 16.9967 6.34587 20.4884C5.65134 23.98 6.0078 27.5992 7.37018 30.8883C8.73256 34.1774 11.0397 36.9886 13.9997 38.9665Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
+                                                            <span>{t('markWatched')}</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M12.333 6.53914C15.7865 4.23163 19.8466 3 24 3C29.5696 3 34.911 5.21249 38.8493 9.15076C42.7875 13.089 45 18.4305 45 24C45 28.1534 43.7684 32.2135 41.4609 35.667C39.1534 39.1204 35.8736 41.812 32.0364 43.4015C28.1991 44.9909 23.9767 45.4068 19.9031 44.5965C15.8295 43.7862 12.0877 41.7861 9.15077 38.8492C6.21386 35.9123 4.21381 32.1705 3.40352 28.0969C2.59323 24.0233 3.0091 19.8009 4.59854 15.9636C6.18798 12.1264 8.8796 8.84665 12.333 6.53914ZM12.793 24.6194L21 32.8281L35.2072 18.6225L32.3775 15.7928L21 27.1719L15.6195 21.7929L12.793 24.6194Z" fill="#FFFFFF" fillRule="evenodd"></path></svg>
+                                                            <span>{t('markUnwatched')}</span>
+                                                        </>
+                                                    )
+                                                }
+                                            </button>
+                                            <button className="season-btn">
+                                                {
+                                                    true ? (
+                                                        <>
+                                                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>
+                                                            <span>Marcar como visto</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <svg aria-hidden="true" fill="currentColor" height="18" viewBox="0 0 48 48" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>
+                                                            <span>Marcar como no visto</span>
+                                                        </>
+                                                    )
+                                                }
+                                            </button>
+                                        </div>
+                                    ) : null
+                                }
                                 <div className="tracks-info">
                                     <div className="track-info">
                                         <span>1080p (HEVC Main 10)</span>
