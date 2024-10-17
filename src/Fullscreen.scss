@@ -124,7 +124,7 @@ html, body {
 
         .active {
             opacity: 1;
-            border-bottom: 2px solid $app-color;
+            border-bottom: 3px solid $app-color;
             border-radius: 0;
         }
     }
@@ -266,7 +266,7 @@ html, body {
             }
 
             #home-subtitle {
-                font-size: $font-xxx-larger;
+                font-size: $font-xxx-large;
                 font-weight: bold;
                 color: $color-text-primary;
                 filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
@@ -518,6 +518,184 @@ html, body {
             }
         }
     }
+
+    .music-container {
+        height: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        overflow-y: hidden;
+
+        .music-info-container {
+            display: flex;
+            flex-flow: column nowrap;
+            margin-top: 2em;
+            margin-left: 8em;
+            margin-bottom: 2em;
+            width: 40%;
+            gap: 1em;
+
+            color: $color-text-primary;
+
+            .album-image {
+                
+
+                img {
+                    border-radius: 5px;
+                    width: 30vh;
+                    height: auto;
+                }
+            }
+
+            #music-title {
+                font-size: $font-xxx-large;
+                font-weight: bold;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            #music-subtitle {
+                font-size: $font-xx-large;
+                font-weight: bold;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            .music-overview-container {
+                margin-top: 0.5em;
+                padding: 0.8em 2em 0.8em 0.5em;
+                width: fit-content;
+                border-radius: 10px;
+            }
+
+
+            #music-overview {
+                font-size: $font-x-large;
+
+                max-width: 100vh;
+                height: 8vh;
+
+                box-sizing: border-box;
+
+                --line-clamp-amount: 3;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden !important;
+                text-overflow: ellipsis;
+                line-clamp: var(--line-clamp-amount);
+                -webkit-line-clamp: var(--line-clamp-amount);
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            .music-overview-container:focus {
+                background-color: #6d6d6d8a;
+            }
+
+            .music-overview-container:hover {
+                background-color: #3a3a3a8a;
+                cursor: pointer;
+            }
+
+            .music-info-horizontal {
+                display: flex;
+                gap: 1em;
+
+                font-size: $font-x-large;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.472));
+            }
+        }
+
+        .music-list {
+            padding: 1.5em 0;
+            padding-left: 4em;
+            padding-right: 4em;
+            margin-right: 5em;
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 0.5em;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            width: 60%;
+
+            .disc-text-title {
+                font-size: $font-x-large;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 0.3em;
+            }
+
+            .separator {
+                margin-top: 0.5em;
+            }
+
+            .element {
+                padding: 2em;
+                border: none;
+                border-radius: 5px;
+                background-color: #5e5e5e4f;
+                transition: all .15s ease;
+
+                font-size: $font-medium;
+
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .element-selected {
+                background-color: white;
+                color: black;
+            }
+        }
+
+        .music-btns {
+            margin: 2em 0 2em 0;
+            display: flex;
+            gap: 1em;
+
+            .btns-container {
+                margin-right: 4em;
+                display: flex;
+                gap: 1em;
+
+                .season-btn {
+                    padding: 1.3em;
+                    border-radius: 50px;
+                    outline: none;
+                    border: none;
+                    background-color: #101010;
+                    
+                    display: flex;
+                    align-items: center;
+                    gap: 1em;
+    
+                    transition: all .15s ease;
+                    
+                    svg {
+                        width: 3vh;
+                        height: 3vh;
+                    }
+    
+                    span {
+                        display: none;
+                        font-size: $font-medium;
+                        color: $color-text-primary;
+                    }
+                }
+    
+                .season-btn:hover {
+                    background-color: #080808;
+                    
+                    span {
+                        display: block;
+                    }
+                }
+
+                #playButton {
+                    span {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
 }
 
 .main-menu {
@@ -572,7 +750,7 @@ html, body {
     width: 20vw;
     height: 100%;
     z-index: 1;
-    filter: brightness(30%);
+    filter: brightness(15%);
 }
 
 .gradient {
@@ -587,7 +765,7 @@ html, body {
     z-index: 1;
     background-size: 100% 100%;
     background-position: 0px 0px;
-    filter: brightness(30%);
+    filter: brightness(15%);
 }
 
 .background-image {
