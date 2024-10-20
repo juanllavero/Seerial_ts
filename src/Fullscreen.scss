@@ -696,6 +696,219 @@ html, body {
             }
         }
     }
+
+    .albums-container {
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        overflow-y: hidden;
+
+        .music-info-container {
+            display: flex;
+            flex-flow: row nowrap;
+            margin-top: 2em;
+            margin-left: 8em;
+            margin-bottom: 2em;
+            gap: 1em;
+
+            color: $color-text-primary;
+
+            .album-image {
+                img {
+                    border-radius: 5px;
+                    width: auto;
+                    height: 30vh;
+                }
+            }
+
+            .collection-info {
+                display: flex;
+                flex-flow: column nowrap;
+            }
+
+            #music-title {
+                font-size: $font-xxx-large;
+                font-weight: bold;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            #music-subtitle {
+                font-size: $font-xx-large;
+                font-weight: bold;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            .music-overview-container {
+                margin-top: 0.5em;
+                padding: 0.8em 2em 0.8em 0.5em;
+                width: fit-content;
+                border-radius: 10px;
+            }
+
+
+            #music-overview {
+                font-size: $font-x-large;
+
+                max-width: 100vh;
+                height: 8vh;
+
+                box-sizing: border-box;
+
+                --line-clamp-amount: 3;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden !important;
+                text-overflow: ellipsis;
+                line-clamp: var(--line-clamp-amount);
+                -webkit-line-clamp: var(--line-clamp-amount);
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.724));
+            }
+
+            .music-overview-container:focus {
+                background-color: #6d6d6d8a;
+            }
+
+            .music-overview-container:hover {
+                background-color: #3a3a3a8a;
+                cursor: pointer;
+            }
+
+            .music-info-horizontal {
+                display: flex;
+                gap: 1em;
+
+                font-size: $font-x-large;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.472));
+            }
+        }
+
+        #albums-title {
+            padding-left: 4em;
+            margin-bottom: 0.8em;
+            font-size: $font-x-large;
+            color: white;
+        }
+
+        .music-list {
+            margin-left: 8em;
+            display: flex;
+            flex-flow: row nowrap;
+            overflow-x: hidden;
+
+            gap: 1em;
+
+            .album-button {
+                padding-top: 1em;
+                padding-bottom: 1em;
+                width: fit-content;
+                height: fit-content;
+                background-color: transparent;
+                outline: none;
+                border: none;
+
+                transition: all .15s ease;
+
+                color: white;
+                font-size: $font-small;
+            }
+
+            .selected {
+                transform: scale(1.1);
+            }
+        }
+
+        
+
+        .music-btns {
+            margin: 2em 0 2em 0;
+            display: flex;
+            gap: 1em;
+
+            .btns-container {
+                margin-right: 4em;
+                display: flex;
+                gap: 1em;
+
+                .season-btn {
+                    padding: 1.3em;
+                    border-radius: 50px;
+                    outline: none;
+                    border: none;
+                    background-color: #101010;
+                    
+                    display: flex;
+                    align-items: center;
+                    gap: 1em;
+    
+                    transition: all .15s ease;
+                    
+                    svg {
+                        width: 3vh;
+                        height: 3vh;
+                    }
+    
+                    span {
+                        display: none;
+                        font-size: $font-medium;
+                        color: $color-text-primary;
+                    }
+                }
+    
+                .season-btn:hover {
+                    background-color: #080808;
+                    
+                    span {
+                        display: block;
+                    }
+                }
+
+                #playButton {
+                    span {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.next-season-btn-container {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    -webkit-app-region: no-drag;
+
+    gap: 2em;
+
+    button {
+        padding: 0;
+        margin: 0;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        opacity: 0.5;
+        transition: all .15s ease;
+
+        color: white;
+        font-size: $font-x-large;
+        
+    }
+
+    button:hover {
+        opacity: 1;
+    }
+
+    #prevBtn {
+        transform: rotate(180deg);
+    }
+
+    .selected-season-btn {
+        opacity: 1;
+        transform: scale(1.1);
+        color: $app-color;
+    }
 }
 
 .main-menu {
