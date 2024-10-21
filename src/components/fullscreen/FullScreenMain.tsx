@@ -232,40 +232,60 @@ function FullScreenMain() {
         }
     };
 
-    const handleEpisodeClick = (episode: EpisodeData, index: number) => {
-        setCurrentEpisode(episode);
-    
-        const episodeButton = listRef.current?.children[index] as HTMLElement;
-        if (episodeButton && listRef.current) {
-            const listRect = listRef.current.getBoundingClientRect();
-            const buttonRect = episodeButton.getBoundingClientRect();
-    
-            const buttonCenter = buttonRect.left + buttonRect.width / 2;
-            const listCenter = listRect.left + listRect.width / 2;
-    
-            if (buttonCenter !== listCenter) {
-                const scrollOffset = buttonCenter - listCenter;
-                scrollToCenter(listRef.current, scrollOffset, 300); // Ajusta la duración a 300ms
-            }
-        }
-    };
-
-    const scrollToCenter = (scrollElement: HTMLElement, scrollOffset: number, duration: number) => {
-        const start = scrollElement.scrollLeft;
+    const scrollToCenter = (
+        scrollElement: HTMLElement, 
+        scrollOffset: number, 
+        duration: number, 
+        isVertical: boolean
+    ) => {
+        const start = isVertical ? scrollElement.scrollTop : scrollElement.scrollLeft;
         const startTime = performance.now();
     
         const animateScroll = (currentTime: number) => {
             const timeElapsed = currentTime - startTime;
-            const progress = Math.min(timeElapsed / duration, 1); // Limitar al 100%
+            const progress = Math.min(timeElapsed / duration, 1);
     
-            scrollElement.scrollLeft = start + scrollOffset * progress;
+            if (isVertical) {
+                scrollElement.scrollTop = start + scrollOffset * progress; // Scroll vertical
+            } else {
+                scrollElement.scrollLeft = start + scrollOffset * progress; // Scroll horizontal
+            }
     
             if (timeElapsed < duration) {
-                requestAnimationFrame(animateScroll); // Continuar la animación
+                requestAnimationFrame(animateScroll);
             }
         };
     
         requestAnimationFrame(animateScroll);
+    };
+    
+    const handleScrollElementClick = <T extends { id: string }>(
+        elementData: T, 
+        index: number, 
+        listRef: React.RefObject<HTMLDivElement>, 
+        setCurrentElement: (element: T) => void, 
+        isVertical: boolean
+    ) => {
+        setCurrentElement(elementData);
+    
+        const elementButton = listRef.current?.children[index] as HTMLElement;
+        if (elementButton && listRef.current) {
+            const listRect = listRef.current.getBoundingClientRect();
+            const buttonRect = elementButton.getBoundingClientRect();
+    
+            const buttonCenter = isVertical 
+                ? buttonRect.top + buttonRect.height / 2 
+                : buttonRect.left + buttonRect.width / 2;
+    
+            const listCenter = isVertical 
+                ? listRect.top + listRect.height / 2 
+                : listRect.left + listRect.width / 2;
+    
+            if (buttonCenter !== listCenter) {
+                const scrollOffset = buttonCenter - listCenter;
+                scrollToCenter(listRef.current, scrollOffset, 300, isVertical); // Ajusta la duración a 300ms
+            }
+        }
     };
 
     // Manejador de eventos de teclado
@@ -280,7 +300,13 @@ function FullScreenMain() {
             // Mover al siguiente episodio si existe
             const nextIndex = currentIndex + 1;
             if (nextIndex < currentSeason.episodes.length) {
-                handleEpisodeClick(currentSeason.episodes[nextIndex], nextIndex);
+                handleScrollElementClick<EpisodeData>(
+                    currentSeason.episodes[nextIndex], 
+                    nextIndex, 
+                    listRef, 
+                    setCurrentEpisode, 
+                    selectedLibrary?.type === "Music" && currentSeason ? true : false
+                );
             }
         }
 
@@ -288,7 +314,13 @@ function FullScreenMain() {
             // Mover al episodio anterior si existe
             const prevIndex = currentIndex - 1;
             if (prevIndex >= 0) {
-                handleEpisodeClick(currentSeason.episodes[prevIndex], prevIndex);
+                handleScrollElementClick<EpisodeData>(
+                    currentSeason.episodes[prevIndex], 
+                    prevIndex, 
+                    listRef, 
+                    setCurrentEpisode, 
+                    selectedLibrary?.type === "Music" && currentSeason ? true : false
+                );
             }
         }
     };
@@ -328,15 +360,21 @@ function FullScreenMain() {
             if (discs.length === 0) {
                 return (
                     <div className="music-list" ref={listRef}>
-                        {currentSeason.episodes.map((episode: EpisodeData, index: number) => (
-                            <div className={`element ${episode === currentEpisode ? 'element-selected' : null}`} key={episode.id}
+                        {currentSeason.episodes.map((song: EpisodeData, index: number) => (
+                            <div className={`element ${song === currentEpisode ? 'element-selected' : null}`} key={song.id}
                                 onClick={() => {
-                                    handleEpisodeClick(episode, index);
+                                    handleScrollElementClick<EpisodeData>(
+                                        song, 
+                                        index, 
+                                        listRef, 
+                                        setCurrentEpisode, 
+                                        true
+                                    );
                                 }}
                                 >
-                                <span>{episode.episodeNumber}</span>
-                                <span style={{width: '100%', marginLeft: '2em', marginRight: '2em'}}>{episode.name}</span>
-                                <span>{ReactUtils.formatTime(episode.runtimeInSeconds)}</span>
+                                <span>{song.episodeNumber}</span>
+                                <span style={{width: '100%', marginLeft: '2em', marginRight: '2em'}}>{song.name}</span>
+                                <span>{ReactUtils.formatTime(song.runtimeInSeconds)}</span>
                             </div>
                         ))}
                     </div>
@@ -350,7 +388,13 @@ function FullScreenMain() {
                                 {currentSeason.episodes.filter(song => song.seasonNumber === disc).sort((a, b) => a.episodeNumber - b.episodeNumber).map((song: EpisodeData, index: number) => (
                                     <div className={`element ${song === currentEpisode ? 'element-selected' : null}`} key={song.id}
                                         onClick={() => {
-                                            handleEpisodeClick(song, index);
+                                            handleScrollElementClick<EpisodeData>(
+                                                song, 
+                                                index, 
+                                                listRef, 
+                                                setCurrentEpisode, 
+                                                true
+                                            );
                                         }}
                                         >
                                         <span>{song.episodeNumber}</span>
@@ -669,15 +713,17 @@ function FullScreenMain() {
                                                             <span id="music-title">
                                                                 {currentShow.name}
                                                             </span>
-                                                            <span id="music-subtitle">
-                                                                {currentSeason.name}
-                                                            </span>
                                                             <div className="music-info-horizontal">
-                                                                <span>{new Date(currentSeason.year).getFullYear()}</span>
-                                                                <span>{ReactUtils.formatTimeForView(handleTotalRuntime())}</span>
+                                                                <span>
+                                                                    {(() => {
+                                                                        const minYear = Math.min(...currentShow.seasons.map((season: SeasonData) => Number.parseInt(season.year)));
+                                                                        const maxYear = Math.max(...currentShow.seasons.map((season: SeasonData) => Number.parseInt(season.year)));
+                                                                        return minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
+                                                                    })()}
+                                                                </span>
                                                             </div>
                                                             {
-                                                                currentEpisode.overview || currentSeason.overview || currentShow.overview ? (
+                                                                currentShow.overview ? (
                                                                     <div className="music-overview-container">
                                                                         <span id="music-overview">
                                                                             {currentEpisode.overview || currentSeason.overview || currentShow.overview || t('defaultOverview')}
@@ -728,13 +774,21 @@ function FullScreenMain() {
                                                         </div>
                                                     </div>
                                                     <span id="albums-title">{t('albums')}</span>
-                                                    <div className="music-list">
-                                                        {currentShow.seasons.map((element) => (
+                                                    <div className="music-list" ref={listRef}>
+                                                        {currentShow.seasons.map((element, index) => (
                                                             <button
                                                                 key={element.id} 
                                                                 className={`album-button ${currentSeason === element ? 'selected' : ''}`} 
                                                                 title={element.name}
-                                                                onClick={() => handleSelectSeason(element)}
+                                                                onClick={() => {
+                                                                    handleScrollElementClick<SeasonData>(
+                                                                        element, 
+                                                                        index, 
+                                                                        listRef, 
+                                                                        setCurrentSeason, 
+                                                                        false
+                                                                    );
+                                                                }}
                                                                 >
                                                                 <img loading='lazy' src={element.coverSrc} alt="Poster"
                                                                     style={{ width: `${seriesImageWidth}px`, height: `${seriesImageWidth}px` }}
@@ -898,7 +952,13 @@ function FullScreenMain() {
                                                     {currentSeason.episodes.map((episode: EpisodeData, index: number) => (
                                                         <div className={`element ${episode === currentEpisode ? 'element-selected' : null}`} key={episode.id}
                                                             onClick={() => {
-                                                                handleEpisodeClick(episode, index);
+                                                                handleScrollElementClick<EpisodeData>(
+                                                                    episode, 
+                                                                    index, 
+                                                                    listRef, 
+                                                                    setCurrentEpisode, 
+                                                                    false
+                                                                );
                                                             }}
                                                             >
                                                             {

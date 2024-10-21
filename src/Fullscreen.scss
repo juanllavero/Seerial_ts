@@ -606,7 +606,7 @@ html, body {
         .music-list {
             padding: 1.5em 0;
             padding-left: 4em;
-            padding-right: 4em;
+            padding-right: 8em;
             margin-right: 5em;
             display: flex;
             flex-flow: column nowrap;
@@ -709,7 +709,7 @@ html, body {
             flex-flow: row nowrap;
             margin-top: 2em;
             margin-left: 8em;
-            margin-bottom: 2em;
+            margin-bottom: 5em;
             gap: 1em;
 
             color: $color-text-primary;
@@ -717,12 +717,14 @@ html, body {
             .album-image {
                 img {
                     border-radius: 5px;
-                    width: auto;
+                    width: 33vh;
                     height: 30vh;
                 }
             }
 
             .collection-info {
+                margin-left: 2em;
+                gap: 0.5em;
                 display: flex;
                 flex-flow: column nowrap;
             }
@@ -791,7 +793,8 @@ html, body {
         }
 
         .music-list {
-            margin-left: 8em;
+            padding: 3em 0;
+            padding-left: 8em;
             display: flex;
             flex-flow: row nowrap;
             overflow-x: hidden;
@@ -799,18 +802,32 @@ html, body {
             gap: 1em;
 
             .album-button {
-                padding-top: 1em;
-                padding-bottom: 1em;
-                width: fit-content;
-                height: fit-content;
                 background-color: transparent;
                 outline: none;
                 border: none;
+
+                width: 20vh;
+                height: 25vh;
+
+                display: flex;
+                flex-flow: column nowrap;
 
                 transition: all .15s ease;
 
                 color: white;
                 font-size: $font-small;
+
+                img {
+                    border-radius: 5px;
+                }
+
+                span {
+                    margin-top: 0.4em;
+                    width: 100%;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis;
+                    white-space: nowrap !important;
+                }
             }
 
             .selected {
