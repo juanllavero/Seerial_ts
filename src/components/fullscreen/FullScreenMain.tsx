@@ -408,9 +408,6 @@ function FullScreenMain() {
                     </div>
                 );
             }
-
-
-            
         }else {
             return (
                 <>
