@@ -12,6 +12,7 @@ const initialState = {
     seasonMenu: false,
     episodeMenu: false,
     mainMenu: false,
+    settingsMenu: false,
 };
 
 const contextMenuSlice = createSlice({
@@ -67,9 +68,12 @@ reducers: {
     toggleMainMenu: (state) => {
         state.mainMenu = !state.mainMenu;
     },
+    toggleSettingsMenu: (state) => {
+        state.settingsMenu = !state.settingsMenu;
+    },
 },
 });
 
 export const { closeAllMenus, closeContextMenu, toggleContextMenu, toggleVideoMenu, toggleAudioMenu, toggleSubsMenu, toggleSubsSizeMenu, toggleLibraryMenu, 
-    toggleLibraryMenuSecondary, toggleSeriesMenu, toggleSeasonMenu, toggleEpisodeMenu, toggleMainMenu } = contextMenuSlice.actions;
+    toggleLibraryMenuSecondary, toggleSeriesMenu, toggleSeasonMenu, toggleEpisodeMenu, toggleMainMenu, toggleSettingsMenu } = contextMenuSlice.actions;
 export default contextMenuSlice.reducer;

@@ -1376,6 +1376,10 @@ html, body {
           flex-flow: column wrap;
           width: 100%;
 
+          .check-text {
+            margin-left: 0.5em;
+          }
+
           span {
             font-size: small;
             margin-bottom: 0.6em;
