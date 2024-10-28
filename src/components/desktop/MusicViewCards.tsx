@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { LibraryData } from '@interfaces/LibraryData';
 import { ContextMenu } from 'primereact/contextmenu';
-import { selectSeason, selectSeries, showMenu, showSeriesMenu, toggleSeriesWindow } from 'redux/slices/dataSlice';
+import { selectSeason, selectSeries, showMenu, showSeriesMenu, toggleSeasonWindow, toggleSeriesWindow } from 'redux/slices/dataSlice';
 import { closeContextMenu, toggleSeasonMenu, toggleSeriesMenu } from 'redux/slices/contextMenuSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { SeriesData } from '@interfaces/SeriesData';
@@ -479,7 +479,7 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
                                     </button>
                                     <button className="svg-button-desktop" title="Mark as watched">
                                         <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z" fill="#FFFFFF"></path></svg>                </button>
-                                    <button className="svg-button-desktop" title={t('editButton')} onClick={() => dispatch(toggleSeriesWindow())}>
+                                    <button className="svg-button-desktop" title={t('editButton')} onClick={() => dispatch(toggleSeasonWindow())}>
                                         <svg aria-hidden="true" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z" fill="#FFFFFF"></path><path d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z" fill="#FFFFFF"></path></svg>
                                     </button>
                                     <button className="svg-button-desktop"
