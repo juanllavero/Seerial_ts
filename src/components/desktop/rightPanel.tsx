@@ -2,9 +2,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectEpisode, showMenu, toggleEpisodeWindow, 
   selectSeries, selectSeason, showSeriesMenu, setShowPoster,
-  selectLibrary, 
-  toggleSeasonWindow,
-  toggleSeriesWindow} from '../../redux/slices/dataSlice';
+  toggleSeasonWindow, toggleSeriesWindow} from '../../redux/slices/dataSlice';
 import { RootState } from '../../redux/store';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';

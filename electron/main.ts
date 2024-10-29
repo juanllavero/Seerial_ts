@@ -10,7 +10,6 @@ import propertiesReader from 'properties-reader';
 import { MovieDb } from 'moviedb-promise';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
-import Configuration from '../src/data/utils/Configuration';
 import { LibraryData } from '@interfaces/LibraryData';
 import { SeriesData } from '@interfaces/SeriesData';
 import { SeasonData } from '@interfaces/SeasonData';
@@ -48,7 +47,45 @@ let win: BrowserWindow | null;
 let fullScreenWindow: BrowserWindow | null;
 let controlsWindow: BrowserWindow | null;
 let mpvController: MPVController | null = null;
+//#endregion
 
+//#region CONFIGURATION FILE
+const configPath = app.isPackaged 
+  ? path.join(path.dirname(app.getPath('exe')), 'resources/config/config.json') 
+  : path.join(app.getAppPath(), 'resources/config/config.json');
+
+// Cargar o crear la configuración
+function loadOrCreateConfig(): Record<string, any> {
+  if (fs.existsSync(configPath)) {
+    const data = fs.readFileSync(configPath, 'utf-8');
+    return JSON.parse(data);
+  } else {
+    const defaultConfig = { language: 'es-ES' };
+    fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
+    return defaultConfig;
+  }
+}
+
+// Guardar configuración
+function saveConfig(config: Record<string, any>): void {
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+}
+
+let configData = loadOrCreateConfig();
+
+// IPC Handlers para `get` y `set`
+ipcMain.handle('get-config', (_event, key: string, defaultValue: any) => {
+  if (!(key in configData)) {
+    configData[key] = defaultValue;
+    saveConfig(configData);
+  }
+  return configData[key];
+});
+
+ipcMain.handle('set-config', (_event, key: string, value: any) => {
+  configData[key] = value;
+  saveConfig(configData);
+});
 //#endregion
 
 //#region EXTERNAL PATHS
@@ -74,9 +111,6 @@ ipcMain.handle('get-external-path', async (_event, relativePath: string) => {
     throw error; // Propagar el error para que pueda ser manejado en el renderer
   }
 });
-
-// Set Configuration file path
-Configuration.setConfigFile(Utils.getExternalPath('resources/config/config.properties'));
 //#endregion
 
 //#region LOCALIZATION
