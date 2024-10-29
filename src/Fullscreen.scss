@@ -806,9 +806,6 @@ html, body {
                 outline: none;
                 border: none;
 
-                width: 20vh;
-                height: 25vh;
-
                 display: flex;
                 flex-flow: column nowrap;
 
@@ -819,11 +816,13 @@ html, body {
 
                 img {
                     border-radius: 5px;
+                    width: 25vh;
+                    height: 25vh;
                 }
 
                 span {
                     margin-top: 0.4em;
-                    width: 100%;
+                    width: 25vh;
                     overflow: hidden !important;
                     text-overflow: ellipsis;
                     white-space: nowrap !important;
