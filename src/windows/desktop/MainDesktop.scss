@@ -270,10 +270,10 @@ html, body {
   span {
     transition: 0.3s ease;
   }
-}
 
-.library-button:hover{
-  color: $color-text-primary;
+  &:hover{
+    color: $color-text-primary;
+  }
 }
 
 .svg-button-desktop-transparent{

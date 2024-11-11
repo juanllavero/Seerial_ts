@@ -27,7 +27,8 @@
       "@components/*": ["./components/*"],
       "@interfaces/*": ["./data/interfaces/*"],
       "@objects/*": ["./data/objects/*"],
-      "@utils/*": ["./utils"]
+      "@utils/*": ["./utils"],
+      "@pages/*": ["./pages/*"],
     }
   },
   "include": ["src", "electron"],

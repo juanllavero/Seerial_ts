@@ -4,7 +4,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 interface ResolvedImageProps {
   src: string;
   alt?: string;
-  [key: string]: any; // Permitir otros props (como className, style, etc.)
+  [key: string]: any; // Allow other props
 }
 
 const ResolvedImage: React.FC<ResolvedImageProps> = ({ src, alt = '', ...props }) => {

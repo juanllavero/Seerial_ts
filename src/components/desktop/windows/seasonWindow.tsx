@@ -3,10 +3,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
-import '../../App.scss';
 import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
-import ResolvedImage from "@components/Image";
+import ResolvedImage from "@components/image/Image";
 import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from 'react-player'
 

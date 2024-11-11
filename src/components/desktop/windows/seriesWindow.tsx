@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
-import '../../App.scss';
 import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, toggleSeriesWindow } from "redux/slices/dataSlice";
 import { TagsInput } from "react-tag-input-component";

@@ -9,7 +9,7 @@ import { LibraryData } from '@interfaces/LibraryData';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
 import { useTranslation } from 'react-i18next';
-import ResolvedImage from '@components/Image';
+import ResolvedImage from '@components/image/Image';
 import { HomeInfoElement } from '@interfaces/HomeInfoElement';
 
 function HomeView() {

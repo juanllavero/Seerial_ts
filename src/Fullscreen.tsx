@@ -1,14 +1,11 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { Provider } from "react-redux"
-import FullScreenMain from '@components/fullscreen/FullScreenMain'
-import { store } from "./redux/store"
-import './Fullscreen.scss'
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import MainFullscreen from "./windows/fullscreen/MainFullscreen";
+import { store } from "./redux/store";
+import "./Fullscreen.scss";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <FullScreenMain />
-    </Provider>
-  </React.StrictMode>,
-)
+ReactDOM.createRoot(document.getElementById("root")!).render(
+	<Provider store={store}>
+		<MainFullscreen />
+	</Provider>
+);
