@@ -10,8 +10,9 @@ import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
 import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
 import { MusicOptionsIcon, NextTrackIcon, PauseIcon, PlayIcon, PrevTrackIcon, StopIcon } from '@components/utils/IconLibrary';
+import MusicPlayer from 'windows/fullscreen/MusicPlayer';
 
-export const renderMusicPlayer = () => {
+function renderMusicPlayer() {
     const dispatch = useDispatch();
     const songsList = useSelector((state: RootState) => state.musicPlayer.songsList);
     const currentSong = useSelector((state: RootState) => state.musicPlayer.currentSong);
@@ -380,3 +381,5 @@ export const renderMusicPlayer = () => {
         </>
     )
 }
+
+export default MusicPlayer;

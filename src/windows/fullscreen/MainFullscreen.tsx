@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
 import { RootState } from "redux/store";
 import {
 	selectEpisode,
@@ -18,7 +17,6 @@ import { EpisodeData } from "@interfaces/EpisodeData";
 import { ReactUtils } from "data/utils/ReactUtils";
 import MainMenu from "./mainMenu";
 import { toggleMainMenu } from "redux/slices/contextMenuSlice";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import { FullscreenSection } from "data/enums/FullscreenSections";
 import {
 	changeFullscreenSection,
@@ -36,7 +34,6 @@ import { HomeInfoElement } from "@interfaces/HomeInfoElement";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
-	const { t } = useTranslation();
 
 	const [time, setTime] = useState(new Date());
 

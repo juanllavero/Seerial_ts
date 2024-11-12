@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { renderLibrariesList } from "./librariesList";
-import { renderRightPanelContent } from "./rightPanel";
-import { renderLibraryAndSlider } from "@components/desktop/libraryAndSlider";
-import { renderMainBackgroundImage } from "@components/desktop/mainBackgroundImage";
+import LibrariesList from "./librariesList";
+import RightPanel from "./rightPanel";
+import LibraryAndSlider from "@components/desktop/libraryAndSlider";
+import MainBackgroundImage from "@components/desktop/mainBackgroundImage";
 import {
 	addEpisode,
 	addSeason,
@@ -26,13 +26,8 @@ import {
 	toggleMainMenu,
 	toggleSettingsMenu,
 } from "redux/slices/contextMenuSlice";
-import renderDesktopSettings from "@components/desktop/windows/desktopSettings";
-import renderLibraryWindow from "@components/desktop/windows/libraryWindow";
-import renderEpisodeWindow from "@components/desktop/windows/episodeWindow";
-import renderSeasonWindow from "@components/desktop/windows/seasonWindow";
-import renderSeriesWindow from "@components/desktop/windows/seriesWindow";
 import { LibraryData } from "@interfaces/LibraryData";
-import { renderMusicPlayer } from "./MusicPlayer";
+import MusicPlayer from "./MusicPlayer";
 import { ReactUtils } from "data/utils/ReactUtils";
 import { setGradientLoaded } from "redux/slices/imageLoadedSlice";
 import { SeriesData } from "@interfaces/SeriesData";
@@ -48,6 +43,11 @@ import {
 	WindowMinIcon,
 	WindowRestoreIcon,
 } from "@components/utils/IconLibrary";
+import EpisodeWindow from "@components/desktop/windows/episodeWindow";
+import SeasonWindow from "@components/desktop/windows/seasonWindow";
+import DesktopSettings from "@components/desktop/windows/desktopSettings";
+import LibraryWindow from "@components/desktop/windows/libraryWindow";
+import SeriesWindow from "@components/desktop/windows/seriesWindow";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
@@ -203,18 +203,12 @@ function MainDesktop() {
 						window.electronAPI.setFullscreenControls();
 					}}
 				/>
-			) : (
-				<></>
-			)}
-			{
-				<>
-					{renderDesktopSettings()}
-					{renderLibraryWindow()}
-					{renderSeriesWindow()}
-					{renderSeasonWindow()}
-					{renderEpisodeWindow()}
-				</>
-			}
+			) : null}
+			<DesktopSettings />
+			<LibraryWindow />
+			<SeriesWindow />
+			<SeasonWindow />
+			<EpisodeWindow />
 			<div
 				className={`gradient-background ${gradientLoaded ? "fade-in" : ""}`}
 				style={{
@@ -232,7 +226,7 @@ function MainDesktop() {
 					}
 				}}
 			>
-				{renderMainBackgroundImage()}
+				<MainBackgroundImage />
 				<div className="noise-background">
 					<ResolvedImage
 						src="resources/img/noise.png"
@@ -240,7 +234,7 @@ function MainDesktop() {
 					/>
 				</div>
 
-				{renderMusicPlayer()}
+				<MusicPlayer />
 
 				{/* Left Panel */}
 				<section className="left-panel">
@@ -300,7 +294,7 @@ function MainDesktop() {
 							<span>{t("libraryWindowTitle")}</span>
 						</button>
 					</div>
-					{renderLibrariesList()}
+					<LibrariesList />
 				</section>
 
 				{/* Right Panel */}
@@ -331,8 +325,8 @@ function MainDesktop() {
 							</button>
 						</div>
 					</div>
-					{renderLibraryAndSlider()}
-					{renderRightPanelContent()}
+					<LibraryAndSlider />
+					<RightPanel />
 				</section>
 			</section>
 		</>

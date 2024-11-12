@@ -11,7 +11,7 @@ import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
 import { TagsInput } from "react-tag-input-component";
 import { LockIcon } from "@components/utils/IconLibrary";
 
-export const renderEpisodeWindow = () => {
+function EpisodeWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
 
@@ -693,4 +693,4 @@ export const renderEpisodeWindow = () => {
 	);
 };
 
-export default renderEpisodeWindow;
+export default EpisodeWindow;

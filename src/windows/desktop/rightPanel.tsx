@@ -35,7 +35,7 @@ import MusicViewCards from "./MusicViewCards";
 import { MusicSection } from "data/enums/MusicSection";
 import { LibraryData } from "@interfaces/LibraryData";
 
-export const renderRightPanelContent = () => {
+function RightPanel() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
 
@@ -1849,3 +1849,5 @@ export const renderRightPanelContent = () => {
 
 	return null;
 };
+
+export default RightPanel;

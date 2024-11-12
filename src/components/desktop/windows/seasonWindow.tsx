@@ -9,7 +9,7 @@ import ResolvedImage from "@components/image/Image";
 import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from 'react-player'
 
-const renderSeasonWindow = () => {
+function SeasonWindow() {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -640,4 +640,4 @@ const renderSeasonWindow = () => {
     )
 };
 
-export default renderSeasonWindow;
+export default SeasonWindow;

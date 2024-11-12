@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, toggleSeriesWindow } from "redux/slices/dataSlice";
 import { TagsInput } from "react-tag-input-component";
 
-const renderSeriesWindow = () => {
+function SeriesWindow() {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -470,4 +470,4 @@ const renderSeriesWindow = () => {
     )
 };
 
-export default renderSeriesWindow;
+export default SeriesWindow;

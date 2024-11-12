@@ -10,7 +10,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Slider } from "primereact/slider";
 import ConfigManager from "data/utils/Configuration";
 
-const renderDesktopSettings = () => {
+function DesktopSettings() {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -281,4 +281,4 @@ const renderDesktopSettings = () => {
     )
 };
 
-export default renderDesktopSettings;
+export default DesktopSettings;

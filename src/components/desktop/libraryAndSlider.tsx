@@ -24,7 +24,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { BoxMatrixIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
 
-export const renderLibraryAndSlider = () => {
+function LibraryAndSlider() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
 	const selectedLibrary = useSelector(
@@ -219,3 +219,5 @@ export const renderLibraryAndSlider = () => {
 		);
 	}
 };
+
+export default LibraryAndSlider;

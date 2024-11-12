@@ -11,7 +11,7 @@ import {
 	closeAllMenus,
 	toggleLibraryMenu,
 } from "redux/slices/contextMenuSlice";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { ContextMenu } from "primereact/contextmenu";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -23,7 +23,7 @@ import {
 	VerticalDotsIcon,
 } from "@components/utils/IconLibrary";
 
-export const renderLibrariesList = () => {
+function LibrariesList() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
 	const libraries = useSelector((state: RootState) => state.data.libraries);
@@ -169,4 +169,6 @@ export const renderLibrariesList = () => {
 			</div>
 		</>
 	);
-};
+}
+
+export default LibrariesList;

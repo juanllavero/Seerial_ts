@@ -3,8 +3,7 @@ import { RootState } from '../../redux/store';
 import { loadImage, removeImage } from '../../redux/slices/imageLoadedSlice'; 
 import ResolvedImage from '@components/image/Image';
 
-// Componente definido sin React.FC
-export function renderMainBackgroundImage() {
+export function MainBackgroundImage() {
     const dispatch = useDispatch();
     const selectedSeason = useSelector((state: RootState) => state.data.selectedSeason);
     const imageLoaded = useSelector((state: RootState) => state.imageLoaded.isImageLoaded);
@@ -13,7 +12,6 @@ export function renderMainBackgroundImage() {
         dispatch(loadImage());
     };
 
-    // Renderiza la imagen de fondo si todos los datos están disponibles
     if (selectedSeason && selectedSeason.backgroundSrc !== "") {
         return (
             <div className="main-background">
@@ -31,4 +29,4 @@ export function renderMainBackgroundImage() {
     }
 }
 
-export default renderMainBackgroundImage;
+export default MainBackgroundImage;

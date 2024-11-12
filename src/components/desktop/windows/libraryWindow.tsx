@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Library } from "@objects/Library";
 import { MoviesIcon, MusicIcon, ShowsIcon } from "@components/utils/IconLibrary";
 
-const renderLibraryWindow = () => {
+function LibraryWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
 	const { i18n } = useTranslation();
@@ -319,4 +319,4 @@ const renderLibraryWindow = () => {
 	);
 };
 
-export default renderLibraryWindow;
+export default LibraryWindow;
