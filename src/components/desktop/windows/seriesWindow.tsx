@@ -1,4 +1,4 @@
-import { Section } from "data/enums/Section";
+import { WindowSections } from "@data/enums/Sections";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
@@ -72,9 +72,9 @@ function SeriesWindow() {
                 selectPoster(series?.coverSrc.split('/').pop());
         }
 
-        if (menuSection === Section.Logos && series){
+        if (menuSection === WindowSections.Logos && series){
             fetchLogos().then(() => setImageDownloaded(false));
-        }else if (menuSection === Section.Posters && series){
+        }else if (menuSection === WindowSections.Posters && series){
             fetchPosters().then(() => setImageDownloaded(false));
         }
     }, [menuSection, imageDownloaded]);
@@ -84,7 +84,7 @@ function SeriesWindow() {
             let noImages: string[] = [];
             setPosters(noImages);
             setLogos(noImages);
-            dispatch(changeMenuSection(Section.General));
+            dispatch(changeMenuSection(WindowSections.General));
 
             if (library?.type === "Shows") {
                 setYear(series.year || "");
@@ -191,27 +191,27 @@ function SeriesWindow() {
                 </section>
                 <section className="dialog-center">
                     <div className="dialog-center-left">
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.General ? ' desktop-dialog-side-btn-active' : ''}`}
-                    onClick={() => dispatch(changeMenuSection(Section.General))}>{t('generalButton')}</button>
+                    <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.General ? ' desktop-dialog-side-btn-active' : ''}`}
+                    onClick={() => dispatch(changeMenuSection(WindowSections.General))}>{t('generalButton')}</button>
                     {
                         library?.type === "Shows" ? (
                             <>
-                                <button className={`desktop-dialog-side-btn ${menuSection === Section.Details ? ' desktop-dialog-side-btn-active' : ''}`}
-                                onClick={() => dispatch(changeMenuSection(Section.Details))}>{t('tags')}</button>
-                                <button className={`desktop-dialog-side-btn ${menuSection === Section.Logos ? ' desktop-dialog-side-btn-active' : ''}`}
-                                onClick={() => dispatch(changeMenuSection(Section.Logos))}>{t('logosButton')}</button>
-                                <button className={`desktop-dialog-side-btn ${menuSection === Section.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
-                                onClick={() => dispatch(changeMenuSection(Section.Posters))}>{t('postersButton')}</button>
+                                <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Details ? ' desktop-dialog-side-btn-active' : ''}`}
+                                onClick={() => dispatch(changeMenuSection(WindowSections.Details))}>{t('tags')}</button>
+                                <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Logos ? ' desktop-dialog-side-btn-active' : ''}`}
+                                onClick={() => dispatch(changeMenuSection(WindowSections.Logos))}>{t('logosButton')}</button>
+                                <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
+                                onClick={() => dispatch(changeMenuSection(WindowSections.Posters))}>{t('postersButton')}</button>
                             </>
                         ) : series?.isCollection ? (
-                            <button className={`desktop-dialog-side-btn ${menuSection === Section.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
-                            onClick={() => dispatch(changeMenuSection(Section.Posters))}>{t('postersButton')}</button>
+                            <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Posters ? ' desktop-dialog-side-btn-active' : ''}`}
+                            onClick={() => dispatch(changeMenuSection(WindowSections.Posters))}>{t('postersButton')}</button>
                         ) : null
                     }
                     </div>
                     <div className="dialog-center-right scroll">
                     {
-                        menuSection === Section.General ? (
+                        menuSection === WindowSections.General ? (
                             library?.type === "Shows" ? (
                                 <>
                                     <div className="dialog-input-box">
@@ -289,7 +289,7 @@ function SeriesWindow() {
                                     </div>
                                 </>
                             )
-                        ) : menuSection === Section.Details ? (
+                        ) : menuSection === WindowSections.Details ? (
                             <>
                                 <div className="dialog-input-box">
                                     <span>{t('genres')}</span>
@@ -356,7 +356,7 @@ function SeriesWindow() {
                                     </div>
                                 </div>
                             </>
-                        ) : menuSection === Section.Logos ? (
+                        ) : menuSection === WindowSections.Logos ? (
                             <>
                                 {
                                     pasteUrl ? (
@@ -406,7 +406,7 @@ function SeriesWindow() {
                                 ))}
                                 </div>
                             </>
-                        ) : menuSection === Section.Posters ? (
+                        ) : menuSection === WindowSections.Posters ? (
                             <>
                                 {
                                     pasteUrl ? (

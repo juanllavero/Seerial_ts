@@ -1,18 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Section } from 'data/enums/Section';
+import { WindowSections } from '@data/enums/Sections';
 
 interface SectionInterface {
-    menuSection: Section;
+    menuSection: WindowSections;
 }
 const initialState: SectionInterface = {
-    menuSection: Section.General,
+    menuSection: WindowSections.General,
 };
 
 const menuSectionsSlice = createSlice({
 name: 'menuSections',
 initialState,
 reducers: {
-    changeMenuSection: (state, action: PayloadAction<Section>) => {
+    changeMenuSection: (state, action: PayloadAction<WindowSections>) => {
         state.menuSection = action.payload;
     },
 },

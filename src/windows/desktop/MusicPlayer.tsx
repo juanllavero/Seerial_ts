@@ -5,7 +5,7 @@ import ReactHowler from 'react-howler';
 import { useEffect, useRef, useState } from 'react';
 import { setCurrentSong, setSongs, toggleMusicPause } from 'redux/slices/musicPlayerSlice';
 import { changeMenuSection } from 'redux/slices/menuSectionsSlice';
-import { Section } from 'data/enums/Section';
+import { WindowSections } from '@data/enums/Sections';
 import { EpisodeData } from '@interfaces/EpisodeData';
 import { ReactUtils } from 'data/utils/ReactUtils';
 import { setGradientLoaded } from 'redux/slices/imageLoadedSlice';
@@ -127,7 +127,7 @@ function renderMusicPlayer() {
 
     useEffect(() => {
         // Comprobar si hay letas
-        dispatch(changeMenuSection(Section.Details));
+        dispatch(changeMenuSection(WindowSections.Details));
     }, [hidePlayer]);
 
     // Manejar la carga del archivo y establecer la duración
@@ -204,15 +204,15 @@ function renderMusicPlayer() {
                     </div>
                     <div className={`right-panel ${showMore ? '' : 'hide-right-panel'}`}>
                             <div className="music-player-upper-btns">
-                                <button className={menuSection === Section.Advanced ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(Section.Advanced))}>
+                                <button className={menuSection === WindowSections.Advanced ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(WindowSections.Advanced))}>
                                     <span>SIGUIENTE</span>
                                 </button>
-                                <button className={menuSection === Section.Details ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(Section.Details))}>
+                                <button className={menuSection === WindowSections.Details ? 'button-selected' : ''} onClick={() => dispatch(changeMenuSection(WindowSections.Details))}>
                                     <span>LETRAS</span>
                                 </button>
                             </div>
                             {
-                                menuSection === Section.Advanced ? (
+                                menuSection === WindowSections.Advanced ? (
                                     <div className="music-player-scroll scroll" id="scroll">
                                         {songsList.slice(0, 150).map((song: EpisodeData, index: number) => (
                                             <div className="music-player-item">

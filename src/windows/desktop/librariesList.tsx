@@ -23,6 +23,12 @@ import {
 	VerticalDotsIcon,
 } from "@components/utils/IconLibrary";
 
+/**
+ * A component that displays a list of libraries and allows the user to select a library, 
+ * open the library menu, edit the library, update the library, and remove the library.
+ * 
+ * @returns A JSX element that displays the list of libraries.
+ */
 function LibrariesList() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
@@ -40,7 +46,6 @@ function LibrariesList() {
 
 	const cm = useRef<ContextMenu | null>(null);
 
-	//#region CONTEXT MENU ITEMS
 	const menuItems = [
 		{
 			label: t("editButton"),
@@ -68,7 +73,6 @@ function LibrariesList() {
 			},
 		},
 	];
-	//#endregion
 
 	const showDeleteDialog = () => {
 		confirmDialog({

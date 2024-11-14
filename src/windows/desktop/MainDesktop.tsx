@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import LibrariesList from "./librariesList";
-import RightPanel from "./rightPanel";
-import LibraryAndSlider from "@components/desktop/libraryAndSlider";
+import RightPanel from "./rightContent/RightPanel";
+import LibraryAndSlider from "./rightContent/utils/libraryAndSlider";
 import MainBackgroundImage from "@components/desktop/mainBackgroundImage";
 import {
 	addEpisode,
@@ -48,6 +47,8 @@ import SeasonWindow from "@components/desktop/windows/seasonWindow";
 import DesktopSettings from "@components/desktop/windows/desktopSettings";
 import LibraryWindow from "@components/desktop/windows/libraryWindow";
 import SeriesWindow from "@components/desktop/windows/seriesWindow";
+import TopBar from "./rightContent/utils/TopBar";
+import LibrariesList from "./LibrariesList";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
@@ -56,9 +57,7 @@ function MainDesktop() {
 	const isVideoLoaded = useSelector(
 		(state: RootState) => state.video.isLoaded
 	);
-	const isMaximized = useSelector(
-		(state: RootState) => state.windowState.isMaximized
-	);
+
 	const mainMenuOpen = useSelector(
 		(state: RootState) => state.contextMenu.mainMenu
 	);
@@ -204,11 +203,13 @@ function MainDesktop() {
 					}}
 				/>
 			) : null}
+
 			<DesktopSettings />
 			<LibraryWindow />
 			<SeriesWindow />
 			<SeasonWindow />
 			<EpisodeWindow />
+
 			<div
 				className={`gradient-background ${gradientLoaded ? "fade-in" : ""}`}
 				style={{
@@ -299,32 +300,7 @@ function MainDesktop() {
 
 				{/* Right Panel */}
 				<section className="right-panel">
-					<div className="top-bar">
-						<div className="window-buttons-container">
-							<button
-								className="window-button minimize-button"
-								onClick={() => window.electronAPI.minimizeWindow()}
-							>
-								<WindowMinIcon />
-							</button>
-							<button
-								className="window-button maximize-button"
-								onClick={() => window.electronAPI.maximizeWindow()}
-							>
-								{isMaximized ? (
-									<WindowRestoreIcon />
-								) : (
-									<WindowMaxIcon />
-								)}
-							</button>
-							<button
-								className="window-button close-button"
-								onClick={() => window.electronAPI.closeWindow()}
-							>
-								<WindowCloseIcon />
-							</button>
-						</div>
-					</div>
+					<TopBar />
 					<LibraryAndSlider />
 					<RightPanel />
 				</section>

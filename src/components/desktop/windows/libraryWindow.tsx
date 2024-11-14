@@ -1,4 +1,4 @@
-import { Section } from "data/enums/Section";
+import { WindowSections } from "@data/enums/Sections";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
@@ -99,7 +99,7 @@ function LibraryWindow() {
 	};
 
 	useEffect(() => {
-		dispatch(changeMenuSection(Section.General));
+		dispatch(changeMenuSection(WindowSections.General));
 		if (selectedLibrary) {
 			setLanguage(selectedLibrary.language);
 			setFolders(selectedLibrary.folders);
@@ -148,31 +148,31 @@ function LibraryWindow() {
 						<div className="dialog-center-left">
 							<button
 								className={`desktop-dialog-side-btn ${
-									menuSection === Section.General
+									menuSection === WindowSections.General
 										? " desktop-dialog-side-btn-active"
 										: ""
 								}`}
 								onClick={() =>
-									dispatch(changeMenuSection(Section.General))
+									dispatch(changeMenuSection(WindowSections.General))
 								}
 							>
 								{t("generalButton")}
 							</button>
 							<button
 								className={`desktop-dialog-side-btn ${
-									menuSection === Section.Folders
+									menuSection === WindowSections.Folders
 										? " desktop-dialog-side-btn-active"
 										: ""
 								}`}
 								onClick={() =>
-									dispatch(changeMenuSection(Section.Folders))
+									dispatch(changeMenuSection(WindowSections.Folders))
 								}
 							>
 								{t("folders")}
 							</button>
 						</div>
 						<div className="dialog-center-right scroll">
-							{menuSection == Section.General ? (
+							{menuSection == WindowSections.General ? (
 								<>
 									<span>{t("type")}</span>
 									<div className="dialog-library-type-box">
@@ -255,7 +255,7 @@ function LibraryWindow() {
 										</div>
 									</section>
 								</>
-							) : menuSection == Section.Folders ? (
+							) : menuSection == WindowSections.Folders ? (
 								<>
 									<span>{t("addFolderText")}</span>
 									<ul className="folder-list">
@@ -303,12 +303,12 @@ function LibraryWindow() {
 						<button
 							className="btn-app-color"
 							onClick={
-								menuSection === Section.General
-									? () => dispatch(changeMenuSection(Section.Folders))
+								menuSection === WindowSections.General
+									? () => dispatch(changeMenuSection(WindowSections.Folders))
 									: () => handleSave()
 							}
 						>
-							{menuSection === Section.General
+							{menuSection === WindowSections.General
 								? `${t("next")}`
 								: `${t("saveButton")}`}
 						</button>

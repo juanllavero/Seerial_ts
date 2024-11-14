@@ -2,19 +2,19 @@ import { useDispatch, useSelector } from "react-redux";
 import {
 	increaseEpisodeImageSize,
 	reduceEpisodeImageSize,
-} from "../../redux/slices/episodeImageSlice";
+} from "@redux/slices/episodeImageSlice";
 import {
 	increaseSeriesImageSize,
 	reduceSeriesImageSize,
-} from "../../redux/slices/seriesImageSlice";
-import { removeTransparentImage } from "../../redux/slices/transparentImageLoadedSlice";
+} from "@redux/slices/seriesImageSlice";
+import { removeTransparentImage } from "@redux/slices/transparentImageLoadedSlice";
 import {
 	selectLibrary,
 	setLibraryForMenu,
 	toggleLibraryEditWindow,
 	resetSelection,
-} from "../../redux/slices/dataSlice";
-import { RootState } from "../../redux/store";
+} from "@redux/slices/dataSlice";
+import { RootState } from "@redux/store";
 import { ContextMenu } from "primereact/contextmenu";
 import { useRef } from "react";
 import {

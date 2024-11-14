@@ -29,6 +29,8 @@
       "@objects/*": ["./data/objects/*"],
       "@utils/*": ["./utils"],
       "@pages/*": ["./pages/*"],
+      "@redux/*": ["./redux/*"],
+      "@data/*": ["./data/*"],
     }
   },
   "include": ["src", "electron"],

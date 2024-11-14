@@ -1,4 +1,4 @@
-import { Section } from "data/enums/Section";
+import { WindowSections } from "@data/enums/Sections";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
@@ -78,7 +78,7 @@ function DesktopSettings() {
             setVolume(Number(await configManager.get('backgroundVolume', '30')));
             setVideoDelay(Number(await configManager.get('backgroundDelay', '2.0')));
     
-            dispatch(changeMenuSection(Section.General));
+            dispatch(changeMenuSection(WindowSections.General));
         };
     
         if (settingsOpen) {
@@ -129,16 +129,16 @@ function DesktopSettings() {
                 </section>
                 <section className="dialog-center">
                     <div className="dialog-center-left">
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.General ? ' desktop-dialog-side-btn-active' : ''}`}
-                        onClick={() => dispatch(changeMenuSection(Section.General))}>{t('generalButton')}</button>
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.Details ? ' desktop-dialog-side-btn-active' : ''}`}
-                        onClick={() => dispatch(changeMenuSection(Section.Details))}>{t('fullscreenButton')}</button>
-                    <button className={`desktop-dialog-side-btn ${menuSection === Section.Advanced ? ' desktop-dialog-side-btn-active' : ''}`}
-                        onClick={() => dispatch(changeMenuSection(Section.Advanced))}>{t('languagesButton')}</button>
+                    <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.General ? ' desktop-dialog-side-btn-active' : ''}`}
+                        onClick={() => dispatch(changeMenuSection(WindowSections.General))}>{t('generalButton')}</button>
+                    <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Details ? ' desktop-dialog-side-btn-active' : ''}`}
+                        onClick={() => dispatch(changeMenuSection(WindowSections.Details))}>{t('fullscreenButton')}</button>
+                    <button className={`desktop-dialog-side-btn ${menuSection === WindowSections.Advanced ? ' desktop-dialog-side-btn-active' : ''}`}
+                        onClick={() => dispatch(changeMenuSection(WindowSections.Advanced))}>{t('languagesButton')}</button>
                     </div>
                     <div className="dialog-center-right scroll">
                     {
-                        menuSection === Section.General ? (
+                        menuSection === WindowSections.General ? (
                             <>
                                 <div className="dialog-input-box">
                                     <span>{t('languageText')}</span>
@@ -196,7 +196,7 @@ function DesktopSettings() {
                                     <span className="info-text">{t('interpolationMeaning')}</span>
                                 </div>
                             </>
-                        ) : menuSection === Section.Details ? (
+                        ) : menuSection === WindowSections.Details ? (
                             <>
                                 <span>{t('backgroundDelay')}</span>
                                 <div className="dialog-horizontal-box align-center">
@@ -236,7 +236,7 @@ function DesktopSettings() {
                                     </div>
                                 </div>
                             </>
-                        ) : menuSection === Section.Advanced ? (
+                        ) : menuSection === WindowSections.Advanced ? (
                             <>
                                 <div className="dialog-input-box">
                                     <span>{t('preferAudio')}</span>

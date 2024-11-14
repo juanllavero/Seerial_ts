@@ -1,4 +1,4 @@
-import { Section } from "data/enums/Section";
+import { WindowSections } from "@data/enums/Sections";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
@@ -66,7 +66,7 @@ function EpisodeWindow() {
 				selectImage(selectedEpisode?.imgSrc.split("/").pop());
 		};
 
-		if (menuSection === Section.Thumbnails && selectedEpisode) {
+		if (menuSection === WindowSections.Thumbnails && selectedEpisode) {
 			fetchImages().then(() => setImageDownloaded(false));
 		}
 	}, [menuSection, imageDownloaded]);
@@ -75,7 +75,7 @@ function EpisodeWindow() {
 		if (episodeMenuOpen && selectedEpisode) {
 			let noImages: string[] = [];
 			setImages(noImages);
-			dispatch(changeMenuSection(Section.General));
+			dispatch(changeMenuSection(WindowSections.General));
 
 			// @ts-ignore
 			window.electronAPI.getMediaInfo(selectedEpisode).then((data) => {
@@ -328,12 +328,12 @@ function EpisodeWindow() {
 						<div className="dialog-center-left">
 							<button
 								className={`desktop-dialog-side-btn ${
-									menuSection === Section.General
+									menuSection === WindowSections.General
 										? " desktop-dialog-side-btn-active"
 										: ""
 								}`}
 								onClick={() =>
-									dispatch(changeMenuSection(Section.General))
+									dispatch(changeMenuSection(WindowSections.General))
 								}
 							>
 								{t("generalButton")}
@@ -342,24 +342,24 @@ function EpisodeWindow() {
 								<>
 									<button
 										className={`desktop-dialog-side-btn ${
-											menuSection === Section.Thumbnails
+											menuSection === WindowSections.Thumbnails
 												? " desktop-dialog-side-btn-active"
 												: ""
 										}`}
 										onClick={() =>
-											dispatch(changeMenuSection(Section.Thumbnails))
+											dispatch(changeMenuSection(WindowSections.Thumbnails))
 										}
 									>
 										{t("thumbnailsButton")}
 									</button>
 									<button
 										className={`desktop-dialog-side-btn ${
-											menuSection === Section.Details
+											menuSection === WindowSections.Details
 												? " desktop-dialog-side-btn-active"
 												: ""
 										}`}
 										onClick={() =>
-											dispatch(changeMenuSection(Section.Details))
+											dispatch(changeMenuSection(WindowSections.Details))
 										}
 									>
 										{t("details")}
@@ -368,7 +368,7 @@ function EpisodeWindow() {
 							) : null}
 						</div>
 						<div className="dialog-center-right scroll">
-							{menuSection == Section.General ? (
+							{menuSection == WindowSections.General ? (
 								<>
 									<div className="dialog-input-box">
 										<span>{t("name")}</span>
@@ -498,7 +498,7 @@ function EpisodeWindow() {
 										<></>
 									)}
 								</>
-							) : menuSection == Section.Thumbnails ? (
+							) : menuSection == WindowSections.Thumbnails ? (
 								<>
 									{pasteUrl ? (
 										<div className="horizontal-center-align">
@@ -583,7 +583,7 @@ function EpisodeWindow() {
 										))}
 									</div>
 								</>
-							) : menuSection == Section.Details ? (
+							) : menuSection == WindowSections.Details ? (
 								<>
 									<div className="dialog-horizontal-box">
 										<section className="left-media-info">
