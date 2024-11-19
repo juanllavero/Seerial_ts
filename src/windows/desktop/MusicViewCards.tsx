@@ -28,6 +28,7 @@ import {
 	toggleMusicPause,
 } from "redux/slices/musicPlayerSlice";
 import { PlayIcon } from "@components/utils/IconLibrary";
+import Image from "@components/image/Image";
 
 interface MusicViewProps {
 	selectedLibrary: LibraryData;
@@ -365,19 +366,13 @@ const MusicViewCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
 											height: `${seriesImageWidth}px`,
 										}}
 									>
-										<img
-											loading="lazy"
+										<Image
 											src={series.coverSrc}
 											alt="Poster"
-											style={{
-												width: `${seriesImageWidth}px`,
-												height: `${seriesImageWidth}px`,
-											}}
-											onError={(e: any) => {
-												e.target.onerror = null; // To avoid infinite loop
-												e.target.src =
-													"./src/resources/img/songDefault.png";
-											}}
+                                            width={seriesImageWidth}
+                                            height={seriesImageWidth}
+											errorSrc="./src/resources/img/songDefault.png"
+                                            isRelative={false}
 										/>
 									</div>
 								</div>

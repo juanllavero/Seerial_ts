@@ -1,3 +1,106 @@
+@use "../../utils/variables" as v;
+
 .card {
-   
+	margin-right: 1em;
+	.top-section {
+		position: relative;
+
+		.on-loading {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+
+			border-radius: 4px;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			background-color: rgba(0, 0, 0, 0.362);
+
+			.spinner {
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				display: inline-block;
+				border-top: 3px solid v.$app-color;
+				border-right: 3px solid transparent;
+				box-sizing: border-box;
+				animation: rotation 1s linear infinite;
+			}
+
+			@keyframes rotation {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.visible {
+				display: flex;
+			}
+		}
+
+		.on-hover {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+
+         padding: .5em .3em;
+
+			display: none;
+			border-radius: 4px;
+			border: 2px solid transparent;
+			background-color: rgba(0, 0, 0, 0.46);
+
+			flex-flow: row nowrap;
+			justify-content: space-between;
+			align-items: end;
+
+			transition: all 0.3s ease-in-out;
+			cursor: pointer;
+
+			&:hover {
+				border-color: v.$app-color;
+			}
+		}
+
+		.image-section {
+         display: flex;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+
+				border-radius: 5px;
+            box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.414);
+			}
+		}
+
+		&:hover {
+			.on-hover {
+				display: flex;
+			}
+		}
+	}
+
+	.info-section {
+		display: flex;
+		flex-flow: column nowrap;
+
+		#title {
+			font-size: medium;
+		}
+
+		#subtitle {
+			margin-left: 0.3em;
+			font-size: small;
+			color: rgb(184, 184, 184);
+		}
+	}
 }

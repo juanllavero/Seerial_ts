@@ -22,6 +22,8 @@ import { ContextMenu } from "primereact/contextmenu";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import Card from "./Card";
+import { LeftArrowIcon, RightArrowIcon } from "@components/utils/IconLibrary";
 
 function HomeSection() {
 	const dispatch = useDispatch();
@@ -182,19 +184,7 @@ function HomeSection() {
 								handleScroll("left", true);
 							}}
 						>
-							<svg
-								aria-hidden="true"
-								fill="currentColor"
-								height="18"
-								viewBox="0 0 48 48"
-								width="18"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M12.7869 24.3848L31.1716 42.7696L34.0001 39.9411L18.4437 24.3848L34.0001 8.82843L31.1716 6L12.7869 24.3848Z"
-									fill="#FFFFFF"
-								></path>
-							</svg>
+							<LeftArrowIcon />
 						</button>
 						<button
 							className="svg-button"
@@ -202,19 +192,7 @@ function HomeSection() {
 								handleScroll("right", true);
 							}}
 						>
-							<svg
-								aria-hidden="true"
-								fill="currentColor"
-								height="18"
-								viewBox="0 0 48 48"
-								width="18"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M35.2132 24.3848L16.8284 42.7696L14 39.9411L29.5564 24.3848L14 8.82843L16.8284 6L35.2132 24.3848Z"
-									fill="#FFFFFF"
-								></path>
-							</svg>
+							<RightArrowIcon />
 						</button>
 					</div>
 				</div>
@@ -232,226 +210,12 @@ function HomeSection() {
 								season: SeasonData;
 								episode: EpisodeData;
 							}) => (
-								<div
-									className="episode-box"
-									key={value.show.id + "continueWatching"}
-									style={{
-										maxWidth: `${seriesImageWidth}px`,
-									}}
-								>
-									<div
-										style={{ cursor: "pointer" }}
-										onMouseEnter={() => {
-											dispatch(showMenu(true));
-
-											if (!seriesMenuOpen)
-												dispatch(showSeriesMenu(value.show));
-										}}
-										onMouseLeave={() => {
-											dispatch(showMenu(false));
-										}}
-										onAuxClick={(e) => {
-											if (seriesMenu && value.show === seriesMenu) {
-												dispatch(toggleSeriesMenu());
-												cm.current?.show(e);
-											}
-										}}
-									>
-										<div className="video-button-image-section">
-											<div
-												className={`loading-element-hover ${
-													value.show.analyzingFiles
-														? "loading-visible"
-														: ""
-												}`}
-												style={{
-													width: `${seriesImageWidth}px`,
-													height: `${seriesImageHeight}px`,
-												}}
-											>
-												<span className="spinner"></span>
-											</div>
-											<div
-												className="video-button-hover"
-												style={{
-													width: `${seriesImageWidth}px`,
-													height: `${seriesImageHeight}px`,
-												}}
-											>
-												<div
-													className="series-selection-div"
-													onClick={() =>
-														handleSeriesSelection(value.show)
-													}
-												></div>
-												<div className="bottom-btns">
-													<button
-														className="svg-button-desktop-transparent"
-														onClick={() =>
-															dispatch(toggleSeriesWindow())
-														}
-													>
-														<svg
-															aria-hidden="true"
-															fill="currentColor"
-															height="18"
-															viewBox="0 0 48 48"
-															width="18"
-															xmlns="http://www.w3.org/2000/svg"
-														>
-															<path
-																d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z"
-																fill="#FFFFFF"
-															></path>
-															<path
-																d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z"
-																fill="#FFFFFF"
-															></path>
-														</svg>
-													</button>
-													<button
-														className="svg-button-desktop-transparent"
-														onClick={(e) => {
-															dispatch(toggleSeriesMenu());
-															cm.current?.show(e);
-														}}
-													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="0 0 560 560"
-															aria-hidden="true"
-															width="16"
-															height="16"
-														>
-															<path
-																d="M350 280c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0-210c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70m0 420c0 38.634-31.366 70-70 70s-70-31.366-70-70 31.366-70 70-70 70 31.366 70 70"
-																fill="#FFFFFF"
-															></path>
-														</svg>
-													</button>
-												</div>
-											</div>
-											<div
-												className="video-button"
-												style={{
-													width: `${seriesImageWidth}px`,
-													height: `${seriesImageHeight}px`,
-												}}
-											>
-												{value.show.coverSrc !== "" ? (
-													<Image
-														src={value.show.coverSrc}
-														alt="Poster"
-														width={seriesImageWidth}
-														height={seriesImageHeight}
-														errorSrc="./src/resources/img/fileNotFound.jpg"
-														isRelative={true}
-														/>
-												) : value.show.seasons &&
-												  value.show.seasons.length > 0 &&
-												  value.show.seasons[0].coverSrc !== "" ? (
-													<Image
-														src={value.show.seasons[0].coverSrc}
-														alt="Poster"
-														width={seriesImageWidth}
-														height={seriesImageHeight}
-														errorSrc="./src/resources/img/fileNotFound.jpg"
-														isRelative={true}
-													/>
-												) : (
-													<Image
-														src="resources/img/fileNotFound.jpg"
-														alt="Poster"
-														width={seriesImageWidth}
-														height={seriesImageHeight}
-														errorSrc="./src/resources/img/fileNotFound.jpg"
-														isRelative={true}
-													/>
-												)}
-											</div>
-										</div>
-									</div>
-									<a
-										id="seriesName"
-										title={value.show.name}
-										onClick={() => handleSeriesSelection(value.show)}
-									>
-										{value.show.name}
-									</a>
-									{value.show.seasons &&
-									value.show.seasons.length > 1 ? (
-										<span id="episodeNumber">
-											{(() => {
-												const minYear = Math.min(
-													...value.show.seasons.map(
-														(season: SeasonData) =>
-															Number.parseInt(season.year)
-													)
-												);
-												const maxYear = Math.max(
-													...value.show.seasons.map(
-														(season: SeasonData) =>
-															Number.parseInt(season.year)
-													)
-												);
-												return minYear === maxYear
-													? `${minYear}`
-													: `${minYear} - ${maxYear}`;
-											})()}
-										</span>
-									) : value.show.seasons &&
-									  value.show.seasons.length > 0 ? (
-										<span id="episodeNumber">
-											{new Date(
-												value.show.seasons[0].year
-											).getFullYear()}
-										</span>
-									) : null}
-									<ContextMenu
-										model={[
-											{
-												label: t("editButton"),
-												command: () => {
-													dispatch(toggleSeriesMenu());
-													dispatch(toggleSeriesWindow());
-												},
-											},
-											{
-												label: t("markWatched"),
-												command: () => dispatch(toggleSeriesMenu()),
-											},
-											{
-												label: t("markUnwatched"),
-												command: () => dispatch(toggleSeriesMenu()),
-											},
-											...(value.library.type === "Shows" ||
-											!value.show.isCollection
-												? [
-														{
-															label: t("correctIdentification"),
-															command: () =>
-																dispatch(toggleSeriesMenu()),
-														},
-												  ]
-												: []),
-											...(value.library.type === "Shows"
-												? [
-														{
-															label: t("changeEpisodesGroup"),
-															command: () =>
-																dispatch(toggleSeriesMenu()),
-														},
-												  ]
-												: []),
-											{
-												label: t("removeButton"),
-												command: () => dispatch(toggleSeriesMenu()),
-											},
-										]}
-										ref={cm}
-										className="dropdown-menu"
-									/>
-								</div>
+								<Card 
+									key={value.show.id}
+									show={value.show}
+									season={value.season}
+									type="default"
+								/>
 							)
 						)}
 				</div>
@@ -466,19 +230,7 @@ function HomeSection() {
 								handleScroll("left", false);
 							}}
 						>
-							<svg
-								aria-hidden="true"
-								fill="currentColor"
-								height="18"
-								viewBox="0 0 48 48"
-								width="18"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M12.7869 24.3848L31.1716 42.7696L34.0001 39.9411L18.4437 24.3848L34.0001 8.82843L31.1716 6L12.7869 24.3848Z"
-									fill="#FFFFFF"
-								></path>
-							</svg>
+							<LeftArrowIcon />
 						</button>
 						<button
 							className="svg-button"
@@ -486,19 +238,7 @@ function HomeSection() {
 								handleScroll("right", false);
 							}}
 						>
-							<svg
-								aria-hidden="true"
-								fill="currentColor"
-								height="18"
-								viewBox="0 0 48 48"
-								width="18"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M35.2132 24.3848L16.8284 42.7696L14 39.9411L29.5564 24.3848L14 8.82843L16.8284 6L35.2132 24.3848Z"
-									fill="#FFFFFF"
-								></path>
-							</svg>
+							<RightArrowIcon />
 						</button>
 					</div>
 				</div>

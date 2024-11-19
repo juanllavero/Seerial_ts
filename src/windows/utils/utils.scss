@@ -1,0 +1,31 @@
+@use "./variables" as v;
+
+.a_text {
+	position: relative;
+	margin-top: 10px;
+	margin-left: 0.3em;
+	width: fit-content;
+	color: v.$color-text-primary;
+
+	cursor: pointer;
+
+	overflow: hidden !important;
+	text-overflow: ellipsis;
+	white-space: nowrap !important;
+	max-width: 100%;
+
+	&::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 0;
+		height: 1px;
+		background-color: white;
+		transition: width 0.2s ease;
+	}
+
+	&:hover::after {
+		width: 100%;
+	}
+}

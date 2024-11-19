@@ -163,6 +163,38 @@ export const MenuIcon = () => (
 	</svg>
 );
 
+export const LeftArrowIcon = () => (
+	<svg
+		aria-hidden="true"
+		fill="currentColor"
+		height="18"
+		viewBox="0 0 48 48"
+		width="18"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M12.7869 24.3848L31.1716 42.7696L34.0001 39.9411L18.4437 24.3848L34.0001 8.82843L31.1716 6L12.7869 24.3848Z"
+			fill="#FFFFFF"
+		></path>
+	</svg>
+);
+
+export const RightArrowIcon = () => (
+	<svg
+		aria-hidden="true"
+		fill="currentColor"
+		height="18"
+		viewBox="0 0 48 48"
+		width="18"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M35.2132 24.3848L16.8284 42.7696L14 39.9411L29.5564 24.3848L14 8.82843L16.8284 6L35.2132 24.3848Z"
+			fill="#FFFFFF"
+		></path>
+	</svg>
+);
+
 export const SettingsIcon = () => (
 	<svg
 		aria-hidden="true"
@@ -199,6 +231,26 @@ export const AddIcon = () => (
 	>
 		<path
 			d="m320 320l0 200-80 0 0-200-200 0 0-80 200 0 0-200 80 0 0 200 200 0 0 80-200 0"
+			fill="#FFFFFF"
+		></path>
+	</svg>
+);
+
+export const EditIcon = () => (
+	<svg
+		aria-hidden="true"
+		fill="currentColor"
+		height="18"
+		viewBox="0 0 48 48"
+		width="18"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M8.76987 30.5984L4 43L16.4017 38.2302L8.76987 30.5984Z"
+			fill="#FFFFFF"
+		></path>
+		<path
+			d="M19.4142 35.5858L41.8787 13.1214C43.0503 11.9498 43.0503 10.0503 41.8787 8.87872L38.1213 5.12135C36.9497 3.94978 35.0503 3.94978 33.8787 5.12136L11.4142 27.5858L19.4142 35.5858Z"
 			fill="#FFFFFF"
 		></path>
 	</svg>

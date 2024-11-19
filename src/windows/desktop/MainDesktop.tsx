@@ -16,10 +16,10 @@ import {
 } from "redux/slices/dataSlice";
 import { useTranslation } from "react-i18next";
 import "./MainDesktop.scss";
+import "../utils/utils.scss";
 import "../../i18n";
 import { toggleMaximize } from "redux/slices/windowStateSlice";
 import { closeVideo } from "redux/slices/videoSlice";
-import ResolvedImage from "@components/image/Image";
 import {
 	closeAllMenus,
 	toggleMainMenu,
@@ -36,11 +36,7 @@ import {
 	AddIcon,
 	MenuIcon,
 	SettingsIcon,
-	ShowsIcon,
-	WindowCloseIcon,
-	WindowMaxIcon,
-	WindowMinIcon,
-	WindowRestoreIcon,
+	ShowsIcon
 } from "@components/utils/IconLibrary";
 import EpisodeWindow from "@components/desktop/windows/episodeWindow";
 import SeasonWindow from "@components/desktop/windows/seasonWindow";
@@ -205,6 +201,7 @@ function MainDesktop() {
 				/>
 			) : null}
 
+			{/* PopUp Windows */}
 			<DesktopSettings />
 			<LibraryWindow />
 			<SeriesWindow />
