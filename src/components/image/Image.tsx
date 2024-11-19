@@ -1,39 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import React from "react";
+import ResolvedImage from "./ExternalImage";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
-interface ResolvedImageProps {
-  src: string;
-  alt?: string;
-  [key: string]: any; // Allow other props
+interface ImageProps {
+	src: string;
+	alt: string;
+	width: number;
+	height: number;
+	errorSrc: string;
+	isRelative: boolean;
 }
 
-const ResolvedImage: React.FC<ResolvedImageProps> = ({ src, alt = '', ...props }) => {
-  const [resolvedPath, setResolvedPath] = useState<string>('');
+function Image({ src, alt, width, height, errorSrc, isRelative }: ImageProps) {
+	return (
+		<>
+			{isRelative ? (
+				<ResolvedImage
+					src={src}
+					alt={alt}
+					style={{
+						width: `${width}px`,
+						height: `${height}px`,
+					}}
+					onError={(e: any) => {
+						e.target.onerror = null; // To avoid infinite loop
+						e.target.src = errorSrc;
+					}}
+				/>
+			) : (
+				<LazyLoadImage
+					src={src}
+					alt={alt}
+					style={{
+						width: `${width}px`,
+						height: `${height}px`,
+					}}
+					onError={(e: any) => {
+						e.target.onerror = null; // To avoid infinite loop
+						e.target.src = errorSrc;
+					}}
+				/>
+			)}
+		</>
+	);
+}
 
-  useEffect(() => {
-    
-    const fetchResolvedPath = async () => {
-        // @ts-ignore
-        window.electronAPI.getExternalPath(src).then((data: string) => {
-            let absolutePath = data;
-            setResolvedPath(absolutePath);
-        })
-        .catch((error: unknown) => {
-        if (error instanceof Error) {
-            console.error('Error fetching image path:', error.message);
-        } else {
-            console.error('Unexpected error:', error);
-        }
-        });
-    };
-
-    fetchResolvedPath();
-  }, [src]);
-
-  return resolvedPath ? <LazyLoadImage src={resolvedPath} alt={alt} {...props} onError={(e: any) => {
-    e.target.onerror = null; // To avoid infinite loop
-    e.target.src = "../resources/img/backgroundDefault.png";
-  }}/> : null;
-};
-
-export default ResolvedImage;
+export default React.memo(Image);

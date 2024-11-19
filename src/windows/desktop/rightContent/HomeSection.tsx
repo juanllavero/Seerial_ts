@@ -1,4 +1,5 @@
-import ResolvedImage from "@components/image/Image";
+import ResolvedImage from "@components/image/ExternalImage";
+import Image from "@components/image/Image";
 import { RightPanelSections } from "@data/enums/Sections";
 import { EpisodeData } from "@interfaces/EpisodeData";
 import { LibraryData } from "@interfaces/LibraryData";
@@ -338,43 +339,33 @@ function HomeSection() {
 												}}
 											>
 												{value.show.coverSrc !== "" ? (
-													<ResolvedImage
+													<Image
 														src={value.show.coverSrc}
 														alt="Poster"
-														style={{
-															width: `${seriesImageWidth}px`,
-															height: `${seriesImageHeight}px`,
-														}}
-														onError={(e: any) => {
-															e.target.onerror = null; // To avoid infinite loop
-															e.target.src =
-																"./src/resources/img/fileNotFound.jpg";
-														}}
-													/>
+														width={seriesImageWidth}
+														height={seriesImageHeight}
+														errorSrc="./src/resources/img/fileNotFound.jpg"
+														isRelative={true}
+														/>
 												) : value.show.seasons &&
 												  value.show.seasons.length > 0 &&
 												  value.show.seasons[0].coverSrc !== "" ? (
-													<ResolvedImage
+													<Image
 														src={value.show.seasons[0].coverSrc}
 														alt="Poster"
-														style={{
-															width: `${seriesImageWidth}px`,
-															height: `${seriesImageHeight}px`,
-														}}
-														onError={(e: any) => {
-															e.target.onerror = null; // To avoid infinite loop
-															e.target.src =
-																"./src/resources/img/fileNotFound.jpg";
-														}}
+														width={seriesImageWidth}
+														height={seriesImageHeight}
+														errorSrc="./src/resources/img/fileNotFound.jpg"
+														isRelative={true}
 													/>
 												) : (
-													<ResolvedImage
+													<Image
 														src="resources/img/fileNotFound.jpg"
 														alt="Poster"
-														style={{
-															width: `${seriesImageWidth}px`,
-															height: `${seriesImageHeight}px`,
-														}}
+														width={seriesImageWidth}
+														height={seriesImageHeight}
+														errorSrc="./src/resources/img/fileNotFound.jpg"
+														isRelative={true}
 													/>
 												)}
 											</div>

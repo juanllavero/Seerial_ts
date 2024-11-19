@@ -1,4 +1,4 @@
-import ResolvedImage from "@components/image/Image";
+import ResolvedImage from "@components/image/ExternalImage";
 import { SeasonData } from "@interfaces/SeasonData";
 import { SeriesData } from "@interfaces/SeriesData";
 import { closeContextMenu, toggleSeriesMenu } from "@redux/slices/contextMenuSlice";

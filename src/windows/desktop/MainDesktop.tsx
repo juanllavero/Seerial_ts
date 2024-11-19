@@ -49,6 +49,7 @@ import LibraryWindow from "@components/desktop/windows/libraryWindow";
 import SeriesWindow from "@components/desktop/windows/seriesWindow";
 import TopBar from "./rightContent/utils/TopBar";
 import LibrariesList from "./LibrariesList";
+import Image from "@components/image/Image";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
@@ -229,9 +230,13 @@ function MainDesktop() {
 			>
 				<MainBackgroundImage />
 				<div className="noise-background">
-					<ResolvedImage
+					<Image
 						src="resources/img/noise.png"
 						alt="Background noise"
+						width={1920}
+						height={1080}
+						isRelative={true}
+						errorSrc="resources/img/noise.png"
 					/>
 				</div>
 

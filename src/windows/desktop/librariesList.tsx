@@ -11,7 +11,7 @@ import {
 	closeAllMenus,
 	toggleLibraryMenu,
 } from "redux/slices/contextMenuSlice";
-import { useCallback, useRef } from "react";
+import { useCallback, useContext, useRef } from "react";
 import { ContextMenu } from "primereact/contextmenu";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -22,6 +22,9 @@ import {
 	ShowsIcon,
 	VerticalDotsIcon,
 } from "@components/utils/IconLibrary";
+import { LibraryData } from "@interfaces/LibraryData";
+import { SectionContext } from "context/section.context";
+import { RightPanelSections } from "@data/enums/Sections";
 
 /**
  * A component that displays a list of libraries and allows the user to select a library, 
@@ -32,6 +35,7 @@ import {
 function LibrariesList() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
+	const {setCurrentRightSection} = useContext(SectionContext);
 	const libraries = useSelector((state: RootState) => state.data.libraries);
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
@@ -92,10 +96,18 @@ function LibrariesList() {
 	};
 
 	const handleSelectLibrary = useCallback(
-		(library: any) => {
+		(library: LibraryData | null) => {
 			dispatch(selectLibrary(library));
 			dispatch(resetSelection());
 			dispatch(removeTransparentImage());
+
+			if (library === null) {
+				setCurrentRightSection(RightPanelSections.Home);
+			}else if (library.type === "Shows" || library.type === "Movies") {
+				setCurrentRightSection(RightPanelSections.Collections);
+			} else {
+				setCurrentRightSection(RightPanelSections.MusicAlbums);
+			}
 		},
 		[dispatch]
 	);
