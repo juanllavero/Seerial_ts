@@ -26,7 +26,7 @@ import {
 	toggleSettingsMenu,
 } from "redux/slices/contextMenuSlice";
 import { LibraryData } from "@interfaces/LibraryData";
-import MusicPlayer from "./MusicPlayer";
+import MusicPlayer from "./rightContent/MusicPlayer";
 import { ReactUtils } from "data/utils/ReactUtils";
 import { setGradientLoaded } from "redux/slices/imageLoadedSlice";
 import { SeriesData } from "@interfaces/SeriesData";
@@ -41,22 +41,11 @@ import {
 import TopBar from "./rightContent/utils/TopBar";
 import LibrariesList from "./LibrariesList";
 import Image from "@components/image/Image";
-
-const EpisodeWindow = React.lazy(
-	() => import("@components/desktop/windows/episodeWindow")
-);
-const SeasonWindow = React.lazy(
-	() => import("@components/desktop/windows/seasonWindow")
-);
-const DesktopSettings = React.lazy(
-	() => import("@components/desktop/windows/desktopSettings")
-);
-const LibraryWindow = React.lazy(
-	() => import("@components/desktop/windows/libraryWindow")
-);
-const SeriesWindow = React.lazy(
-	() => import("@components/desktop/windows/seriesWindow")
-);
+import DesktopSettings from "@components/desktop/windows/desktopSettings";
+import EpisodeWindow from "@components/desktop/windows/episodeWindow";
+import LibraryWindow from "@components/desktop/windows/libraryWindow";
+import SeasonWindow from "@components/desktop/windows/seasonWindow";
+import SeriesWindow from "@components/desktop/windows/seriesWindow";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
@@ -188,7 +177,11 @@ function MainDesktop() {
 
 	// Save data function
 	const saveLibraries = (newData: LibraryData[]) => {
-		// @ts-ignore
+		/*************  ✨ Codeium Command ⭐  *************/
+		/**
+		 * Send a message to the main process to show the video controls.
+		 */
+		/******  c8fb40b2-fbf5-4157-9d85-a5c3a02f2a26  *******/ // @ts-ignore
 		window.electronAPI.saveLibraryData(newData).then((success: boolean) => {
 			if (success) {
 				console.log("Datos guardados correctamente");

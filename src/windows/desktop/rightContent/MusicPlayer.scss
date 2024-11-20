@@ -1,0 +1,228 @@
+@use "../../utils/variables" as v;
+
+.music-player-container {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 100;
+	background: transparent;
+	display: none;
+	opacity: 0;
+	pointer-events: none;
+
+	transition: opacity 0.2s ease;
+	.music-main {
+		position: absolute;
+		width: 100%;
+		height: 91vh;
+		background-color: rgb(18, 18, 18);
+		pointer-events: auto;
+
+		display: flex;
+		transition: all 0.2s;
+		.left-panel {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 60%;
+			transition: width 0.3s;
+
+			img {
+				border-radius: 15px;
+				height: auto;
+				max-width: 90%;
+				max-height: 60%;
+			}
+
+			.left-panel-info {
+				margin-top: 2em;
+				display: flex;
+				flex-flow: column nowrap;
+
+				#left-panel-info-title {
+					font-size: larger;
+					font-weight: bold;
+					color: v.$color-text-primary;
+				}
+
+				#left-panel-info-subtitle {
+					font-size: medium;
+					margin-top: 0.5em;
+				}
+			}
+		}
+
+		.right-panel {
+			width: 40%;
+         height: 100%;
+			transition: all 0.2s;
+		}
+
+		.hide-right-panel {
+			transform: translateX(+100%);
+			width: 0;
+		}
+
+		.expand-left-panel {
+			width: 100%;
+		}
+	}
+
+	.music-bottom-bar {
+		position: absolute;
+		bottom: 0;
+		height: 9vh;
+		min-height: 9vh;
+		width: 100%;
+		background-color: #090909;
+		pointer-events: auto;
+
+		.music-controls {
+			display: flex;
+			height: 100%;
+			width: 100%;
+
+			justify-content: space-between;
+			align-items: center;
+			display: flex;
+
+			.music-controls-left {
+				display: flex;
+				width: 52%;
+				justify-content: space-between;
+
+				.music-controls-left-box {
+					display: flex;
+
+					img {
+						width: 4.6em;
+						height: 4.6em;
+						margin-left: 0.5em;
+						margin-right: 0.8em;
+						border-radius: 5px;
+					}
+
+					.music-controls-text {
+						display: flex;
+						flex-flow: column nowrap;
+						text-align: left;
+						max-width: 30em;
+
+						#music-title {
+							font-size: medium;
+							font-weight: bold;
+
+							overflow: hidden !important;
+							text-overflow: ellipsis;
+							white-space: nowrap !important;
+						}
+
+						#music-subtitle {
+							font-size: medium;
+
+							overflow: hidden !important;
+							text-overflow: ellipsis;
+							white-space: nowrap !important;
+						}
+
+						#music-time {
+							font-size: small;
+						}
+					}
+				}
+
+				.music-controls-btns {
+					display: flex;
+					margin-left: 2em;
+				}
+			}
+
+			.music-controls-right {
+				display: flex;
+				justify-content: right;
+				align-items: center;
+				height: 100%;
+
+				#music-volume-slider {
+					margin-right: 1em;
+					height: 70%;
+				}
+			}
+		}
+	}
+
+	.music-main-hidden {
+		background-color: transparent;
+		transform: translateY(+100%);
+		transition: all 0.2s;
+	}
+
+	.music-player-upper-btns {
+		margin-top: 8em;
+
+		display: flex;
+		flex-flow: row nowrap;
+
+		button {
+			padding: 2em;
+			width: 50%;
+
+			font-weight: bold;
+			font-size: small;
+
+			outline: none;
+			background-color: transparent;
+			border: none;
+			border-bottom: 1px solid v.$color-text-dark;
+			cursor: pointer;
+
+			transition: all 0.3s ease;
+		}
+
+		.button-selected {
+			border-bottom: 1px solid v.$color-text-primary;
+		}
+	}
+
+	.music-player-scroll {
+		padding: 2em 0.5em;
+		text-align: left;
+
+		.music-player-item {
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: space-between;
+
+			margin-top: 0.8em;
+
+			.music-player-item-left {
+				display: flex;
+				flex-flow: row nowrap;
+
+				.music-player-item-text {
+					display: flex;
+					flex-flow: column nowrap;
+					margin-left: 0.8em;
+					margin-right: 0.8em;
+
+					font-size: medium;
+
+					#music-player-item-title {
+						color: v.$color-text-primary;
+					}
+				}
+
+				img {
+					width: 3em;
+					height: 3em;
+					border-radius: 5px;
+				}
+			}
+		}
+	}
+}
+
+.show-music-player {
+	display: block;
+	opacity: 1;
+}
