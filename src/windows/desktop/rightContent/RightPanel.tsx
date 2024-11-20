@@ -8,6 +8,7 @@ import DetailsSection from "./DetailsSection";
 import NoContent from "./NoContent";
 import MusicSection from "./MusicSection";
 import { useSectionContext } from "context/section.context";
+import "./RightPanel.scss";
 
 /**
  * The RightPanel component is responsible for rendering the correct content
@@ -17,7 +18,7 @@ import { useSectionContext } from "context/section.context";
  * @returns The correct content based on the selected library and series.
  */
 function RightPanel() {
-	const { currentRightSection, setCurrentRightSection } = useSectionContext();
+	const { currentRightSection } = useSectionContext();
 
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
@@ -30,12 +31,6 @@ function RightPanel() {
 		if (scroll) {
 			scroll.scrollTop = 0;
 		}
-
-		setCurrentRightSection(
-			selectedLibrary
-				? RightPanelSections.Collections
-				: RightPanelSections.Home
-		);
 	}, [selectedSeries, selectedLibrary]);
 
 	return (
@@ -44,7 +39,8 @@ function RightPanel() {
 				<HomeSection />
 			) : currentRightSection === RightPanelSections.Collections ? (
 				<CollectionsList />
-			) : currentRightSection === RightPanelSections.MusicAlbums || currentRightSection === RightPanelSections.MusicTable ? (
+			) : currentRightSection === RightPanelSections.MusicAlbums ||
+			  currentRightSection === RightPanelSections.MusicTable ? (
 				<MusicSection />
 			) : currentRightSection === RightPanelSections.Details ? (
 				<DetailsSection />

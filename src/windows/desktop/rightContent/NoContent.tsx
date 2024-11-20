@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import "./NoContent.scss";
 
 /**
  * Component shown when there are no libraries.

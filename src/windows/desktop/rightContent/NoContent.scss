@@ -1,0 +1,11 @@
+.no-libraries-container {
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: center;
+	text-align: center;
+	height: 100%;
+
+	h2 {
+		margin-bottom: 0;
+	}
+}

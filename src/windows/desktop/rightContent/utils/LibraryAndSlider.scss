@@ -1,0 +1,62 @@
+@use "../../../utils/variables" as v;
+
+.library-slicer-bar {
+	background-color: #0000009a;
+	z-index: 1;
+	position: fixed;
+	padding: 10px;
+	margin-top: 80px;
+	margin-left: 50px;
+	margin-bottom: 40px;
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: left;
+}
+
+.library-button {
+	font-size: medium;
+	border: none;
+	background-color: transparent;
+	color: v.$color-text-default;
+	cursor: pointer;
+
+	span {
+		transition: 0.3s ease;
+	}
+
+	&:hover {
+		color: v.$color-text-primary;
+	}
+}
+
+.desktopSlider {
+	margin-left: 20px;
+	margin-right: 10px;
+	-webkit-appearance: none; /* Override default CSS styles */
+	appearance: none;
+	width: 80px;
+	height: 3px;
+	border-radius: 25px;
+	background: #d3d3d3;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: 0.2s;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none; /* Override default look */
+		appearance: none;
+		width: 15px;
+		height: 15px;
+		border-radius: 50px;
+		background: v.$color-text-primary;
+		cursor: pointer;
+	}
+}

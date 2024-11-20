@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import Card from "./Card";
 import { LeftArrowIcon, RightArrowIcon } from "@components/utils/IconLibrary";
+import "./HomeSection.scss";
 
 function HomeSection() {
 	const { t } = useTranslation();

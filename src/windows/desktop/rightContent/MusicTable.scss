@@ -1,0 +1,124 @@
+@use "../../utils/variables" as v;
+
+.music-container {
+	height: 80vh;
+
+	table {
+		border-collapse: collapse;
+	}
+
+	thead {
+		position: sticky;
+		top: 0;
+		border-radius: 5px;
+
+		z-index: 1;
+	}
+
+	th,
+	td {
+		padding: 0.8em;
+		text-align: left;
+		width: auto;
+		border: none;
+
+		color: v.$color-text-primary;
+
+		img {
+			border-radius: 5px;
+		}
+	}
+
+	th {
+		background-color: v.$color-light;
+		span {
+			margin-right: 0.3em;
+		}
+	}
+
+	th:hover {
+		background-color: v.$color-lighter;
+		color: v.$color-text-primary;
+		cursor: pointer;
+	}
+
+	tr {
+		border-radius: 5px;
+	}
+
+	.song-row-options {
+		display: flex;
+		min-width: 20px;
+	}
+}
+
+.floating-box {
+	position: fixed;
+	top: 100px;
+	left: 50%;
+	padding: 10px;
+	background: #000;
+	color: #fff;
+	border-radius: 5px;
+	z-index: 10;
+}
+
+.list-container {
+	height: 100vh;
+	background-color: #000;
+}
+
+.song-row {
+	background-color: transparent;
+	.song-image-container {
+		display: flex;
+
+		.song-btn-overlay {
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			background-color: #000000b0;
+			border-radius: 5px;
+
+			display: none;
+			align-items: center;
+			justify-content: center;
+
+			button {
+				border-radius: 50px;
+				width: 35px;
+				height: 35px;
+				outline: none;
+				background-color: transparent;
+				border: none;
+				cursor: pointer;
+
+				svg path {
+					fill: v.$color-text-default;
+				}
+			}
+
+			button:hover {
+				svg path {
+					fill: v.$color-text-primary;
+				}
+			}
+		}
+	}
+}
+
+.song-row:hover .song-image-container .song-btn-overlay {
+	display: flex;
+}
+
+.row-selected {
+	background-color: v.$color-more-lighter;
+	cursor: pointer;
+}
+
+.search-container {
+	.search-bar {
+		margin-bottom: 1em;
+		background-color: transparent;
+	}
+}

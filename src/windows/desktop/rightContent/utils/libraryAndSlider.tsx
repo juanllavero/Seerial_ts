@@ -23,6 +23,7 @@ import {
 } from "redux/slices/contextMenuSlice";
 import { useTranslation } from "react-i18next";
 import { BoxMatrixIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
+import "./LibraryAndSlider.scss";
 
 function LibraryAndSlider() {
 	const { t } = useTranslation();
@@ -218,6 +219,6 @@ function LibraryAndSlider() {
 			</div>
 		);
 	}
-};
+}
 
 export default LibraryAndSlider;

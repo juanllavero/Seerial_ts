@@ -26,6 +26,7 @@ import {
 	PlayIcon,
 	UpArrowIcon,
 } from "@components/utils/IconLibrary";
+import "./DetailsSection.scss";
 
 function DetailsSection() {
 	const dispatch = useDispatch();
@@ -129,7 +130,7 @@ function DetailsSection() {
 	return (
 		<>
 			{selectedLibrary && selectedSeries && selectedSeason && (
-				<div className="season-episodes-container scroll" id="scroll">
+				<div className="details-container scroll" id="scroll">
 					<div className="logo-container">
 						{selectedLibrary.type === "Shows" ? (
 							selectedSeries && selectedSeries.logoSrc != "" ? (
@@ -164,21 +165,8 @@ function DetailsSection() {
 								className={transparentImageLoaded ? "imageLoaded" : ""}
 							/>
 						</div>
-					) : (
-						<div></div>
-					)}
+					) : null}
 					<div className="info-container">
-						<div
-							className={`loading-element-hover ${
-								selectedSeries.analyzingFiles ? "loading-visible" : ""
-							}`}
-							style={{
-								width: `${seriesImageWidth}px`,
-								height: `${seriesImageHeight}px`,
-							}}
-						>
-							<span className="spinner"></span>
-						</div>
 						<div
 							className={`poster-image ${
 								selectedLibrary.type !== "Shows" &&
@@ -188,6 +176,19 @@ function DetailsSection() {
 									: ""
 							}`}
 						>
+							<div
+								className={`on-loading ${
+									selectedSeries.analyzingFiles
+										? "visible"
+										: ""
+								}`}
+								style={{
+									width: `${seriesImageWidth}px`,
+									height: `${seriesImageHeight}px`,
+								}}
+							>
+								<span className="spinner"></span>
+							</div>
 							{selectedLibrary.type == "Shows" ||
 							showCollectionPoster ? (
 								<Image

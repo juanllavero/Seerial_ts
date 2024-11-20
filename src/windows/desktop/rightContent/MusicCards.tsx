@@ -25,6 +25,7 @@ import {
 } from "redux/slices/musicPlayerSlice";
 import { PlayIcon } from "@components/utils/IconLibrary";
 import Card from "./Card";
+import "./MusicCards.scss";
 
 interface MusicViewProps {
 	selectedLibrary: LibraryData;

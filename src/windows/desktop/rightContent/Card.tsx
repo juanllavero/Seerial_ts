@@ -41,7 +41,7 @@ interface CardProps {
  */
 function Card(props: CardProps) {
 	const dispatch = useDispatch();
-	const {setCurrentRightSection} = useSectionContext();
+	const { setCurrentRightSection } = useSectionContext();
 	const { library, show, season, type } = props;
 	const seriesImageWidth = useSelector(
 		(state: RootState) => state.seriesImage.width
@@ -54,7 +54,7 @@ function Card(props: CardProps) {
 
 	const handleSeriesSelection = (series: SeriesData) => {
 		if (type === "music") ReactUtils.generateGradient(series, null);
-		
+
 		setCurrentRightSection(RightPanelSections.Details);
 		dispatch(selectSeries(series));
 

@@ -7,6 +7,7 @@ import { useSectionContext } from "context/section.context";
 import { RightPanelSections } from "@data/enums/Sections";
 import MusicTable from "./MusicTable";
 import MusicCards from "./MusicCards";
+import "./MusicSection.scss";
 
 function MusicSection() {
    const { t } = useTranslation();

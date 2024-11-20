@@ -3,6 +3,7 @@ import { RootState } from "@redux/store";
 import React from "react";
 import { useSelector } from "react-redux";
 import EpisodeCard from "./EpisodeCard";
+import "./EpisodeList.scss";
 
 function EpisodeList() {
 	const selectedSeason = useSelector(
