@@ -1,11 +1,12 @@
 import { WindowSections } from "@data/enums/Sections";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, toggleSeriesWindow } from "redux/slices/dataSlice";
 import { TagsInput } from "react-tag-input-component";
+import Loading from "@components/utils/Loading";
 
 function SeriesWindow() {
     const dispatch = useDispatch();
@@ -178,7 +179,7 @@ function SeriesWindow() {
     };
 
     return (
-        <>
+        <Suspense fallback={<Loading />}>
             <section className={`dialog ${seriesMenuOpen ? ' dialog-active' : ''}`}>
                 <div className="dialog-background" onClick={() => dispatch(toggleSeriesWindow())}></div>
                 <div className="dialog-box">
@@ -466,7 +467,7 @@ function SeriesWindow() {
                 </section>
                 </div>
             </section>
-        </>
+        </Suspense>
     )
 };
 

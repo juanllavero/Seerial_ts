@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import RightPanel from "./rightContent/RightPanel";
@@ -36,16 +36,27 @@ import {
 	AddIcon,
 	MenuIcon,
 	SettingsIcon,
-	ShowsIcon
+	ShowsIcon,
 } from "@components/utils/IconLibrary";
-import EpisodeWindow from "@components/desktop/windows/episodeWindow";
-import SeasonWindow from "@components/desktop/windows/seasonWindow";
-import DesktopSettings from "@components/desktop/windows/desktopSettings";
-import LibraryWindow from "@components/desktop/windows/libraryWindow";
-import SeriesWindow from "@components/desktop/windows/seriesWindow";
 import TopBar from "./rightContent/utils/TopBar";
 import LibrariesList from "./LibrariesList";
 import Image from "@components/image/Image";
+
+const EpisodeWindow = React.lazy(
+	() => import("@components/desktop/windows/episodeWindow")
+);
+const SeasonWindow = React.lazy(
+	() => import("@components/desktop/windows/seasonWindow")
+);
+const DesktopSettings = React.lazy(
+	() => import("@components/desktop/windows/desktopSettings")
+);
+const LibraryWindow = React.lazy(
+	() => import("@components/desktop/windows/libraryWindow")
+);
+const SeriesWindow = React.lazy(
+	() => import("@components/desktop/windows/seriesWindow")
+);
 
 function MainDesktop() {
 	const dispatch = useDispatch();

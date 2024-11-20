@@ -720,6 +720,8 @@ html, body {
             border: 3px solid transparent;
             margin: 10px;
 
+            position: relative;
+
             display: flex;
             justify-content: flex-end;
             cursor: pointer;
@@ -734,7 +736,9 @@ html, body {
   
             svg {
               position: absolute;
-              padding: 0.4em;
+              top: 5px;
+              right: 5px;
+              padding: 0.1em;
 
               path {
                 fill: $color-dark;

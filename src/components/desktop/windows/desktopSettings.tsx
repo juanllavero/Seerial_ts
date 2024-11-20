@@ -1,5 +1,5 @@
 import { WindowSections } from "@data/enums/Sections";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
@@ -9,6 +9,7 @@ import i18n from "i18n";
 import { Checkbox } from "primereact/checkbox";
 import { Slider } from "primereact/slider";
 import ConfigManager from "data/utils/Configuration";
+import Loading from "@components/utils/Loading";
 
 function DesktopSettings() {
     const dispatch = useDispatch();
@@ -116,7 +117,7 @@ function DesktopSettings() {
     };
 
     return (
-        <>
+        <Suspense fallback={<Loading />}>
             <section className={`dialog ${settingsOpen ? ' dialog-active' : ''}`}>
                 <div className="dialog-background" onClick={() => dispatch(toggleSettingsMenu())}></div>
                 <div className="dialog-box">
@@ -277,7 +278,7 @@ function DesktopSettings() {
                 </section>
                 </div>
             </section>
-        </>
+        </Suspense>
     )
 };
 

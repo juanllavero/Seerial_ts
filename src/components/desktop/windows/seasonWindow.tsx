@@ -1,5 +1,5 @@
 import { WindowSections } from "@data/enums/Sections";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
@@ -8,6 +8,8 @@ import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
 import ResolvedImage from "@components/image/Image";
 import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from 'react-player'
+import Loading from "@components/utils/Loading";
+import Image from "@components/image/Image";
 
 function SeasonWindow() {
     const dispatch = useDispatch();
@@ -197,7 +199,7 @@ function SeasonWindow() {
     };
 
     return (
-        <>
+        <Suspense fallback={<Loading />}>
             <section className={`dialog ${seasonMenuOpen ? ' dialog-active' : ''}`}>
                 <div className="dialog-background" onClick={() => dispatch(toggleSeasonWindow())}></div>
                 <div className="dialog-box">
@@ -435,13 +437,11 @@ function SeasonWindow() {
                                         </div>
                                         <span>{resolution.width}x{resolution.height}</span>
                                     </div>
-                                    <ResolvedImage src={season?.backgroundSrc ? season.backgroundSrc : ''}
+                                    <Image src={season?.backgroundSrc ? season.backgroundSrc : ''}
                                         id="seasonBackgroundImage"
                                         alt="Video Thumbnail"
-                                        onError={(e: any) => {
-                                            e.target.onerror = null; // To avoid infinite loop
-                                            e.target.src = "./src/resources/img/Default_video_thumbnail.jpg";
-                                        } }
+                                        errorSrc="./src/resources/img/Default_video_thumbnail.jpg"
+                                        isRelative={true}
                                         onLoad={handleImageLoad}
                                     />
                                 </div>
@@ -636,7 +636,7 @@ function SeasonWindow() {
                 </section>
                 </div>
             </section>
-        </>
+        </Suspense>
     )
 };
 

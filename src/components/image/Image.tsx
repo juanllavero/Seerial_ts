@@ -3,6 +3,7 @@ import ResolvedImage from "./ExternalImage";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface ImageProps {
+	id?: string;
 	src: string;
 	alt: string;
 	width?: number;
@@ -10,14 +11,25 @@ interface ImageProps {
 	errorSrc: string;
 	isRelative: boolean;
 	className?: string;
-	onLoad?: () => void;
+	onLoad?: (e?: any) => void;
 }
 
-function Image({ src, alt, width, height, errorSrc, isRelative, className, onLoad }: ImageProps) {
+function Image({
+	id,
+	src,
+	alt,
+	width,
+	height,
+	errorSrc,
+	isRelative,
+	className,
+	onLoad,
+}: ImageProps) {
 	return (
 		<>
 			{isRelative ? (
 				<ResolvedImage
+					id={id && id}
 					src={src}
 					alt={alt}
 					style={
@@ -36,6 +48,7 @@ function Image({ src, alt, width, height, errorSrc, isRelative, className, onLoa
 				/>
 			) : (
 				<LazyLoadImage
+					id={id && id}
 					src={src}
 					alt={alt}
 					style={{

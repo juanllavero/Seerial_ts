@@ -1,5 +1,5 @@
 import { WindowSections } from "@data/enums/Sections";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
@@ -10,6 +10,7 @@ import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
 import { TagsInput } from "react-tag-input-component";
 import { LockIcon } from "@components/utils/IconLibrary";
+import Loading from "@components/utils/Loading";
 
 function EpisodeWindow() {
 	const dispatch = useDispatch();
@@ -293,7 +294,7 @@ function EpisodeWindow() {
 	};
 
 	return (
-		<>
+		<Suspense fallback={<Loading />}>
 			<section
 				className={`dialog ${episodeMenuOpen ? " dialog-active" : ""}`}
 			>
@@ -689,7 +690,7 @@ function EpisodeWindow() {
 					</section>
 				</div>
 			</section>
-		</>
+		</Suspense>
 	);
 };
 

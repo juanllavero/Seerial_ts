@@ -66,13 +66,17 @@ function EpisodeCard({ episode }: EpisodeCardProps) {
 					</div>
 					<button
 						className="svg-button-desktop-transparent"
-						onClick={() => dispatch(toggleEpisodeWindow())}
+						onClick={() => {
+							dispatch(selectEpisode(episode));
+							dispatch(toggleEpisodeWindow());
+						}}
 					>
 						<EditIcon />
 					</button>
 					<button
 						className="svg-button-desktop-transparent"
 						onClick={(e) => {
+							dispatch(selectEpisode(episode));
 							dispatch(toggleEpisodeMenu());
 							cm2.current?.show(e);
 						}}

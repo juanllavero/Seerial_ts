@@ -12,6 +12,7 @@ import {
 	selectSeries,
 	selectSeason,
 	toggleSeriesWindow,
+	showSeriesMenu,
 } from "@redux/slices/dataSlice";
 import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
@@ -39,7 +40,7 @@ interface CardProps {
  * @param {"default" | "music"} props.type The type of the card.
  * @returns {JSX.Element} The JSX element for the Card component.
  */
-function Card(props: CardProps) {
+function Card(props: CardProps): JSX.Element {
 	const dispatch = useDispatch();
 	const { setCurrentRightSection } = useSectionContext();
 	const { library, show, season, type } = props;
@@ -86,13 +87,19 @@ function Card(props: CardProps) {
 				>
 					<button
 						className="svg-button-desktop-transparent"
-						onClick={() => dispatch(toggleSeriesWindow())}
+						onClick={(e) => {
+							e.stopPropagation();
+							dispatch(showSeriesMenu(show));
+							dispatch(toggleSeriesWindow());
+						}}
 					>
 						<EditIcon />
 					</button>
 					<button
 						className="svg-button-desktop-transparent"
 						onClick={(e) => {
+							e.stopPropagation();
+							dispatch(showSeriesMenu(show));
 							dispatch(toggleSeriesMenu());
 							cm.current?.show(e);
 						}}

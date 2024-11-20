@@ -1,14 +1,15 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { RightPanelSections } from "@data/enums/Sections";
-import HomeSection from "./HomeSection";
-import CollectionsList from "./CollectionsList";
-import DetailsSection from "./DetailsSection";
-import NoContent from "./NoContent";
-import MusicSection from "./MusicSection";
 import { useSectionContext } from "context/section.context";
 import "./RightPanel.scss";
+
+const HomeSection = React.lazy(() => import("./HomeSection"));
+const CollectionsList = React.lazy(() => import("./CollectionsList"));
+const DetailsSection = React.lazy(() => import("./DetailsSection"));
+const NoContent = React.lazy(() => import("./NoContent"));
+const MusicSection = React.lazy(() => import("./MusicSection"));
 
 /**
  * The RightPanel component is responsible for rendering the correct content

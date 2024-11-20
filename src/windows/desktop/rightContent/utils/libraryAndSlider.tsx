@@ -24,10 +24,13 @@ import {
 import { useTranslation } from "react-i18next";
 import { BoxMatrixIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
 import "./LibraryAndSlider.scss";
+import { useSectionContext } from "context/section.context";
+import { RightPanelSections } from "@data/enums/Sections";
 
 function LibraryAndSlider() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
+	const {setCurrentRightSection} = useSectionContext();
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
 	);
@@ -74,6 +77,8 @@ function LibraryAndSlider() {
 		dispatch(selectLibrary(library));
 		dispatch(resetSelection());
 		dispatch(removeTransparentImage());
+
+		setCurrentRightSection(RightPanelSections.Collections);
 	};
 
 	if (selectedSeries == null) {

@@ -15,7 +15,7 @@ import { loadTransparentImage } from "@redux/slices/transparentImageLoadedSlice"
 import { RootState } from "@redux/store";
 import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EpisodeList from "./EpisodeList";
 import {
@@ -27,6 +27,7 @@ import {
 	UpArrowIcon,
 } from "@components/utils/IconLibrary";
 import "./DetailsSection.scss";
+import Loading from "@components/utils/Loading";
 
 function DetailsSection() {
 	const dispatch = useDispatch();
@@ -128,7 +129,7 @@ function DetailsSection() {
 	//#endregion
 
 	return (
-		<>
+		<Suspense fallback={<Loading />}>
 			{selectedLibrary && selectedSeries && selectedSeason && (
 				<div className="details-container scroll" id="scroll">
 					<div className="logo-container">
@@ -396,7 +397,7 @@ function DetailsSection() {
 					<EpisodeList />
 				</div>
 			)}
-		</>
+		</Suspense>
 	);
 }
 

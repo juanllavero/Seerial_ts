@@ -5,12 +5,13 @@ import { SeasonData } from "@interfaces/SeasonData";
 import { SeriesData } from "@interfaces/SeriesData";
 import { RootState } from "@redux/store";
 import { useSectionContext } from "context/section.context";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import Card from "./Card";
 import { LeftArrowIcon, RightArrowIcon } from "@components/utils/IconLibrary";
 import "./HomeSection.scss";
+import Loading from "@components/utils/Loading";
 
 function HomeSection() {
 	const { t } = useTranslation();
@@ -137,96 +138,106 @@ function HomeSection() {
 	//#endregion
 
 	return (
-		<div className="home-view-container scroll" id="scroll">
-			<div>
-				<div className="horizontal-scroll-title">
-					<span id="section-title">{t("continueWatching")}</span>
-					<div className={`scroll-btns ${canScrollCW ? "visible" : ""}`}>
-						<button
-							className="svg-button"
-							onClick={() => {
-								handleScroll("left", true);
-							}}
+		<Suspense fallback={<Loading />}>
+			<div className="home-view-container scroll" id="scroll">
+				<div>
+					<div className="horizontal-scroll-title">
+						<span id="section-title">{t("continueWatching")}</span>
+						<div
+							className={`scroll-btns ${canScrollCW ? "visible" : ""}`}
 						>
-							<LeftArrowIcon />
-						</button>
-						<button
-							className="svg-button"
-							onClick={() => {
-								handleScroll("right", true);
-							}}
-						>
-							<RightArrowIcon />
-						</button>
+							<button
+								className="svg-button"
+								onClick={() => {
+									handleScroll("left", true);
+								}}
+							>
+								<LeftArrowIcon />
+							</button>
+							<button
+								className="svg-button"
+								onClick={() => {
+									handleScroll("right", true);
+								}}
+							>
+								<RightArrowIcon />
+							</button>
+						</div>
+					</div>
+					<div
+						className="container"
+						id="continueWatchingScroll"
+						ref={continueWatchingContainer}
+					>
+						{[...currentlyWatchingShows]
+							.splice(0, 15)
+							.map(
+								(value: {
+									library: LibraryData;
+									show: SeriesData;
+									season: SeasonData;
+									episode: EpisodeData;
+								}) => (
+									<Card
+										key={value.show.id}
+										show={value.show}
+										season={value.season}
+										type="default"
+									/>
+								)
+							)}
 					</div>
 				</div>
-				<div
-					className="container"
-					id="continueWatchingScroll"
-					ref={continueWatchingContainer}
-				>
-					{[...currentlyWatchingShows]
-						.splice(0, 15)
-						.map(
-							(value: {
-								library: LibraryData;
-								show: SeriesData;
-								season: SeasonData;
-								episode: EpisodeData;
-							}) => (
-								<Card
-									key={value.show.id}
-									show={value.show}
-									season={value.season}
-									type="default"
-								/>
-							)
-						)}
-				</div>
-			</div>
-			<div className="scroll-container">
-				<div className="horizontal-scroll-title">
-					<span id="section-title">Mi lista</span>
-					<div className={`scroll-btns ${canScrollML ? "visible" : ""}`}>
-						<button
-							className="svg-button"
-							onClick={() => {
-								handleScroll("left", false);
-							}}
+				<div className="scroll-container">
+					<div className="horizontal-scroll-title">
+						<span id="section-title">Mi lista</span>
+						<div
+							className={`scroll-btns ${canScrollML ? "visible" : ""}`}
 						>
-							<LeftArrowIcon />
-						</button>
-						<button
-							className="svg-button"
-							onClick={() => {
-								handleScroll("right", false);
-							}}
-						>
-							<RightArrowIcon />
-						</button>
+							<button
+								className="svg-button"
+								onClick={() => {
+									handleScroll("left", false);
+								}}
+							>
+								<LeftArrowIcon />
+							</button>
+							<button
+								className="svg-button"
+								onClick={() => {
+									handleScroll("right", false);
+								}}
+							>
+								<RightArrowIcon />
+							</button>
+						</div>
+					</div>
+					<div
+						className="container"
+						id="myListScroll"
+						ref={myListContainer}
+					>
+						{[...currentlyWatchingShows]
+							.splice(0, 15)
+							.map(
+								(value: {
+									library: LibraryData;
+									show: SeriesData;
+									season: SeasonData;
+									episode: EpisodeData;
+								}) => (
+									<Card
+										key={value.show.id}
+										show={value.show}
+										season={value.season}
+										type="default"
+									/>
+								)
+							)}
 					</div>
 				</div>
-				<div className="container" id="myListScroll" ref={myListContainer}>
-					{[...currentlyWatchingShows]
-						.splice(0, 15)
-						.map(
-							(value: {
-								library: LibraryData;
-								show: SeriesData;
-								season: SeasonData;
-								episode: EpisodeData;
-							}) => (
-								<Card
-									key={value.show.id}
-									show={value.show}
-									season={value.season}
-									type="default"
-								/>
-							)
-						)}
-				</div>
 			</div>
-		</div>
+		</Suspense>
 	);
 }
 

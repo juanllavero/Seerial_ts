@@ -1,5 +1,5 @@
 import { WindowSections } from "@data/enums/Sections";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
@@ -7,6 +7,7 @@ import { toggleLibraryEditWindow } from "redux/slices/dataSlice";
 import { useTranslation } from "react-i18next";
 import { Library } from "@objects/Library";
 import { MoviesIcon, MusicIcon, ShowsIcon } from "@components/utils/IconLibrary";
+import Loading from "@components/utils/Loading";
 
 function LibraryWindow() {
 	const dispatch = useDispatch();
@@ -115,7 +116,7 @@ function LibraryWindow() {
 	}, [libraryMenuOpen]);
 
 	return (
-		<>
+		<Suspense fallback={<Loading />}>
 			<section
 				className={`dialog ${libraryMenuOpen ? " dialog-active" : ""}`}
 			>
@@ -315,7 +316,7 @@ function LibraryWindow() {
 					</section>
 				</div>
 			</section>
-		</>
+		</Suspense>
 	);
 };
 

@@ -3,6 +3,8 @@ import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
 import Card from "./Card";
 import "./CollectionsList.scss";
+import { Suspense } from "react";
+import Loading from "@components/utils/Loading";
 
 /**
  * A component that displays a list of series.
@@ -19,12 +21,14 @@ function CollectionsList() {
 	);
 
 	return (
-		<div className="collection-container scroll" id="scroll">
-			{selectedLibrary &&
-				selectedLibrary.series.map((show: SeriesData) => (
-					<Card key={show.id} show={show} type="default" />
-				))}
-		</div>
+		<Suspense fallback={<Loading />}>
+			<div className="collection-container scroll" id="scroll">
+				{selectedLibrary &&
+					selectedLibrary.series.map((show: SeriesData) => (
+						<Card key={show.id} show={show} type="default" />
+					))}
+			</div>
+		</Suspense>
 	);
 }
 
