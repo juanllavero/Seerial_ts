@@ -11,14 +11,11 @@ import "../../i18n";
 import "../../Fullscreen.scss";
 import { SeriesData } from "@interfaces/SeriesData";
 import { LibraryData } from "@interfaces/LibraryData";
-import { SeasonData } from "@interfaces/SeasonData";
 import { EpisodeData } from "@interfaces/EpisodeData";
-import { ReactUtils } from "data/utils/ReactUtils";
 import MainMenu from "./mainMenu";
 import { toggleMainMenu } from "redux/slices/contextMenuSlice";
 import { FullscreenSection } from "data/enums/FullscreenSections";
 import {
-	changeFullscreenSection,
 	setCurrentlyWatchingShows,
 	setDominantColor,
 	setHomeImageLoaded,

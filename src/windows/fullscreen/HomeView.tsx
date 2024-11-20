@@ -1,5 +1,4 @@
 import "../../i18n";
-import "../../Fullscreen.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { useEffect, useRef, useState } from "react";
@@ -16,10 +15,9 @@ import {
 import Image from "@components/image/Image";
 
 function HomeView() {
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const { t } = useTranslation();
 
-	// Main objects
 	const currentSeason = useSelector(
 		(state: RootState) => state.data.selectedSeason
 	);
@@ -32,15 +30,6 @@ function HomeView() {
 	const homeImageLoaded = useSelector(
 		(state: RootState) => state.fullscreenSection.homeImageLoaded
 	);
-	const [showImageLoaded, setShowImageLoaded] = useState(false);
-	const [seasonImageLoaded, setSeasonImageLoaded] = useState(false);
-
-	
-
-	const listRef = useRef<HTMLDivElement>(null);
-	const section = useSelector(
-		(state: RootState) => state.fullscreenSection.fullscreenSection
-	);
 
 	const homeInfoElement = useSelector(
 		(state: RootState) => state.fullscreenSection.homeInfoElement
@@ -48,6 +37,8 @@ function HomeView() {
 	const currentlyWatchingShows = useSelector(
 		(state: RootState) => state.fullscreenSection.currentlyWatchingShows
 	);
+
+	const listRef = useRef<HTMLDivElement>(null);
 
 	//#region KEYBOARD DETECTION
 	const handleKeyDown = (event: KeyboardEvent) => {
@@ -59,63 +50,29 @@ function HomeView() {
 			(episode) => episode === currentEpisode
 		);
 
-		/*if (songsView) {
-            if (event.key === 'ArrowDown') {
-                // Mover al siguiente episodio si existe
-                const nextIndex = currentIndex + 1;
-                if (nextIndex < currentSeason.episodes.length) {
-                    handleScrollElementClick<EpisodeData>(
-                        currentSeason.episodes[nextIndex], 
-                        nextIndex, 
-                        listRef, 
-                        setCurrentEpisode, 
-                        true
-                    );
-                }
-            }
-    
-            if (event.key === 'ArrowUp') {
-                // Mover al episodio anterior si existe
-                const prevIndex = currentIndex - 1;
-                if (prevIndex >= 0) {
-                    handleScrollElementClick<EpisodeData>(
-                        currentSeason.episodes[prevIndex], 
-                        prevIndex, 
-                        listRef, 
-                        setCurrentEpisode, 
-                        true
-                    );
-                }
-            }
-        } else {
-            if (event.key === 'ArrowRight') {
-                // Mover al siguiente episodio si existe
-                const nextIndex = currentIndex + 1;
-                if (nextIndex < currentSeason.episodes.length) {
-                    handleScrollElementClick<EpisodeData>(
-                        currentSeason.episodes[nextIndex], 
-                        nextIndex, 
-                        listRef, 
-                        setCurrentEpisode, 
-                        false
-                    );
-                }
-            }
-    
-            if (event.key === 'ArrowLeft') {
-                // Mover al episodio anterior si existe
-                const prevIndex = currentIndex - 1;
-                if (prevIndex >= 0) {
-                    handleScrollElementClick<EpisodeData>(
-                        currentSeason.episodes[prevIndex], 
-                        prevIndex, 
-                        listRef, 
-                        setCurrentEpisode, 
-                        false
-                    );
-                }
-            }
-        }*/
+		if (event.key === "ArrowRight") {
+			// Mover al siguiente episodio si existe
+			const nextIndex = currentIndex + 1;
+			if (nextIndex < currentSeason.episodes.length) {
+				ReactUtils.handleScrollElementClick(
+					nextIndex,
+					listRef,
+					false
+				);
+			}
+		}
+
+		if (event.key === "ArrowLeft") {
+			// Mover al episodio anterior si existe
+			const prevIndex = currentIndex - 1;
+			if (prevIndex >= 0) {
+				ReactUtils.handleScrollElementClick(
+					prevIndex,
+					listRef,
+					false
+				);
+			}
+		}
 	};
 
 	// Add and Clean Keyboard Events

@@ -1,14 +1,11 @@
 import "../../i18n";
 import "../../Fullscreen.scss";
 import { SeasonData } from "@interfaces/SeasonData";
-import { FullscreenSection } from "@data/enums/FullscreenSections";
 import ResolvedImage from "@components/image/ExternalImage";
 import { ReactUtils } from "@data/utils/ReactUtils";
 import { EpisodeData } from "@interfaces/EpisodeData";
-import { t } from "i18next";
-import { SeriesData } from "@interfaces/SeriesData";
 import { RootState } from "@redux/store";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { selectSeason } from "@redux/slices/dataSlice";
@@ -41,63 +38,6 @@ function SeasonsView() {
 			setCurrentFullscreenSection(FullscreenSections.Details);
 		}
 	};
-    
-    //#region SCROLL
-	const scrollToCenter = (
-		scrollElement: HTMLElement,
-		scrollOffset: number,
-		duration: number,
-		isVertical: boolean
-	) => {
-		const start = isVertical
-			? scrollElement.scrollTop
-			: scrollElement.scrollLeft;
-		const startTime = performance.now();
-
-		const animateScroll = (currentTime: number) => {
-			const timeElapsed = currentTime - startTime;
-			const progress = Math.min(timeElapsed / duration, 1);
-
-			if (isVertical) {
-				scrollElement.scrollTop = start + scrollOffset * progress; // Scroll vertical
-			} else {
-				scrollElement.scrollLeft = start + scrollOffset * progress; // Scroll horizontal
-			}
-
-			if (timeElapsed < duration) {
-				requestAnimationFrame(animateScroll);
-			}
-		};
-
-		requestAnimationFrame(animateScroll);
-	};
-
-	const handleScrollElementClick = <T extends { id: string }>(
-		index: number,
-		listRef: React.RefObject<HTMLDivElement>,
-		isVertical: boolean
-	) => {
-		const elementButton = listRef.current?.children[index] as HTMLElement;
-		if (elementButton && listRef.current) {
-			const listRect = listRef.current.getBoundingClientRect();
-			const buttonRect = elementButton.getBoundingClientRect();
-
-			const buttonCenter = isVertical
-				? buttonRect.top + buttonRect.height / 2
-				: buttonRect.left + buttonRect.width / 2;
-
-			const listCenter = isVertical
-				? listRect.top + listRect.height / 2
-				: listRect.left + listRect.width / 2;
-
-			if (buttonCenter !== listCenter) {
-				const scrollOffset = buttonCenter - listCenter;
-				scrollToCenter(listRef.current, scrollOffset, 300, isVertical);	// 300ms
-			}
-		}
-	};
-	//#endregion
-
 
 	return (
 		<section className="season-container">
@@ -360,6 +300,7 @@ function SeasonsView() {
 							<>
 								{currentShow.seasons.map((season, index) => (
 									<button
+										key={season.id}
 										className={`${
 											season === currentSeason
 												? "selected-season-btn"

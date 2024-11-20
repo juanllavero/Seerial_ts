@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next"
 
 function NoContentFullscreen() {
+  const {t} = useTranslation();
   return (
-    <div>NoContentFullscreen</div>
+    <div>{t('noLibraryFound')}</div>
   )
 }
 
