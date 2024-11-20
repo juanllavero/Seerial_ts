@@ -87,4 +87,60 @@ export class ReactUtils {
             return `${minutes}m`
         }
     }
+
+    //#region SCROLL
+	static scrollToCenter = (
+		scrollElement: HTMLElement,
+		scrollOffset: number,
+		duration: number,
+		isVertical: boolean
+	) => {
+		const start = isVertical
+			? scrollElement.scrollTop
+			: scrollElement.scrollLeft;
+		const startTime = performance.now();
+
+		const animateScroll = (currentTime: number) => {
+			const timeElapsed = currentTime - startTime;
+			const progress = Math.min(timeElapsed / duration, 1);
+
+			if (isVertical) {
+				scrollElement.scrollTop = start + scrollOffset * progress; // Scroll vertical
+			} else {
+				scrollElement.scrollLeft = start + scrollOffset * progress; // Scroll horizontal
+			}
+
+			if (timeElapsed < duration) {
+				requestAnimationFrame(animateScroll);
+			}
+		};
+
+		requestAnimationFrame(animateScroll);
+	};
+
+	public static handleScrollElementClick = (
+		index: number,
+		listRef: React.RefObject<HTMLDivElement>,
+		isVertical: boolean
+	) => {
+		const elementButton = listRef.current?.children[index] as HTMLElement;
+		if (elementButton && listRef.current) {
+			const listRect = listRef.current.getBoundingClientRect();
+			const buttonRect = elementButton.getBoundingClientRect();
+
+			const buttonCenter = isVertical
+				? buttonRect.top + buttonRect.height / 2
+				: buttonRect.left + buttonRect.width / 2;
+
+			const listCenter = isVertical
+				? listRect.top + listRect.height / 2
+				: listRect.left + listRect.width / 2;
+
+			if (buttonCenter !== listCenter) {
+				const scrollOffset = buttonCenter - listCenter;
+				ReactUtils.scrollToCenter(listRef.current, scrollOffset, 300, isVertical);	// 300ms
+			}
+		}
+	};
+	//#endregion
 }

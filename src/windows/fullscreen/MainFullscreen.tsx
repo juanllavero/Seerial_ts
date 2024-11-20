@@ -9,7 +9,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import "../../i18n";
 import "../../Fullscreen.scss";
-import ResolvedImage from "@components/image/Image";
 import { SeriesData } from "@interfaces/SeriesData";
 import { LibraryData } from "@interfaces/LibraryData";
 import { SeasonData } from "@interfaces/SeasonData";
@@ -44,7 +43,8 @@ import NoContentFullscreen from "./NoContentFullscreen";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
-	const { currentFullscreenSection } = useSectionContext();
+	const { currentFullscreenSection, setCurrentFullscreenSection } =
+		useSectionContext();
 
 	const [time, setTime] = useState(new Date());
 
@@ -72,21 +72,12 @@ function MainFullscreen() {
 	const [currentShowForBackground, setCurrentShowForBackground] = useState<
 		SeriesData | undefined
 	>();
-	const [currentSeasonSelected, setCurrentSeasonSelected] = useState<
-		SeasonData | undefined
-	>();
 
-	const homeImageLoaded = useSelector(
-		(state: RootState) => state.fullscreenSection.homeImageLoaded
-	);
 	const showImageLoaded = useSelector(
 		(state: RootState) => state.fullscreenSection.showImageLoaded
 	);
 	const seasonImageLoaded = useSelector(
 		(state: RootState) => state.fullscreenSection.seasonImageLoaded
-	);
-	const dominantColor = useSelector(
-		(state: RootState) => state.fullscreenSection.dominantColor
 	);
 
 	const listRef = useRef<HTMLDivElement>(null);
@@ -96,15 +87,9 @@ function MainFullscreen() {
 	);
 	const [songsView, setSongsView] = useState<boolean>(false);
 
-	const homeInfoElement = useSelector(
-		(state: RootState) => state.fullscreenSection.homeInfoElement
-	);
 	const currentlyWatchingShows = useSelector(
 		(state: RootState) => state.fullscreenSection.currentlyWatchingShows
 	);
-
-	const [gradient, setGradient] = useState<string>("none");
-	const [gradientLeft, setGradientLeft] = useState<string>("none");
 
 	// Set Currently Watching
 	useEffect(() => {
@@ -189,7 +174,7 @@ function MainFullscreen() {
 		setSongsView(false);
 		dispatch(selectSeason(null));
 		dispatch(selectEpisode(undefined));
-		dispatch(changeFullscreenSection(FullscreenSection.Home));
+		setCurrentFullscreenSection(FullscreenSections.Home);
 	};
 
 	const handleSelectLibrary = (library: LibraryData | null) => {
@@ -197,10 +182,11 @@ function MainFullscreen() {
 		if (library) {
 			dispatch(setHomeInfoElement(undefined));
 			dispatch(setHomeImageLoaded(false));
-			dispatch(changeFullscreenSection(FullscreenSection.Shows));
 			dispatch(setDominantColor("000000"));
+
+			setCurrentFullscreenSection(FullscreenSections.Collections);
 		} else {
-			dispatch(changeFullscreenSection(FullscreenSection.Home));
+			setCurrentFullscreenSection(FullscreenSections.Home);
 		}
 
 		dispatch(selectLibrary(library));
@@ -266,58 +252,11 @@ function MainFullscreen() {
 
 			if (buttonCenter !== listCenter) {
 				const scrollOffset = buttonCenter - listCenter;
-				scrollToCenter(listRef.current, scrollOffset, 300, isVertical); // Ajusta la duración a 300ms
+				scrollToCenter(listRef.current, scrollOffset, 300, isVertical);	// 300ms
 			}
 		}
 	};
 	//#endregion
-
-	// Generate Gradient Background
-	useEffect(() => {
-		const generateGradient = async (path: string) => {
-			if (path !== "none") {
-				const extPath = await window.electronAPI.getExternalPath(path);
-
-				if (extPath !== "") {
-					await ReactUtils.getDominantColors(extPath);
-
-					setDominantColor(ReactUtils.colors[0]);
-
-					if (dominantColor) {
-						setGradient(
-							`radial-gradient(135% 103% at 97% 39%, #073AFF00 41%, ${dominantColor} 68%)`
-						);
-						setGradientLeft(
-							`linear-gradient(90deg, ${dominantColor} 0%, ${dominantColor} 100%)`
-						);
-					}
-				}
-			} else {
-				setGradient(
-					`radial-gradient(135% 103% at 97% 39%, #073AFF00 41%, #000000FF 68%)`
-				);
-				setGradientLeft(
-					`linear-gradient(90deg, #000000FF 0%, #000000FF 100%)`
-				);
-			}
-		};
-
-		if (
-			homeInfoElement &&
-			homeInfoElement.season.backgroundSrc &&
-			homeInfoElement.season.backgroundSrc !== ""
-		) {
-			setHomeImageLoaded(false);
-			setTimeout(() => {
-				generateGradient(homeInfoElement.season.backgroundSrc);
-				setHomeImageLoaded(true);
-			}, 600);
-		} else if (homeInfoElement) {
-			setTimeout(() => {
-				generateGradient("none");
-			}, 100);
-		}
-	}, [homeInfoElement]);
 
 	//#region KEYBOARD DETECTION
 	const handleKeyDown = (event: KeyboardEvent) => {
@@ -430,34 +369,6 @@ function MainFullscreen() {
 						errorSrc=""
 					/>
 				</div>
-			) : null}
-			{homeInfoElement !== undefined ? (
-				<>
-					<div
-						className={`background-image ${
-							homeImageLoaded ? "loaded" : ""
-						}`}
-					>
-						{homeInfoElement.season.backgroundSrc !== "" ? (
-							<Image
-								src={homeInfoElement.season.backgroundSrc}
-								alt="Background"
-								isRelative={true}
-								errorSrc=""
-							/>
-						) : null}
-					</div>
-					<div
-						className={`gradient-left ${
-							homeImageLoaded ? "loadedFull" : ""
-						}`}
-						style={{ background: `${gradientLeft}` }}
-					></div>
-					<div
-						className={`gradient ${homeImageLoaded ? "loadedFull" : ""}`}
-						style={{ background: `${gradient}` }}
-					></div>
-				</>
 			) : null}
 			<section className="top">
 				{section !== FullscreenSection.Seasons && (
