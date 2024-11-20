@@ -1,9 +1,27 @@
 import '../../i18n';
 import '../../Fullscreen.scss';
 import { SeasonData } from '@interfaces/SeasonData';
+import { FullscreenSection } from '@data/enums/FullscreenSections';
+import ResolvedImage from '@components/image/ExternalImage';
+import { ReactUtils } from '@data/utils/ReactUtils';
+import { EpisodeData } from '@interfaces/EpisodeData';
+import { t } from 'i18next';
+import { SeriesData } from '@interfaces/SeriesData';
+import { RootState } from '@redux/store';
+import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
 
 function SeasonsView() {
+    const { t } = useTranslation();
 
+    // Main objects
+    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
+    const currentShow = useSelector((state: RootState) => state.data.selectedSeries);
+    const currentSeason = useSelector((state: RootState) => state.data.selectedSeason);
+    const currentEpisode = useSelector((state: RootState) => state.data.selectedEpisode);
+
+    const listRef = useRef<HTMLDivElement>(null);
     const handleSelectSeason = (season: SeasonData | undefined) => {
         setCurrentSeason(season);
 

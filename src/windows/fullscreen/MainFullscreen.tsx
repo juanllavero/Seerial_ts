@@ -31,9 +31,20 @@ import AlbumsView from "./AlbumsView";
 import SongsView from "./SongsView";
 import ShowsView from "./ShowsView";
 import { HomeInfoElement } from "@interfaces/HomeInfoElement";
+import Image from "@components/image/Image";
+import {
+	GoBackIcon,
+	HomeFullDefaultIcon,
+	HomeFullSelectedIcon,
+	MenuIcon,
+} from "@components/utils/IconLibrary";
+import { useSectionContext } from "context/section.context";
+import { FullscreenSections } from "@data/enums/Sections";
+import NoContentFullscreen from "./NoContentFullscreen";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
+	const { currentFullscreenSection } = useSectionContext();
 
 	const [time, setTime] = useState(new Date());
 
@@ -165,8 +176,9 @@ function MainFullscreen() {
 				}
 			});
 
+		// Update time every second
 		const timer = setInterval(() => {
-			setTime(new Date()); // Actualiza la hora cada segundo
+			setTime(new Date());
 		}, 1000);
 
 		return () => clearInterval(timer);
@@ -368,7 +380,7 @@ function MainFullscreen() {
 
 	return (
 		<>
-			{MainMenu()}
+			<MainMenu />
 			<div
 				className={`season-image ${
 					seasonImageLoaded ? "loaded-blur-in" : "loaded-blur-out"
@@ -377,9 +389,11 @@ function MainFullscreen() {
 				{selectedLibrary &&
 				currentSeason &&
 				currentSeason.backgroundSrc !== "" ? (
-					<ResolvedImage
+					<Image
 						src={currentSeason.backgroundSrc}
 						alt="Background"
+						isRelative={true}
+						errorSrc=""
 					/>
 				) : null}
 			</div>
@@ -398,18 +412,22 @@ function MainFullscreen() {
 					currentShowForBackground &&
 					currentShowForBackground.seasons &&
 					currentShowForBackground.seasons.length > 0 ? (
-						<ResolvedImage
+						<Image
 							src={`/resources/img/backgrounds/${currentShowForBackground.seasons[0].id}/fullBlur.jpg`}
 							alt="Background"
+							isRelative={true}
+							errorSrc=""
 						/>
 					) : null}
 				</div>
 			) : null}
 			{section === FullscreenSection.Home || useImageAsBackground ? (
 				<div className="noise-background">
-					<ResolvedImage
+					<Image
 						src="resources/img/noise.png"
-						alt="Background noise"
+						alt="Noise image"
+						isRelative={true}
+						errorSrc=""
 					/>
 				</div>
 			) : null}
@@ -421,9 +439,11 @@ function MainFullscreen() {
 						}`}
 					>
 						{homeInfoElement.season.backgroundSrc !== "" ? (
-							<ResolvedImage
+							<Image
 								src={homeInfoElement.season.backgroundSrc}
 								alt="Background"
+								isRelative={true}
+								errorSrc=""
 							/>
 						) : null}
 					</div>
@@ -443,29 +463,9 @@ function MainFullscreen() {
 				{section !== FullscreenSection.Seasons && (
 					<button id="home" onClick={() => handleSelectLibrary(null)}>
 						{selectedLibrary ? (
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1em"
-								height="1em"
-								viewBox="0 0 15 15"
-							>
-								<path
-									fill="currentColor"
-									d="m7.5.5l.325-.38a.5.5 0 0 0-.65 0zm-7 6l-.325-.38L0 6.27v.23zm5 8v.5a.5.5 0 0 0 .5-.5zm4 0H9a.5.5 0 0 0 .5.5zm5-8h.5v-.23l-.175-.15zM1.5 15h4v-1h-4zm13.325-8.88l-7-6l-.65.76l7 6zm-7.65-6l-7 6l.65.76l7-6zM6 14.5v-3H5v3zm3-3v3h1v-3zm.5 3.5h4v-1h-4zm5.5-1.5v-7h-1v7zm-15-7v7h1v-7zM7.5 10A1.5 1.5 0 0 1 9 11.5h1A2.5 2.5 0 0 0 7.5 9zm0-1A2.5 2.5 0 0 0 5 11.5h1A1.5 1.5 0 0 1 7.5 10zm6 6a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zm-12-1a.5.5 0 0 1-.5-.5H0A1.5 1.5 0 0 0 1.5 15z"
-								></path>
-							</svg>
+							<HomeFullSelectedIcon />
 						) : (
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1em"
-								height="1em"
-								viewBox="0 0 15 15"
-							>
-								<path
-									fill="currentColor"
-									d="M7.825.12a.5.5 0 0 0-.65 0L0 6.27v7.23A1.5 1.5 0 0 0 1.5 15h4a.5.5 0 0 0 .5-.5v-3a1.5 1.5 0 0 1 3 0v3a.5.5 0 0 0 .5.5h4a1.5 1.5 0 0 0 1.5-1.5V6.27z"
-								></path>
-							</svg>
+							<HomeFullDefaultIcon />
 						)}
 					</button>
 				)}
@@ -491,17 +491,7 @@ function MainFullscreen() {
 							className="go-back-btn"
 							onClick={() => handleGoToMainView()}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1em"
-								height="1em"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z"
-								></path>
-							</svg>
+							<GoBackIcon />
 						</button>
 					</>
 				)}
@@ -514,46 +504,38 @@ function MainFullscreen() {
 								dispatch(toggleMainMenu());
 							}}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1em"
-								height="1em"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1M3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1"
-								></path>
-							</svg>
+							<MenuIcon />
 						</button>
 					)}
 				</div>
 			</section>
 			<section className="content">
-				{section !== FullscreenSection.Seasons &&
-				selectedLibrary !== null ? (
-					<>{ShowsView()}</>
-				) : section !== FullscreenSection.Seasons ? (
-					<>{HomeView()}</>
-				) : section === FullscreenSection.Seasons &&
-				  selectedLibrary &&
-				  currentShow &&
-				  currentSeason &&
-				  currentEpisode ? (
-					<>
-						{selectedLibrary.type === "Music" ? (
-							<>
-								{currentShow.seasons.length > 1 ? (
-									<>{AlbumsView()}</>
-								) : (
-									<>{SongsView()}</>
-								)}
-							</>
-						) : (
-							<>{SeasonsView()}</>
-						)}
-					</>
-				) : null}
+				{currentFullscreenSection === FullscreenSections.Home ? (
+					<HomeView />
+				) : currentFullscreenSection === FullscreenSections.Collections ? (
+					<ShowsView />
+				) : currentFullscreenSection === FullscreenSections.Details ? (
+					selectedLibrary &&
+					currentShow &&
+					currentSeason &&
+					currentEpisode ? (
+						<>
+							{selectedLibrary.type === "Music" ? (
+								<>
+									{currentShow.seasons.length > 1 ? (
+										<AlbumsView />
+									) : (
+										<SongsView />
+									)}
+								</>
+							) : (
+								<SeasonsView />
+							)}
+						</>
+					) : null
+				) : (
+					<NoContentFullscreen />
+				)}
 			</section>
 		</>
 	);

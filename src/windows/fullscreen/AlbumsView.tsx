@@ -1,10 +1,23 @@
 import '../../i18n';
 import '../../Fullscreen.scss';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { ReactUtils } from '@data/utils/ReactUtils';
+import { EpisodeData } from '@interfaces/EpisodeData';
+import { SeasonData } from '@interfaces/SeasonData';
+import { RootState } from '@redux/store';
+import {  useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 function AlbumsView() {
+    const { t } = useTranslation();
 
+    // Main objects
+    const currentShow = useSelector((state: RootState) => state.data.selectedSeries);
+    const currentSeason = useSelector((state: RootState) => state.data.selectedSeason);
+    const currentEpisode = useSelector((state: RootState) => state.data.selectedEpisode);
     
+    const listRef = useRef<HTMLDivElement>(null);
 
     //#region SONGS
     const getDiscs = () => {

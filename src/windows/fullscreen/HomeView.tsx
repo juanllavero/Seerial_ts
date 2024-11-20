@@ -11,6 +11,7 @@ import { ReactUtils } from 'data/utils/ReactUtils';
 import { useTranslation } from 'react-i18next';
 import ResolvedImage from '@components/image/Image';
 import { HomeInfoElement } from '@interfaces/HomeInfoElement';
+import { setHomeInfoElement } from '@redux/slices/fullscreenSectionsSlice';
 
 function HomeView() {
     const dispatch = useDispatch();

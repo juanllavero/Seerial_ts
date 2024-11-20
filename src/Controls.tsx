@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import Controls from "pages/videoPlayer/controls";
+import Controls from "windows/videoPlayer/controls";
 import { store } from "./redux/store";
 import "./Controls.scss";
 
