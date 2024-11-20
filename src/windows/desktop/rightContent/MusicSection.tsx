@@ -1,20 +1,19 @@
-import { MusicSection } from "@data/enums/MusicSection";
 import { ContextMenu } from "primereact/contextmenu";
 import { useTranslation } from "react-i18next";
-import MusicView from "../MusicView";
-import MusicViewCards from "../MusicViewCards";
 import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
 import { useRef, useState } from "react";
+import { useSectionContext } from "context/section.context";
+import { RightPanelSections } from "@data/enums/Sections";
+import MusicTable from "./MusicTable";
+import MusicCards from "./MusicCards";
 
-function MusicAlbums() {
+function MusicSection() {
    const { t } = useTranslation();
+	const {currentRightSection, setCurrentRightSection} = useSectionContext();
    const selectedSeries = useSelector((state: RootState) => state.data.selectedSeries);
    const selectedLibrary = useSelector((state: RootState) => state.data.selectedLibrary);
    const [musicSelect, setMusicSelect] = useState(false);
-   const [musicSection, setMusicSection] = useState<MusicSection>(
-		MusicSection.Collections
-	);
 
    const cm4 = useRef<ContextMenu | null>(null);
 	return (
@@ -25,19 +24,19 @@ function MusicAlbums() {
 						model={[
 							{
 								label: `${t("collections")} ${
-									musicSection === MusicSection.Collections ? " ✓" : ""
+									currentRightSection === RightPanelSections.MusicAlbums ? " ✓" : ""
 								}`,
 								command: () => {
-									setMusicSection(MusicSection.Collections);
+									setCurrentRightSection(RightPanelSections.MusicAlbums);
 									setMusicSelect(false);
 								},
 							},
 							{
 								label: `${t("tracks")} ${
-									musicSection === MusicSection.Tracks ? " ✓" : ""
+									currentRightSection === RightPanelSections.MusicTable ? " ✓" : ""
 								}`,
 								command: () => {
-									setMusicSection(MusicSection.Tracks);
+									setCurrentRightSection(RightPanelSections.MusicTable);
 									setMusicSelect(false);
 								},
 							},
@@ -55,7 +54,7 @@ function MusicAlbums() {
 							onAuxClick={() => setMusicSelect(false)}
 						>
 							<span className="selected" style={{ fontSize: "medium" }}>
-								{musicSection === MusicSection.Collections
+								{currentRightSection === RightPanelSections.MusicAlbums
 									? t("collections")
 									: t("tracks")}
 							</span>
@@ -68,13 +67,13 @@ function MusicAlbums() {
 					</div>
 				</>
 			) : null}
-			{selectedLibrary && musicSection === MusicSection.Tracks ? (
-				<MusicView selectedLibrary={selectedLibrary} />
+			{selectedLibrary && currentRightSection === RightPanelSections.MusicTable ? (
+				<MusicTable selectedLibrary={selectedLibrary} />
 			) : selectedLibrary ? (
-				<MusicViewCards selectedLibrary={selectedLibrary} />
+				<MusicCards selectedLibrary={selectedLibrary} />
 			) : null}
 		</div>
 	);
 }
 
-export default MusicAlbums;
+export default MusicSection;

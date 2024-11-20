@@ -11,7 +11,7 @@ import {
 	closeAllMenus,
 	toggleLibraryMenu,
 } from "redux/slices/contextMenuSlice";
-import { useCallback, useContext, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { ContextMenu } from "primereact/contextmenu";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -23,8 +23,8 @@ import {
 	VerticalDotsIcon,
 } from "@components/utils/IconLibrary";
 import { LibraryData } from "@interfaces/LibraryData";
-import { SectionContext } from "context/section.context";
 import { RightPanelSections } from "@data/enums/Sections";
+import { useSectionContext } from "context/section.context";
 
 /**
  * A component that displays a list of libraries and allows the user to select a library, 
@@ -35,7 +35,7 @@ import { RightPanelSections } from "@data/enums/Sections";
 function LibrariesList() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
-	const {setCurrentRightSection} = useContext(SectionContext);
+	const {setCurrentRightSection} = useSectionContext();
 	const libraries = useSelector((state: RootState) => state.data.libraries);
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary

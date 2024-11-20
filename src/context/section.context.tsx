@@ -3,9 +3,9 @@ import {
 	RightPanelSections,
 	WindowSections,
 } from "@data/enums/Sections";
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode, useContext } from "react";
 
-interface SectionContextProps {
+export interface SectionContextProps {
 	currentRightSection: RightPanelSections;
 	setCurrentRightSection: React.Dispatch<
 		React.SetStateAction<RightPanelSections>
@@ -20,14 +20,7 @@ interface SectionContextProps {
 	>;
 }
 
-const SectionContext = createContext<SectionContextProps>({
-	currentRightSection: RightPanelSections.Home,
-	setCurrentRightSection: () => {},
-	currentWindowSection: WindowSections.General,
-	setCurrentWindowSection: () => {},
-	currentFullscreenSection: FullscreenSections.Home,
-	setCurrentFullscreenSection: () => {},
-});
+export const SectionContext = createContext<SectionContextProps | undefined>(undefined);
 
 /**
  * SectionProvider is a context provider component that manages and provides
@@ -39,7 +32,7 @@ const SectionContext = createContext<SectionContextProps>({
  * @param {ReactNode} children - The child components that will have access to the section context.
  * @returns {JSX.Element} A provider component that supplies the section context to its descendants.
  */
-const SectionProvider = ({ children }: { children: ReactNode }) => {
+export const SectionProvider = ({ children }: { children: ReactNode }): JSX.Element => {
 	const [currentRightSection, setCurrentRightSection] = useState(
 		RightPanelSections.Home
 	);
@@ -66,4 +59,11 @@ const SectionProvider = ({ children }: { children: ReactNode }) => {
 	);
 };
 
-export { SectionProvider, SectionContext };
+// Custom hook to use the SectionContext
+export const useSectionContext = (): SectionContextProps => {
+	const context = useContext(SectionContext);
+	if (!context) {
+	  throw new Error("useSectionContext must be used within a SectionProvider");
+	}
+	return context;
+ };

@@ -1,18 +1,23 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { SectionContext } from "context/section.context";
 import { RightPanelSections } from "@data/enums/Sections";
 import HomeSection from "./HomeSection";
-import MusicTable from "./MusicTable";
 import CollectionsList from "./CollectionsList";
 import DetailsSection from "./DetailsSection";
 import NoContent from "./NoContent";
-import MusicAlbums from "./MusicAlbums";
+import MusicSection from "./MusicSection";
+import { useSectionContext } from "context/section.context";
 
+/**
+ * The RightPanel component is responsible for rendering the correct content
+ * based on the selected library and series. It will reset the scroll position
+ * to the top when the library or series changes. It uses the SectionContext to
+ * switch between the different sections of the right panel.
+ * @returns The correct content based on the selected library and series.
+ */
 function RightPanel() {
-	const { currentRightSection, setCurrentRightSection } =
-		useContext(SectionContext);
+	const { currentRightSection, setCurrentRightSection } = useSectionContext();
 
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
@@ -39,10 +44,8 @@ function RightPanel() {
 				<HomeSection />
 			) : currentRightSection === RightPanelSections.Collections ? (
 				<CollectionsList />
-			) : currentRightSection === RightPanelSections.MusicTable ? (
-				<MusicTable />
-			) : currentRightSection === RightPanelSections.MusicAlbums ? (
-				<MusicAlbums />
+			) : currentRightSection === RightPanelSections.MusicAlbums || currentRightSection === RightPanelSections.MusicTable ? (
+				<MusicSection />
 			) : currentRightSection === RightPanelSections.Details ? (
 				<DetailsSection />
 			) : (

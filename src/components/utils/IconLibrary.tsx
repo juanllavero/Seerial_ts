@@ -91,6 +91,29 @@ export const VerticalDotsIcon = (props: React.SVGProps<SVGSVGElement>) => (
 	</svg>
 );
 
+export const HorizontalDotsIcon = () => (
+	<svg
+		aria-hidden="true"
+		height="48"
+		viewBox="0 0 48 48"
+		width="48"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M12 27C13.6569 27 15 25.6569 15 24C15 22.3431 13.6569 21 12 21C10.3431 21 9 22.3431 9 24C9 25.6569 10.3431 27 12 27Z"
+			fill="#FFFFFF"
+		></path>
+		<path
+			d="M24 27C25.6569 27 27 25.6569 27 24C27 22.3431 25.6569 21 24 21C22.3431 21 21 22.3431 21 24C21 25.6569 22.3431 27 24 27Z"
+			fill="#FFFFFF"
+		></path>
+		<path
+			d="M39 24C39 25.6569 37.6569 27 36 27C34.3431 27 33 25.6569 33 24C33 22.3431 34.3431 21 36 21C37.6569 21 39 22.3431 39 24Z"
+			fill="#FFFFFF"
+		></path>
+	</svg>
+);
+
 export const BoxMatrixIcon = () => (
 	<svg
 		aria-hidden="true"
@@ -191,6 +214,33 @@ export const RightArrowIcon = () => (
 		<path
 			d="M35.2132 24.3848L16.8284 42.7696L14 39.9411L29.5564 24.3848L14 8.82843L16.8284 6L35.2132 24.3848Z"
 			fill="#FFFFFF"
+		></path>
+	</svg>
+);
+
+export const DownArrowIcon = () => (
+	<svg
+		aria-hidden="true"
+		height="16"
+		viewBox="0 0 48 48"
+		width="16"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"></path>
+	</svg>
+);
+
+export const UpArrowIcon = () => (
+	<svg
+		aria-hidden="true"
+		height="16"
+		viewBox="0 0 48 48"
+		width="16"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M24.1213 33.2213L7 16.1L9.1 14L24.1213 29.0213L39.1426 14L41.2426 16.1L24.1213 33.2213Z"
+			transform="rotate(180, 24, 24)"
 		></path>
 	</svg>
 );
@@ -310,6 +360,21 @@ export const LockIcon = () => (
 		viewBox="0 0 24 24"
 	>
 		<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
+	</svg>
+);
+
+export const MarkWatchedIcon = () => (
+	<svg
+		aria-hidden="true"
+		height="48"
+		viewBox="0 0 48 48"
+		width="48"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M38 6V40.125L24.85 33.74L23.5 33.065L22.15 33.74L9 40.125V6H38ZM38 3H9C8.20435 3 7.44129 3.31607 6.87868 3.87868C6.31607 4.44129 6 5.20435 6 6V45L23.5 36.5L41 45V6C41 5.20435 40.6839 4.44129 40.1213 3.87868C39.5587 3.31607 38.7957 3 38 3Z"
+			fill="#FFFFFF"
+		></path>
 	</svg>
 );
 

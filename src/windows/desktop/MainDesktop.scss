@@ -88,7 +88,7 @@ html, body {
   overflow-y: hidden;
   margin: 0 8px 8px 0;
   height: 100%;
-  z-index: 100;
+  z-index: 10;
 }
 
 /* LEFT PANEL CONTROLS */
@@ -796,56 +796,6 @@ html, body {
   margin-left: 0.3em;
   font-size: small;
   color: rgb(184, 184, 184);
-}
-
-/* WINDOW TOP BAR */
-.top-bar {
-  display: flex;
-  justify-content: flex-end;
-  padding: 5px 5px 0 5px;
-  position: absolute;
-  top: 0;
-  height: 2.5em;
-  width: 100%;
-  z-index: 10;
-  -webkit-app-region: drag;
-}
-
-.window-buttons-container {
-  padding-top: 10px;
-  padding-right: 40px;
-  position: fixed;
-  right: 0;
-}
-
-.window-button {
-  padding: 10px 15px 10px 15px;
-  color: white;
-  background: none;
-  border: none;
-  cursor: pointer;
-  -webkit-app-region: no-drag;
-}
-
-.window-button svg{
-  width: 18px;
-  height: 18px;
-  display: inline-block;
-  overflow: middle;
-}
-
-.minimize-button:hover {
-  background-color: rgba(0, 0, 0, 0.797);
-  border-radius: 5px 0 0 5px;
-}
-
-.maximize-button:hover {
-  background-color: rgba(0, 0, 0, 0.797);
-}
-
-.close-button:hover {
-  background-color: rgb(255, 15, 15);
-  border-radius: 0 5px 5px 0;
 }
 
 /* IMAGES */

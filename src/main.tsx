@@ -5,11 +5,14 @@ import { store } from "./redux/store";
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-dark-indigo/theme.css";
 import "./index.scss";
+import { SectionProvider } from "context/section.context";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<PrimeReactProvider>
 		<Provider store={store}>
-			<MainDesktop />
+			<SectionProvider>
+				<MainDesktop />
+			</SectionProvider>
 		</Provider>
 	</PrimeReactProvider>
 );

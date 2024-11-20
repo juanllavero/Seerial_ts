@@ -1,3 +1,5 @@
+import { SeasonData } from '@interfaces/SeasonData';
+import { SeriesData } from '@interfaces/SeriesData';
 import { extractColors } from 'extract-colors';
 
 export class ReactUtils {
@@ -6,11 +8,11 @@ export class ReactUtils {
     public static extractColorsFromImage = async (imgSrc: string) => {
         try {
             const options = {
-                pixels: 50000, // Reducimos el número de píxeles a analizar para centrarnos más en colores prominentes
-                distance: 0.15, // Reducimos la distancia entre colores para obtener menos variedad
-                saturationDistance: 0.5, // Reducimos la distancia de saturación para colores menos vibrantes
-                lightnessDistance: 0.12, // Reducimos la distancia de brillo para obtener colores más oscuros
-                hueDistance: 0.05, // Reducimos la distancia del matiz para que los colores estén más cercanos entre sí
+                pixels: 50000, // Reduce the number of pixels to analyze to focus on prominent colors
+                distance: 0.15, // Reduce color distance to get less variety
+                saturationDistance: 0.5, // Reduce saturation distance to get less vibrant colors
+                lightnessDistance: 0.12, // Reduce lightness distance to get darker colors
+                hueDistance: 0.05, // Reduce hue distance to get colors closer to each other
             };
     
             const extractedColors = await extractColors(imgSrc, options);
@@ -43,6 +45,27 @@ export class ReactUtils {
         }
         return "none";
     };
+
+    public static generateGradient = (
+		collection: SeriesData | null,
+		album: SeasonData | null
+	) => {
+		if (collection && !album) {
+			if (collection.coverSrc !== "") {
+				ReactUtils.getDominantColors(collection.coverSrc);
+			} else {
+				ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+			}
+		} else if (collection && album) {
+			if (album.coverSrc !== "") {
+				ReactUtils.getDominantColors(album.coverSrc);
+			} else if (collection.coverSrc !== "") {
+				ReactUtils.getDominantColors(collection.coverSrc);
+			} else {
+				ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+			}
+		}
+	};
 
     public static formatTime = (time: number) => {
         const minutes = Math.floor(time / 60);

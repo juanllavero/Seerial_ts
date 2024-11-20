@@ -15,9 +15,12 @@ import {
 } from "@redux/slices/dataSlice";
 import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { EditIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
 import { LibraryData } from "@interfaces/LibraryData";
+import { ReactUtils } from "@data/utils/ReactUtils";
+import { useSectionContext } from "context/section.context";
+import { RightPanelSections } from "@data/enums/Sections";
 
 interface CardProps {
 	library?: LibraryData;
@@ -26,8 +29,19 @@ interface CardProps {
 	type: "default" | "music";
 }
 
+/**
+ * @function Card
+ * @description A single card on the right content panel representing a series or a season.
+ * @param {CardProps} props The props for the Card component.
+ * @param {LibraryData} [props.library] The library that the card belongs to.
+ * @param {SeriesData} props.show The series the card represents.
+ * @param {SeasonData} [props.season] The season the card represents if type is "default".
+ * @param {"default" | "music"} props.type The type of the card.
+ * @returns {JSX.Element} The JSX element for the Card component.
+ */
 function Card(props: CardProps) {
 	const dispatch = useDispatch();
+	const {setCurrentRightSection} = useSectionContext();
 	const { library, show, season, type } = props;
 	const seriesImageWidth = useSelector(
 		(state: RootState) => state.seriesImage.width
@@ -39,13 +53,19 @@ function Card(props: CardProps) {
 	const cm = useRef<ContextMenu | null>(null);
 
 	const handleSeriesSelection = (series: SeriesData) => {
+		if (type === "music") ReactUtils.generateGradient(series, null);
+		
+		setCurrentRightSection(RightPanelSections.Details);
 		dispatch(selectSeries(series));
 
 		if (series.seasons && series.seasons.length > 0)
-			handleSeasonSelection(series.seasons[0]);
+			handleSeasonSelection(series, series.seasons[0]);
 	};
 
-	const handleSeasonSelection = (season: SeasonData) => {
+	const handleSeasonSelection = (series: SeriesData, season: SeasonData) => {
+		if (type === "music" && season)
+			ReactUtils.generateGradient(series, season);
+
 		dispatch(selectSeason(season));
 		dispatch(closeContextMenu());
 	};
@@ -119,7 +139,7 @@ function Card(props: CardProps) {
 			</div>
 			<div className="info-section">
 				<a
-          className="a_text"
+					className="a_text"
 					id="title"
 					title={show.name}
 					onClick={() => handleSeriesSelection(show)}
@@ -150,50 +170,49 @@ function Card(props: CardProps) {
 					</span>
 				) : null}
 			</div>
-				<ContextMenu
-					model={[
-						{
-							label: t("editButton"),
-							command: () => {
-								dispatch(toggleSeriesMenu());
-								dispatch(toggleSeriesWindow());
-							},
+			<ContextMenu
+				model={[
+					{
+						label: t("editButton"),
+						command: () => {
+							dispatch(toggleSeriesMenu());
+							dispatch(toggleSeriesWindow());
 						},
-						{
-							label: t("markWatched"),
-							command: () => dispatch(toggleSeriesMenu()),
-						},
-						{
-							label: t("markUnwatched"),
-							command: () => dispatch(toggleSeriesMenu()),
-						},
-						...((library && library.type === "Shows") ||
-						!show.isCollection
-							? [
-									{
-										label: t("correctIdentification"),
-										command: () => dispatch(toggleSeriesMenu()),
-									},
-							  ]
-							: []),
-						...(library && library.type === "Shows"
-							? [
-									{
-										label: t("changeEpisodesGroup"),
-										command: () => dispatch(toggleSeriesMenu()),
-									},
-							  ]
-							: []),
-						{
-							label: t("removeButton"),
-							command: () => dispatch(toggleSeriesMenu()),
-						},
-					]}
-					ref={cm}
-					className="dropdown-menu"
-				/>
+					},
+					{
+						label: t("markWatched"),
+						command: () => dispatch(toggleSeriesMenu()),
+					},
+					{
+						label: t("markUnwatched"),
+						command: () => dispatch(toggleSeriesMenu()),
+					},
+					...((library && library.type === "Shows") || !show.isCollection
+						? [
+								{
+									label: t("correctIdentification"),
+									command: () => dispatch(toggleSeriesMenu()),
+								},
+						  ]
+						: []),
+					...(library && library.type === "Shows"
+						? [
+								{
+									label: t("changeEpisodesGroup"),
+									command: () => dispatch(toggleSeriesMenu()),
+								},
+						  ]
+						: []),
+					{
+						label: t("removeButton"),
+						command: () => dispatch(toggleSeriesMenu()),
+					},
+				]}
+				ref={cm}
+				className="dropdown-menu"
+			/>
 		</div>
 	);
 }
 
-export default Card;
+export default React.memo(Card);

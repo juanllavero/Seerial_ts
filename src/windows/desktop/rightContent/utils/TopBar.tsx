@@ -6,6 +6,7 @@ import {
 } from "@components/utils/IconLibrary";
 import { useSelector } from "react-redux";
 import { RootState } from "redux/store";
+import "./TopBar.scss";
 
 /**
  * TopBar component renders the top bar of the application window.
