@@ -166,11 +166,7 @@ function MainDesktop() {
 
 	// Save data function
 	const saveLibraries = (newData: LibraryData[]) => {
-		/*************  ✨ Codeium Command ⭐  *************/
-		/**
-		 * Send a message to the main process to show the video controls.
-		 */
-		/******  c8fb40b2-fbf5-4157-9d85-a5c3a02f2a26  *******/ // @ts-ignore
+		//@ts-ignore
 		window.electronAPI.saveLibraryData(newData).then((success: boolean) => {
 			if (success) {
 				console.log("Datos guardados correctamente");

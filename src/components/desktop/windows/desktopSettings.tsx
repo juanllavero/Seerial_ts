@@ -88,10 +88,6 @@ function DesktopSettings() {
     }, [settingsOpen]);
 
     const handleSavingChanges = () => {
-
-        
-
-
         dispatch(toggleSettingsMenu());
     };
 

@@ -31,7 +31,6 @@ reducers: {
         state.seasonMenu = false;
         state.episodeMenu = false;
         state.mainMenu = false;
-        state.settingsMenu = false;
     },
     toggleContextMenu: (state) => {
         state.isContextShown = !state.isContextShown;

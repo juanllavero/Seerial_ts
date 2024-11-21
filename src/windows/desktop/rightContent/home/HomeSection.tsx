@@ -52,9 +52,13 @@ function HomeSection() {
 		setCurrentlyWatchingShows([]);
 		for (const library of libraries) {
 			for (const show of library.series) {
+				if (show.seasons.length <= 0) continue;
+
 				const season = show.seasons[0];
 
 				if (season) {
+					if (season.episodes.length <= 0) continue;
+
 					const episode = season.episodes[0];
 
 					if (episode) {
