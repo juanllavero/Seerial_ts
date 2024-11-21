@@ -1,0 +1,99 @@
+@use "../utils/variables" as v;
+
+.libraries-list {
+	margin-top: 10px;
+	margin-bottom: 30px;
+	background-color: #0000005b;
+	padding: .5em;
+	border-radius: 5px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	.libraries-button {
+		background-color: transparent;
+		padding: 0.3em;
+		margin-bottom: 0.2em;
+		text-align: left;
+		border: none;
+		transition: color 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: left;
+		cursor: pointer;
+
+		#libraries-button-svg {
+			min-width: 2.2em;
+			min-width: 2.2em;
+			max-width: 2.2em;
+			max-height: 2.2em;
+			width: 2.2em;
+			height: 2.2em;
+
+			path {
+				fill: v.$color-text-default;
+				transition: fill 0.3s;
+			}
+		}
+
+		.inactive-btn {
+			display: none;
+		}
+
+		.active-btn {
+			display: block;
+		}
+	}
+
+	.libraries-button.selected #libraries-button-svg path {
+		fill: v.$app-color;
+	}
+
+	.library-name {
+		color: v.$color-text-default;
+		margin-left: 0.6em;
+		transition: color 0.3s ease;
+
+		width: 100%;
+
+		font-size: medium;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		white-space: nowrap !important;
+		max-width: 100%;
+	}
+
+	.libraries-button.selected .library-name {
+		color: v.$app-color;
+	}
+
+	.libraries-button:hover {
+		a {
+			display: block;
+		}
+
+		.library-name {
+			color: v.$color-text-primary;
+		}
+
+		#libraries-button-svg path {
+			fill: v.$color-text-primary;
+		}
+	}
+
+	.libraries-button span:hover {
+		color: v.$color-text-primary;
+	}
+}
+
+@media (max-width: 720px) {
+   .libraries-list {
+      .libraries-button {
+         gap: .5em;
+      }
+      .library-name {
+         display: none;
+      }
+   }
+ }

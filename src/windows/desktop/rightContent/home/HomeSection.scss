@@ -64,6 +64,12 @@
 		scroll-behavior: smooth;
 
 		margin-bottom: 1.5em;
-      gap: .8em;
+		gap: 0.8em;
+	}
+}
+
+@media (max-width: 720px) {
+	.home-view-container {
+		margin: 10em 120px 0 40px;
 	}
 }

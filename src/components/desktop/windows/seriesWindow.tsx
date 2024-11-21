@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import { useTranslation } from "react-i18next";
-import { toggleSeasonWindow, toggleSeriesWindow } from "redux/slices/dataSlice";
+import { toggleSeriesWindow, updateSeries } from "redux/slices/dataSlice";
 import { TagsInput } from "react-tag-input-component";
 import Loading from "@components/utils/Loading";
 
@@ -122,55 +122,30 @@ function SeriesWindow() {
     }, []);
 
     const handleSavingChanges = () => {
-        /*if (series) {
-            dispatch(updateSeason({
-                name: name,
-                overview: overview,
-                year: year,
-                order: order,
-                id: season.id,
-                tagline: library?.type === "Movies" ? tagline : season.tagline,
-                score: season.score,
-                seasonNumber: season.seasonNumber,
-                logoSrc: season.logoSrc,
-                coverSrc: season.coverSrc,
-                backgroundSrc: season.backgroundSrc,
-                videoSrc: season.videoSrc,
-                musicSrc: season.musicSrc,
-                seriesID: season.seriesID,
-                themdbID: season.themdbID,
-                imdbID: season.imdbID,
-                lastDisc: season.lastDisc,
-                folder: season.folder,
-                showName: season.showName,
-                audioTrackLanguage: season.audioTrackLanguage,
-                selectedAudioTrack: season.selectedAudioTrack,
-                subtitleTrackLanguage: season.subtitleTrackLanguage,
-                selectedSubtitleTrack: season.selectedSubtitleTrack,
-                episodes: season.episodes,
-                genres: season.genres,
-                currentlyWatchingEpisode: season.currentlyWatchingEpisode,
-                cast: season.cast,
-                creator: season.creator,
-                musicComposer: season.musicComposer,
-                directedBy: season.directedBy,
-                writtenBy: season.writtenBy,
-                productionStudios: library?.type === "Movies" ? studios : season.productionStudios,
-                nameLock: season.nameLock,
-                orderLock: orderLock,
-                overviewLock: season.overviewLock,
-                yearLock: season.yearLock,
-                studioLock: season.studioLock,
-                taglineLock: season.taglineLock,
-                creatorLock: false,
-                musicLock: false,
-                directedLock: false,
-                writtenLock: false,
-                genresLock: false
-            }));
-        }*/
+        if (library && series) {
+            dispatch(updateSeries({libraryId: library.id, series: {
+                ...(nameLock ? {name} : {name: series.name}),
+                ...(yearLock ? {year} : {year: series.year}),
+                ...(overviewLock ? {overview} : {overview: series.overview}),
+                ...(taglineLock ? {tagline} : {tagline: series.tagline}),
+                ...(genresLock ? {genres} : {genres: series.genres}),
+                ...(studiosLock ? {productionStudios: studios} : {productionStudios: series.productionStudios}),
+                ...(creatorLock ? {creator} : {creator: series.creator}),
+                ...(musicLock ? {musicComposer: music} : {musicComposer: series.musicComposer}),
+                ...(selectedLogo ? {logoSrc: "resources/img/logos/" + series.id + "/" + selectedLogo} : {logoSrc: series.logoSrc}),
+                ...(selectedPoster ? {coverSrc: "resources/img/posters/" + series.id + "/" + selectedPoster} : {coverSrc: series.coverSrc}),
+                ...(nameLock ? {nameLock} : {nameLock: series.nameLock}),
+                ...(yearLock ? {yearLock} : {yearLock: series.yearLock}),
+                ...(overviewLock ? {overviewLock} : {overviewLock: series.overviewLock}),
+                ...(taglineLock ? {taglineLock} : {taglineLock: series.taglineLock}),
+                ...(genresLock ? {genresLock} : {genresLock: series.genresLock}),
+                ...(studiosLock ? {studioLock: studiosLock} : {studioLock: series.studioLock}),
+                ...(creatorLock ? {creatorLock} : {creatorLock: series.creatorLock}),
+                ...(musicLock ? {musicLock} : {musicLock: series.musicLock}),
+            }}));
+        }
 
-        dispatch(toggleSeasonWindow());
+        dispatch(toggleSeriesWindow());
     };
 
     const handleDownload = () => {

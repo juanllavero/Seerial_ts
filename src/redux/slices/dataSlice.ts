@@ -146,16 +146,16 @@ const dataSlice = createSlice({
         }
       }
     },
-    updateSeries: (state, action: PayloadAction<{ libraryId: string; series: SeriesData }>) => {
+    updateSeries: (state, action: PayloadAction<{ libraryId: string; series: Partial<SeriesData> }>) => {
       const library = state.libraries.find(library => library.id === action.payload.libraryId);
       if (library) {
         const seriesIndex = library.series.findIndex(series => series.id === action.payload.series.id);
         if (seriesIndex >= 0) {
-          library.series[seriesIndex] = action.payload.series;
+          library.series[seriesIndex] = { ...library.series[seriesIndex], ...action.payload.series };
 
           // Update if selected
           if (state.selectedSeries && state.selectedSeries.id === action.payload.series.id) {
-            state.selectedSeries = action.payload.series;
+            state.selectedSeries = { ...state.selectedSeries, ...action.payload.series };
 
             if (state.selectedSeason){
               const season = state.selectedSeries.seasons.find(season => season.id === state.selectedSeason?.id);
@@ -171,6 +171,7 @@ const dataSlice = createSlice({
         }
       }
     },
+
     addSeason: (state, action: PayloadAction<{ libraryId: string; season: SeasonData }>) => {
       const library = state.libraries.find(library => library.id === action.payload.libraryId);
       if (library && library.series) {

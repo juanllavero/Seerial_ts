@@ -25,17 +25,18 @@ import {
 import { LibraryData } from "@interfaces/LibraryData";
 import { RightPanelSections } from "@data/enums/Sections";
 import { useSectionContext } from "context/section.context";
+import "./LibrariesList.scss";
 
 /**
- * A component that displays a list of libraries and allows the user to select a library, 
+ * A component that displays a list of libraries and allows the user to select a library,
  * open the library menu, edit the library, update the library, and remove the library.
- * 
+ *
  * @returns A JSX element that displays the list of libraries.
  */
 function LibrariesList() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
-	const {setCurrentRightSection} = useSectionContext();
+	const { setCurrentRightSection } = useSectionContext();
 	const libraries = useSelector((state: RootState) => state.data.libraries);
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
@@ -103,7 +104,7 @@ function LibrariesList() {
 
 			if (library === null) {
 				setCurrentRightSection(RightPanelSections.Home);
-			}else if (library.type === "Shows" || library.type === "Movies") {
+			} else if (library.type === "Shows" || library.type === "Movies") {
 				setCurrentRightSection(RightPanelSections.Collections);
 			} else {
 				setCurrentRightSection(RightPanelSections.MusicAlbums);
