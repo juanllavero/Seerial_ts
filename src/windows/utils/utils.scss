@@ -151,32 +151,6 @@
 	filter: brightness(0.25);
 }
 
-.background-image {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: -1; /* Set the image at the back */
-
-	img {
-		width: 100%;
-		height: auto; /* To keep aspect ratio */
-		opacity: 0;
-		transition: opacity 0.5s ease-in;
-		mask-image: linear-gradient(
-			to bottom,
-			rgba(0, 0, 0, 1) 20%,
-			rgba(0, 0, 0, 0) 100%
-		);
-		filter: brightness(0.8);
-
-		& .imageLoaded {
-			opacity: 1;
-		}
-	}
-}
-
 .main-background {
 	filter: brightness(0.6);
 	position: absolute;
@@ -195,10 +169,10 @@
 		object-position: center;
 		opacity: 0;
 		transition: opacity 1s ease-in;
+	}
 
-		& .loaded {
-			opacity: 1;
-		}
+	.loaded {
+		opacity: 1;
 	}
 }
 

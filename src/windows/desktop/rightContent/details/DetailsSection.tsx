@@ -78,7 +78,9 @@ function DetailsSection() {
 	};
 
 	const handleTransparentImageLoad = () => {
-		dispatch(loadTransparentImage());
+		setTimeout(() => {
+			dispatch(loadTransparentImage());
+		}, 300);
 	};
 
 	//#region TEXT CLAMP
@@ -179,9 +181,7 @@ function DetailsSection() {
 						>
 							<div
 								className={`on-loading ${
-									selectedSeries.analyzingFiles
-										? "visible"
-										: ""
+									selectedSeries.analyzingFiles ? "visible" : ""
 								}`}
 								style={{
 									width: `${seriesImageWidth}px`,

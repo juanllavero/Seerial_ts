@@ -5,7 +5,6 @@ import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
-import ResolvedImage from "@components/image/Image";
 import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from 'react-player'
 import Loading from "@components/utils/Loading";
@@ -153,7 +152,7 @@ function SeasonWindow() {
                 score: season.score,
                 seasonNumber: season.seasonNumber,
                 logoSrc: season.logoSrc,
-                coverSrc: season.coverSrc,
+                coverSrc: selectedPoster ? selectedPoster : season.coverSrc,
                 backgroundSrc: season.backgroundSrc,
                 videoSrc: season.videoSrc,
                 musicSrc: season.musicSrc,

@@ -65,16 +65,19 @@ function MainDesktop() {
 		(state: RootState) => state.imageLoaded.gradientLoaded
 	);
 
-	const selectedSeries = useSelector(
-		(state: RootState) => state.data.selectedSeries
-	);
 	const selectedSeason = useSelector(
 		(state: RootState) => state.data.selectedSeason
 	);
 	const [gradientBackground, setGradientBackground] = useState<string>("");
 
 	useEffect(() => {
-		if (selectedSeries) {
+		if (selectedSeason) {
+			if (selectedSeason.coverSrc !== "") {
+				ReactUtils.getDominantColors(selectedSeason.coverSrc);
+			} else {
+				ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
+			}
+
 			setTimeout(() => {
 				const newGradient = ReactUtils.getGradientBackground();
 
@@ -93,7 +96,7 @@ function MainDesktop() {
 		} else {
 			setGradientBackground("none");
 		}
-	}, [selectedSeries, selectedSeason]);
+	}, [selectedSeason]);
 
 	useEffect(() => {
 		window.ipcRenderer.on(
@@ -208,7 +211,6 @@ function MainDesktop() {
 				onClick={(event) => {
 					const target = event.target as Element;
 
-					// Check if the click has been done in a "select" element
 					if (!target.closest(".select")) {
 						dispatch(closeAllMenus());
 					}

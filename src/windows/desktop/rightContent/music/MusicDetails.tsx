@@ -75,6 +75,7 @@ function MusicDetails() {
 
 		return foundDiscs;
 	};
+	
 	const handleRenderSongs = () => {
 		const discs = getDiscs();
 
