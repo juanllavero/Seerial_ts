@@ -209,7 +209,7 @@ function MusicDetails() {
 				</section>
 				{selectedCollection.seasons &&
 				selectedCollection.seasons.length > 1 ? (
-					<section className="dropdown" style={{ marginLeft: "30px" }}>
+					<section className="dropdown" style={{ marginTop: "1em" }}>
 						<div
 							className="select season-selector"
 							onClick={(e) => {

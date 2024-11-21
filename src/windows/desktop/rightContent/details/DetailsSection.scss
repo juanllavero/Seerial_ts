@@ -209,53 +209,6 @@
 			color: v.$color-bright;
 			filter: drop-shadow(3px 3px 3px rgb(0, 0, 0));
 		}
-
-		.play-button-desktop {
-			background-color: v.$app-color-darken;
-			padding: 10px 15px;
-			border-radius: 5px;
-			border-color: transparent;
-			color: black;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-
-			&:hover {
-				background-color: v.$app-color;
-			}
-
-			svg {
-				width: 24px;
-				height: 24px;
-
-				path {
-					fill: black;
-				}
-			}
-
-			#playText {
-				margin-left: 10px;
-			}
-		}
-
-		.svg-button-desktop {
-			background-color: transparent;
-			border-radius: 5px;
-			border-color: transparent;
-			padding: 5px 12px 5px 12px;
-			margin-left: 10px;
-			cursor: pointer;
-
-			&:hover {
-				background-color: rgba(0, 0, 0, 0.739);
-			}
-
-			svg {
-				width: 24px;
-				height: 24px;
-			}
-		}
 	}
 
 	.season-selector {

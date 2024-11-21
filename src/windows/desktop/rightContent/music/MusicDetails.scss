@@ -5,6 +5,7 @@
 	flex-flow: column nowrap;
 
    margin-top: 10em;
+   margin-left: 4em;
 
 	.info-container {
 		display: flex;
@@ -27,6 +28,9 @@
 
       .btns-container {
          display: flex;
+         flex-flow: row nowrap;
+         
+         margin-top: 2em;
       }
 
 		#seriesTitle {
