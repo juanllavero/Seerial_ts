@@ -1,52 +1,28 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
-import {
-	selectEpisode,
-	selectLibrary,
-	selectSeason,
-	setLibraries,
-} from "redux/slices/dataSlice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import "../../i18n";
 import "../../Fullscreen.scss";
-import { SeriesData } from "@interfaces/SeriesData";
-import { LibraryData } from "@interfaces/LibraryData";
-import { EpisodeData } from "@interfaces/EpisodeData";
-import MainMenu from "./mainMenu";
-import { toggleMainMenu } from "redux/slices/contextMenuSlice";
-import { FullscreenSection } from "data/enums/FullscreenSections";
 import {
 	setCurrentlyWatchingShows,
-	setDominantColor,
-	setHomeImageLoaded,
 	setHomeInfoElement,
 } from "redux/slices/fullscreenSectionsSlice";
-import HomeView from "./HomeView";
-import SeasonsView from "./SeasonView";
-import AlbumsView from "./AlbumsView";
-import SongsView from "./SongsView";
-import ShowsView from "./ShowsView";
+import HomeView from "./homeView/HomeView";
+import ShowsView from "./showsView/ShowsView";
 import { HomeInfoElement } from "@interfaces/HomeInfoElement";
-import Image from "@components/image/Image";
-import {
-	GoBackIcon,
-	HomeFullDefaultIcon,
-	HomeFullSelectedIcon,
-	MenuIcon,
-} from "@components/utils/IconLibrary";
 import { useSectionContext } from "context/section.context";
 import { FullscreenSections } from "@data/enums/Sections";
 import NoContentFullscreen from "./NoContentFullscreen";
+import HeaderComponent from "./HeaderComponent";
+import BackgroundImages from "./BackgroundImages";
+import DetailsView from "./detailsView/DetailsView";
+import MainMenu from "./MainMenu";
+import useLoadLibraries from "hooks/useLoadLibraries";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
-	const { currentFullscreenSection, setCurrentFullscreenSection } =
-		useSectionContext();
-
-	const [time, setTime] = useState(new Date());
-
-	const [useImageAsBackground, setUseImageAsBackground] =
-		useState<boolean>(true);
+	const { loading, error } = useLoadLibraries();
+	const { currentFullscreenSection } = useSectionContext();
 
 	// Main objects
 	const librariesList = useSelector(
@@ -55,35 +31,6 @@ function MainFullscreen() {
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
 	);
-	const currentShow = useSelector(
-		(state: RootState) => state.data.selectedSeries
-	);
-	const currentSeason = useSelector(
-		(state: RootState) => state.data.selectedSeason
-	);
-	const currentEpisode = useSelector(
-		(state: RootState) => state.data.selectedEpisode
-	);
-
-	// Temp objects for item selection
-	const [currentShowForBackground, setCurrentShowForBackground] = useState<
-		SeriesData | undefined
-	>();
-
-	const showImageLoaded = useSelector(
-		(state: RootState) => state.fullscreenSection.showImageLoaded
-	);
-	const seasonImageLoaded = useSelector(
-		(state: RootState) => state.fullscreenSection.seasonImageLoaded
-	);
-
-	const listRef = useRef<HTMLDivElement>(null);
-
-	const section = useSelector(
-		(state: RootState) => state.fullscreenSection.fullscreenSection
-	);
-	const [songsView, setSongsView] = useState<boolean>(false);
-
 	const currentlyWatchingShows = useSelector(
 		(state: RootState) => state.fullscreenSection.currentlyWatchingShows
 	);
@@ -130,10 +77,10 @@ function MainFullscreen() {
 			dispatch(setCurrentlyWatchingShows(elements));
 
 			if (currentlyWatchingShows.length > 0) {
-				setCurrentlyWatchingShows(currentlyWatchingShows);
+				dispatch(setCurrentlyWatchingShows(currentlyWatchingShows));
 
 				if (!selectedLibrary) {
-					setHomeInfoElement(currentlyWatchingShows[0]);
+					dispatch(setHomeInfoElement(currentlyWatchingShows[0]));
 				}
 			}
 		} else {
@@ -143,63 +90,6 @@ function MainFullscreen() {
 		}
 	}, [librariesList, selectedLibrary]);
 
-	// Initialize Library Data
-	useEffect(() => {
-		// @ts-ignore
-		window.electronAPI.getLibraryData()
-			.then((data: any[]) => {
-				dispatch(setLibraries(data));
-			})
-			.catch((error: unknown) => {
-				if (error instanceof Error) {
-					console.error("Error loading library data:", error.message);
-				} else {
-					console.error("Unexpected error:", error);
-				}
-			});
-
-		// Update time every second
-		const timer = setInterval(() => {
-			setTime(new Date());
-		}, 1000);
-
-		return () => clearInterval(timer);
-	}, []);
-
-	//#region TOP BAR FUNCTIONS
-	const handleGoToMainView = () => {
-		setSongsView(false);
-		dispatch(selectSeason(null));
-		dispatch(selectEpisode(undefined));
-		setCurrentFullscreenSection(FullscreenSections.Home);
-	};
-
-	const handleSelectLibrary = (library: LibraryData | null) => {
-		setSongsView(false);
-		if (library) {
-			dispatch(setHomeInfoElement(undefined));
-			dispatch(setHomeImageLoaded(false));
-			dispatch(setDominantColor("000000"));
-
-			setCurrentFullscreenSection(FullscreenSections.Collections);
-		} else {
-			setCurrentFullscreenSection(FullscreenSections.Home);
-		}
-
-		dispatch(selectLibrary(library));
-		dispatch(selectSeason(null));
-		dispatch(selectEpisode(undefined));
-	};
-
-	const formatTime = (date: Date) => {
-		return date.toLocaleTimeString([], {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-	};
-	//#endregion
-
-	//#region SCROLL
 	const scrollToCenter = (
 		scrollElement: HTMLElement,
 		scrollOffset: number,
@@ -249,14 +139,14 @@ function MainFullscreen() {
 
 			if (buttonCenter !== listCenter) {
 				const scrollOffset = buttonCenter - listCenter;
-				scrollToCenter(listRef.current, scrollOffset, 300, isVertical);	// 300ms
+				scrollToCenter(listRef.current, scrollOffset, 300, isVertical); // 300ms
 			}
 		}
 	};
 	//#endregion
 
 	//#region KEYBOARD DETECTION
-	const handleKeyDown = (event: KeyboardEvent) => {
+	/*const handleKeyDown = (event: KeyboardEvent) => {
 		if (!currentSeason) {
 			return;
 		}
@@ -311,136 +201,32 @@ function MainFullscreen() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [currentEpisode, currentSeason?.episodes]);
+	}, [currentEpisode, currentSeason?.episodes]);*/
 	//#endregion
 
 	return (
 		<>
+			{/* MAIN MENU */}
 			<MainMenu />
-			<div
-				className={`season-image ${
-					seasonImageLoaded ? "loaded-blur-in" : "loaded-blur-out"
-				}`}
-			>
-				{selectedLibrary &&
-				currentSeason &&
-				currentSeason.backgroundSrc !== "" ? (
-					<Image
-						src={currentSeason.backgroundSrc}
-						alt="Background"
-						isRelative={true}
-						errorSrc=""
-					/>
-				) : null}
-			</div>
-			<div
-				className={`season-gradient ${
-					seasonImageLoaded ? "loaded-blur-in" : "loaded-blur-out"
-				}`}
-			></div>
-			{useImageAsBackground ? (
-				<div
-					className={`background-image-blur ${
-						showImageLoaded ? "loaded-blur-in" : "loaded-blur-out"
-					}`}
-				>
-					{selectedLibrary &&
-					currentShowForBackground &&
-					currentShowForBackground.seasons &&
-					currentShowForBackground.seasons.length > 0 ? (
-						<Image
-							src={`/resources/img/backgrounds/${currentShowForBackground.seasons[0].id}/fullBlur.jpg`}
-							alt="Background"
-							isRelative={true}
-							errorSrc=""
-						/>
-					) : null}
-				</div>
-			) : null}
-			{section === FullscreenSection.Home || useImageAsBackground ? (
-				<div className="noise-background">
-					<Image
-						src="resources/img/noise.png"
-						alt="Noise image"
-						isRelative={true}
-						errorSrc=""
-					/>
-				</div>
-			) : null}
-			<section className="top">
-				{section !== FullscreenSection.Seasons && (
-					<button id="home" onClick={() => handleSelectLibrary(null)}>
-						{selectedLibrary ? (
-							<HomeFullSelectedIcon />
-						) : (
-							<HomeFullDefaultIcon />
-						)}
-					</button>
-				)}
-				{section !== FullscreenSection.Seasons && (
-					<div className="libraries-list">
-						{librariesList.map((library) => (
-							<button
-								key={library.id}
-								className={`libraries-button ${
-									library === selectedLibrary ? "active" : ""
-								}`}
-								title={library.name}
-								onClick={() => handleSelectLibrary(library)}
-							>
-								<span className="library-name">{library.name}</span>
-							</button>
-						))}
-					</div>
-				)}
-				{section === FullscreenSection.Seasons && (
-					<>
-						<button
-							className="go-back-btn"
-							onClick={() => handleGoToMainView()}
-						>
-							<GoBackIcon />
-						</button>
-					</>
-				)}
-				<div className="right-options">
-					<span id="time">{formatTime(time)}</span>
-					{section !== FullscreenSection.Seasons && (
-						<button
-							id="options-btn"
-							onClick={() => {
-								dispatch(toggleMainMenu());
-							}}
-						>
-							<MenuIcon />
-						</button>
-					)}
-				</div>
-			</section>
+
+			{/* BACKGROUND IMAGES */}
+			<BackgroundImages />
+
+			{/* HEADER SECTION */}
+			<HeaderComponent />
+
+			{/* CONTENT SECTION */}
 			<section className="content">
-				{currentFullscreenSection === FullscreenSections.Home ? (
+				{loading ? (
+					<div></div>
+				) : error ? (
+					<NoContentFullscreen />
+				) : currentFullscreenSection === FullscreenSections.Home ? (
 					<HomeView />
 				) : currentFullscreenSection === FullscreenSections.Collections ? (
 					<ShowsView />
 				) : currentFullscreenSection === FullscreenSections.Details ? (
-					selectedLibrary &&
-					currentShow &&
-					currentSeason &&
-					currentEpisode ? (
-						<>
-							{selectedLibrary.type === "Music" ? (
-								<>
-									{currentShow.seasons.length > 1 ? (
-										<AlbumsView />
-									) : (
-										<SongsView />
-									)}
-								</>
-							) : (
-								<SeasonsView />
-							)}
-						</>
-					) : null
+					<DetailsView />
 				) : (
 					<NoContentFullscreen />
 				)}

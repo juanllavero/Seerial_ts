@@ -1,16 +1,14 @@
-import "../../i18n";
-import "../../Fullscreen.scss";
+import "../../../i18n";
 import { SeasonData } from "@interfaces/SeasonData";
-import ResolvedImage from "@components/image/ExternalImage";
 import { ReactUtils } from "@data/utils/ReactUtils";
-import { EpisodeData } from "@interfaces/EpisodeData";
 import { RootState } from "@redux/store";
-import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { selectSeason } from "@redux/slices/dataSlice";
 import { useSectionContext } from "context/section.context";
 import { FullscreenSections } from "@data/enums/Sections";
+import Image from "@components/image/Image";
+import EpisodeList from "./EpisodeList";
 
 function SeasonsView() {
 	const dispatch = useDispatch();
@@ -31,7 +29,6 @@ function SeasonsView() {
 		(state: RootState) => state.data.selectedEpisode
 	);
 
-	const listRef = useRef<HTMLDivElement>(null);
 	const handleSelectSeason = (season: SeasonData | undefined) => {
 		if (season) {
 			dispatch(selectSeason(season));
@@ -47,12 +44,11 @@ function SeasonsView() {
 						{selectedLibrary.type === "Shows" ? (
 							<>
 								{currentShow.logoSrc && currentShow.logoSrc !== "" ? (
-									<ResolvedImage
+									<Image
 										src={currentShow.logoSrc}
-										onError={(e: any) => {
-											e.target.onerror = null; // To avoid infinite loop
-											e.target.src = "";
-										}}
+										alt="Logo"
+										isRelative={true}
+										errorSrc=""
 									/>
 								) : (
 									<span id="season-title">{currentShow.name}</span>
@@ -62,12 +58,11 @@ function SeasonsView() {
 							<>
 								{currentSeason.logoSrc &&
 								currentSeason.logoSrc !== "" ? (
-									<ResolvedImage
+									<Image
 										src={currentSeason.logoSrc}
-										onError={(e: any) => {
-											e.target.onerror = null; // To avoid infinite loop
-											e.target.src = "";
-										}}
+										alt="Logo"
+										isRelative={true}
+										errorSrc=""
 									/>
 								) : (
 									<span id="season-title">{currentShow.name}</span>
@@ -107,44 +102,7 @@ function SeasonsView() {
 						</div>
 					</div>
 					{currentSeason.episodes && currentSeason.episodes.length > 1 ? (
-						<div className="episodes-list" ref={listRef}>
-							{currentSeason.episodes.map(
-								(episode: EpisodeData, index: number) => (
-									<div
-										className={`element ${
-											episode === currentEpisode
-												? "element-selected"
-												: null
-										}`}
-										key={episode.id}
-										onClick={() => {
-											ReactUtils.handleScrollElementClick(
-												index,
-												listRef,
-												false
-											);
-										}}
-									>
-										{episode.imgSrc !== "" ? (
-											<ResolvedImage
-												src={episode.imgSrc}
-												alt="Poster"
-												onError={(e: any) => {
-													e.target.onerror = null; // To avoid infinite loop
-													e.target.src =
-														"./src/resources/img/defaultThumbnail.jpg";
-												}}
-											/>
-										) : (
-											<ResolvedImage
-												src="resources/img/defaultThumbnail.jpg"
-												alt="Poster"
-											/>
-										)}
-									</div>
-								)
-							)}
-						</div>
+						<EpisodeList />
 					) : (
 						<div style={{ marginTop: "2.5em" }}></div>
 					)}

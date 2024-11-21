@@ -1,0 +1,46 @@
+@use "../utils/variables" as v;
+
+.main-menu {
+	background-color: black;
+	position: absolute;
+	z-index: 110;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+
+	align-items: center;
+
+	padding-top: 20vh;
+	gap: 0.7em;
+
+	span {
+		margin-bottom: 2vh;
+		font-size: v.$font-xx-large;
+		color: v.$color-text-primary;
+	}
+
+	button {
+		width: 80vh;
+		outline: none;
+		border: none;
+
+		color: white;
+
+		font-size: v.$font-large;
+		padding: 1em;
+		border-radius: 5px;
+		background-color: #282828;
+		transition: all 0.15s ease;
+	}
+
+	button:hover {
+		background-color: #707070;
+		color: #000000;
+	}
+
+	button:focus {
+		background-color: white;
+		color: black;
+	}
+}

@@ -1,0 +1,159 @@
+@use "../utils/variables" as v;
+
+.header-container {
+	padding: 2em 3em 0.7em 3em;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: space-between;
+	z-index: 100;
+
+	-webkit-app-region: drag;
+
+	#home {
+		margin-right: 1em;
+		background-color: transparent;
+		outline: none;
+		border: none;
+		filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.724));
+
+		-webkit-app-region: no-drag;
+
+		transition: all 0.15s ease;
+
+		svg {
+			width: 3em;
+			height: 3em;
+			path {
+				fill: v.$color-text-primary;
+			}
+		}
+	}
+
+	#home:hover {
+		transform: scale(1.1);
+	}
+
+	.libraries-list {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		overflow-x: auto;
+		gap: 0.2em;
+
+		-webkit-app-region: no-drag;
+
+		button {
+			height: fit-content;
+			padding: 0.5em;
+
+			font-size: v.$font-large;
+			font-weight: bold;
+			text-transform: uppercase;
+			color: white;
+			border-radius: 15px;
+
+			opacity: 0.5;
+			transition: all 0.15s ease;
+
+			background-color: transparent;
+			outline: none;
+			border: none;
+			border-bottom: 2px solid transparent;
+			filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.747));
+		}
+
+		button:hover {
+			opacity: 1;
+		}
+
+		button:focus {
+			background-color: white;
+			color: black;
+		}
+
+		.active {
+			opacity: 1;
+			border-bottom: 3px solid v.$app-color;
+			border-radius: 0;
+		}
+	}
+
+	.go-back-btn {
+		background: transparent;
+		outline: none;
+		border: none;
+
+		filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.724));
+
+		-webkit-app-region: no-drag;
+
+		transition: all 0.15s ease;
+
+		svg {
+			width: 3em;
+			height: 3em;
+			path {
+				fill: v.$color-text-primary;
+			}
+		}
+	}
+
+	.go-back-btn:hover {
+		transform: scale(1.1);
+	}
+
+	.right-options {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+
+		#time {
+			margin-right: 1.5em;
+			color: white;
+			font-size: v.$font-large;
+			filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.747));
+		}
+
+		#options-btn {
+			padding: 0.5em;
+			height: 4em;
+
+			-webkit-app-region: no-drag;
+			opacity: 0.7;
+
+			transition: all 0.15s ease;
+
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: transparent;
+			outline: none;
+			border: none;
+			border-radius: 10px;
+			filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.861));
+			svg {
+				width: 2.8em;
+				height: 2.8em;
+
+				path {
+					fill: white;
+				}
+			}
+		}
+
+		#options-btn:hover {
+			opacity: 1;
+		}
+
+		#options-btn:focus {
+			background-color: white;
+
+			svg path {
+				fill: black;
+			}
+		}
+	}
+}

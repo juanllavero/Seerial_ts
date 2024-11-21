@@ -1,0 +1,50 @@
+@use "../../utils/variables" as v;
+
+#albums-title {
+   padding-left: 4em;
+   margin-bottom: 0.8em;
+   font-size: v.$font-x-large;
+   color: white;
+}
+
+.music-list {
+   padding: 3em 0;
+   padding-left: 8em;
+   display: flex;
+   flex-flow: row nowrap;
+   overflow-x: hidden;
+
+   gap: 1em;
+
+   .album-button {
+      background-color: transparent;
+      outline: none;
+      border: none;
+
+      display: flex;
+      flex-flow: column nowrap;
+
+      transition: all 0.15s ease;
+
+      color: white;
+      font-size: v.$font-small;
+
+      img {
+         border-radius: 5px;
+         width: 25vh;
+         height: 25vh;
+      }
+
+      span {
+         margin-top: 0.4em;
+         width: 25vh;
+         overflow: hidden !important;
+         text-overflow: ellipsis;
+         white-space: nowrap !important;
+      }
+   }
+
+   .selected {
+      transform: scale(1.1);
+   }
+}

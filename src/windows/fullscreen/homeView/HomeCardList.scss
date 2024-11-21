@@ -1,0 +1,39 @@
+@use "../../utils/variables" as v;
+
+.continue-watching-title {
+   margin-left: 4em;
+   margin-bottom: 0.5em;
+
+   z-index: 100;
+
+   span {
+      font-size: v.$font-x-large;
+      font-weight: bold;
+      color: white;
+   }
+}
+
+.continue-watching-list {
+   padding: 1.5em 4em;
+   display: flex;
+   gap: 2em;
+   overflow-y: hidden;
+   overflow-x: hidden;
+
+   z-index: 100;
+
+   .element {
+      border: 0.3em solid transparent;
+      transition: all 0.15s ease;
+
+      img {
+         height: 35vh;
+         width: auto;
+      }
+   }
+
+   .element-selected {
+      transform: scale(1.1);
+      border-color: white;
+   }
+}

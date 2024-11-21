@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { toggleMainMenu } from 'redux/slices/contextMenuSlice';
 import { RootState } from 'redux/store';
+import "./MainMenu.scss";
 
 function MainMenu() {
     const dispatch = useDispatch();
