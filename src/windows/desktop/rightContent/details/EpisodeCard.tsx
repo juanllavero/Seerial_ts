@@ -8,7 +8,7 @@ import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import "./Card.scss";
+import "../Card.scss";
 import {
 	EditIcon,
 	PlayIcon,

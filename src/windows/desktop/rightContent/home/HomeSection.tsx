@@ -8,7 +8,7 @@ import { useSectionContext } from "context/section.context";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import Card from "./Card";
+import Card from "../Card";
 import { LeftArrowIcon, RightArrowIcon } from "@components/utils/IconLibrary";
 import "./HomeSection.scss";
 import Loading from "@components/utils/Loading";

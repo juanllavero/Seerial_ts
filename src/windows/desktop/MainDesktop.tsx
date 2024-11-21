@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import RightPanel from "./rightContent/RightPanel";
-import LibraryAndSlider from "./rightContent/utils/libraryAndSlider";
 import MainBackgroundImage from "@components/desktop/mainBackgroundImage";
 import {
 	addEpisode,
@@ -26,7 +25,6 @@ import {
 	toggleSettingsMenu,
 } from "redux/slices/contextMenuSlice";
 import { LibraryData } from "@interfaces/LibraryData";
-import MusicPlayer from "./rightContent/MusicPlayer";
 import { ReactUtils } from "data/utils/ReactUtils";
 import { setGradientLoaded } from "redux/slices/imageLoadedSlice";
 import { SeriesData } from "@interfaces/SeriesData";
@@ -46,10 +44,14 @@ import EpisodeWindow from "@components/desktop/windows/episodeWindow";
 import LibraryWindow from "@components/desktop/windows/libraryWindow";
 import SeasonWindow from "@components/desktop/windows/seasonWindow";
 import SeriesWindow from "@components/desktop/windows/seriesWindow";
+import LibraryAndSlider from "./rightContent/utils/LibraryAndSlider";
+import MusicPlayer from "windows/fullscreen/MusicPlayer";
+import useLoadLibraries from "hooks/useLoadLibraries";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
+	const { loading, error } = useLoadLibraries();
 
 	const isVideoLoaded = useSelector(
 		(state: RootState) => state.video.isLoaded
@@ -94,19 +96,6 @@ function MainDesktop() {
 	}, [selectedSeries, selectedSeason]);
 
 	useEffect(() => {
-		// @ts-ignore
-		window.electronAPI.getLibraryData()
-			.then((data: any[]) => {
-				dispatch(setLibraries(data));
-			})
-			.catch((error: unknown) => {
-				if (error instanceof Error) {
-					console.error("Error loading library data:", error.message);
-				} else {
-					console.error("Unexpected error:", error);
-				}
-			});
-
 		window.ipcRenderer.on(
 			"update-libraries",
 			(_event, newLibraries: LibraryData[]) => {
@@ -307,8 +296,16 @@ function MainDesktop() {
 				{/* Right Panel */}
 				<section className="right-panel">
 					<TopBar />
-					<LibraryAndSlider />
-					<RightPanel />
+					{loading ? (
+						<div>Loading...</div>
+					) : error ? (
+						<div>Error loading libraries</div>
+					) : (
+						<>
+							<LibraryAndSlider />
+							<RightPanel />
+						</>
+					)}
 				</section>
 			</section>
 		</>

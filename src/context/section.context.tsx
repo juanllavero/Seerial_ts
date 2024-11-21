@@ -20,7 +20,9 @@ export interface SectionContextProps {
 	>;
 }
 
-export const SectionContext = createContext<SectionContextProps | undefined>(undefined);
+export const SectionContext = createContext<SectionContextProps | undefined>(
+	undefined
+);
 
 /**
  * SectionProvider is a context provider component that manages and provides
@@ -32,7 +34,11 @@ export const SectionContext = createContext<SectionContextProps | undefined>(und
  * @param {ReactNode} children - The child components that will have access to the section context.
  * @returns {JSX.Element} A provider component that supplies the section context to its descendants.
  */
-export const SectionProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+export const SectionProvider = ({
+	children,
+}: {
+	children: ReactNode;
+}): JSX.Element => {
 	const [currentRightSection, setCurrentRightSection] = useState(
 		RightPanelSections.Home
 	);
@@ -63,7 +69,9 @@ export const SectionProvider = ({ children }: { children: ReactNode }): JSX.Elem
 export const useSectionContext = (): SectionContextProps => {
 	const context = useContext(SectionContext);
 	if (!context) {
-	  throw new Error("useSectionContext must be used within a SectionProvider");
+		throw new Error(
+			"useSectionContext must be used within a SectionProvider"
+		);
 	}
 	return context;
- };
+};

@@ -1,0 +1,124 @@
+@use "../../../utils/variables" as v;
+
+.album-content {
+	display: flex;
+	flex-flow: column nowrap;
+
+   margin-top: 10em;
+
+	.info-container {
+		display: flex;
+		flex-flow: row nowrap;
+      text-align: left;
+
+      gap: 1.5em;
+
+		.poster-image img {
+			width: 250px;
+			height: 250px;
+		}
+
+      .season-info {
+         display: flex;
+         flex-flow: column nowrap;
+
+         gap: .2em;
+      }
+
+      .btns-container {
+         display: flex;
+      }
+
+		#seriesTitle {
+			font-size: v.$font-xx-large;
+         cursor: default;
+		}
+
+		a {
+			border-bottom: 2px solid transparent;
+			cursor: pointer;
+			width: fit-content;
+			transition: border-color 0.15s ease-in;
+		}
+
+		#seasonTitle {
+			margin-top: 0.1em;
+			font-size: larger;
+			color: v.$color-text-default;
+		}
+
+		#seriesTitle::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 0;
+			height: 1px;
+			background-color: white;
+			transition: width 0.2s ease;
+		}
+
+		#seriesTitle:hover::after {
+			width: 100%;
+		}
+
+		.season-info-buttons-container {
+			margin-top: 1em;
+		}
+	}
+
+	.song-list {
+		margin-top: 1em;
+		padding-right: 3em;
+		padding-bottom: 5em;
+		display: flex;
+		flex-flow: column nowrap;
+
+		.disc-text-title {
+			font-size: larger;
+			font-weight: bold;
+			margin-bottom: 1.5em;
+			text-align: left;
+		}
+
+		.music-player-item {
+			margin-bottom: 1em;
+			margin-right: 2em;
+			width: 100%;
+			max-width: 60em;
+			height: 2em;
+			flex-flow: row nowrap;
+
+			.music-player-item-left {
+				display: flex;
+				flex-flow: row nowrap;
+				align-items: center;
+
+				.song-image-container {
+					width: 2em;
+					justify-content: center;
+
+					.song-btn-overlay {
+						width: 30px;
+						height: 30px;
+						background-color: #000;
+						border-radius: 5px;
+
+						svg {
+							width: 24px;
+							height: 24px;
+						}
+					}
+				}
+
+				.music-player-item-text {
+					margin-left: 2em;
+					width: 100%;
+					display: flex;
+					flex-flow: row nowrap;
+					justify-content: space-between;
+				}
+			}
+		}
+	}
+}

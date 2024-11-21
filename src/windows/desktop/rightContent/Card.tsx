@@ -54,9 +54,13 @@ function Card(props: CardProps): JSX.Element {
 	const cm = useRef<ContextMenu | null>(null);
 
 	const handleSeriesSelection = (series: SeriesData) => {
-		if (type === "music") ReactUtils.generateGradient(series, null);
+		if (type === "music") {
+			ReactUtils.generateGradient(series, null);
+			setCurrentRightSection(RightPanelSections.MusicDetails);
+		} else {
+			setCurrentRightSection(RightPanelSections.Details);
+		}
 
-		setCurrentRightSection(RightPanelSections.Details);
 		dispatch(selectSeries(series));
 
 		if (series.seasons && series.seasons.length > 0)

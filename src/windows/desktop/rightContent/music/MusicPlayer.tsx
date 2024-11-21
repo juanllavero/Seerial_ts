@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
+import { RootState } from "../../../../redux/store";
 import { Slider } from "primereact/slider";
 import ReactHowler from "react-howler";
 import { useEffect, useRef, useState } from "react";

@@ -1,7 +1,7 @@
 import { SeriesData } from "@interfaces/SeriesData";
 import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
-import Card from "./Card";
+import Card from "../Card";
 import "./CollectionsList.scss";
 import { Suspense } from "react";
 import Loading from "@components/utils/Loading";

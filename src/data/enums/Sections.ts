@@ -15,6 +15,7 @@ export enum RightPanelSections {
     MusicTable,
     MusicAlbums,
     Details,
+    MusicDetails,
     NoContent
 };
 

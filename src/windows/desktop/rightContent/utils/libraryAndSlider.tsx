@@ -30,7 +30,7 @@ import { RightPanelSections } from "@data/enums/Sections";
 function LibraryAndSlider() {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
-	const {setCurrentRightSection} = useSectionContext();
+	const { setCurrentRightSection } = useSectionContext();
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
 	);
@@ -78,7 +78,13 @@ function LibraryAndSlider() {
 		dispatch(resetSelection());
 		dispatch(removeTransparentImage());
 
-		setCurrentRightSection(RightPanelSections.Collections);
+		if (library) {
+			if (library.type === "Music")
+				setCurrentRightSection(RightPanelSections.MusicAlbums);
+			else setCurrentRightSection(RightPanelSections.Collections);
+		} else {
+			setCurrentRightSection(RightPanelSections.Home);
+		}
 	};
 
 	if (selectedSeries == null) {

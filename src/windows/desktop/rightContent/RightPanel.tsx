@@ -4,11 +4,12 @@ import { RootState } from "@redux/store";
 import { RightPanelSections } from "@data/enums/Sections";
 import { useSectionContext } from "context/section.context";
 import "./RightPanel.scss";
-import CollectionsList from "./CollectionsList";
-import DetailsSection from "./DetailsSection";
-import HomeSection from "./HomeSection";
-import MusicSection from "./MusicSection";
-import NoContent from "./NoContent";
+import NoContent from "./noContent/NoContent";
+import CollectionsList from "./collections/CollectionsList";
+import DetailsSection from "./details/DetailsSection";
+import HomeSection from "./home/HomeSection";
+import MusicSection from "./music/MusicSection";
+import MusicDetails from "./music/MusicDetails";
 
 /**
  * The RightPanel component is responsible for rendering the correct content
@@ -44,6 +45,8 @@ function RightPanel() {
 				<MusicSection />
 			) : currentRightSection === RightPanelSections.Details ? (
 				<DetailsSection />
+			) : currentRightSection === RightPanelSections.MusicDetails ? (
+				<MusicDetails />
 			) : (
 				<NoContent />
 			)}
