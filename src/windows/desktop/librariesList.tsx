@@ -4,6 +4,7 @@ import {
 	setLibraryForMenu,
 	toggleLibraryEditWindow,
 	resetSelection,
+	setLibraries,
 } from "../../redux/slices/dataSlice";
 import { removeTransparentImage } from "../../redux/slices/transparentImageLoadedSlice";
 import { RootState } from "../../redux/store";
@@ -113,6 +114,39 @@ function LibrariesList() {
 		[dispatch]
 	);
 
+	const draggingIndexRef = useRef<number | null>(null); // Índice del elemento arrastrado
+
+	const handleDragStart = (index: number) => {
+		draggingIndexRef.current = index; // Guarda el índice del elemento arrastrado
+		const dragItem = document.querySelectorAll(".libraries-button")[index];
+		dragItem?.classList.add("dragging");
+	};
+
+	const handleDragEnd = () => {
+		const dragItem = document.querySelector(".dragging");
+		dragItem?.classList.remove("dragging");
+		draggingIndexRef.current = null; // Resetea el índice arrastrado
+	};
+
+	const handleDragOver = (index: number, e: React.DragEvent) => {
+		e.preventDefault();
+		const draggingIndex = draggingIndexRef.current;
+
+		// Evita operaciones innecesarias si el índice no ha cambiado
+		if (draggingIndex === null || draggingIndex === index) return;
+
+		// Actualiza el orden de las bibliotecas localmente
+		const updatedLibraries = [...libraries];
+		const [removedItem] = updatedLibraries.splice(draggingIndex, 1);
+		updatedLibraries.splice(index, 0, removedItem);
+
+		// Actualiza el índice en la referencia
+		draggingIndexRef.current = index;
+
+		// Renderiza el nuevo orden en la UI (sin actualizar Redux aún)
+		dispatch(setLibraries(updatedLibraries));
+	};
+
 	return (
 		<>
 			<ConfirmDialog />
@@ -131,13 +165,17 @@ function LibrariesList() {
 						{t("home")}
 					</span>
 				</button>
-				{libraries.map((library) => (
+				{libraries.map((library, index) => (
 					<button
 						key={library.id}
 						className={`libraries-button ${
 							library === selectedLibrary ? "selected" : ""
 						}`}
 						title={library.name}
+						draggable
+						onDragStart={() => handleDragStart(index)}
+						onDragEnd={() => handleDragEnd(index)}
+						onDragOver={(e) => handleDragOver(index, e)}
 					>
 						{library.type === "Shows" ? (
 							<ShowsIcon onClick={() => handleSelectLibrary(library)} />
