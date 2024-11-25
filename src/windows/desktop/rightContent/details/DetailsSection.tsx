@@ -193,14 +193,14 @@ function DetailsSection() {
 							{selectedLibrary.type == "Shows" ||
 							showCollectionPoster ? (
 								<Image
-									src={selectedSeries.coverSrc}
+									src={selectedSeries.coverSrc || selectedSeason.coverSrc}
 									alt="Poster"
 									isRelative={true}
 									errorSrc="./src/resources/img/fileNotFound.jpg"
 								/>
 							) : (
 								<Image
-									src={selectedSeason.coverSrc}
+									src={selectedSeason.coverSrc || selectedSeries.coverSrc}
 									alt="Poster"
 									isRelative={true}
 									errorSrc="./src/resources/img/fileNotFound.jpg"

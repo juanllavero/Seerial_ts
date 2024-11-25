@@ -12,7 +12,7 @@ import {
 	closeAllMenus,
 	toggleLibraryMenu,
 } from "redux/slices/contextMenuSlice";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ContextMenu } from "primereact/contextmenu";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -27,6 +27,7 @@ import { LibraryData } from "@interfaces/LibraryData";
 import { RightPanelSections } from "@data/enums/Sections";
 import { useSectionContext } from "context/section.context";
 import "./LibrariesList.scss";
+import { ReactUtils } from "@data/utils/ReactUtils";
 
 /**
  * A component that displays a list of libraries and allows the user to select a library,
@@ -42,6 +43,7 @@ function LibrariesList() {
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
 	);
+	const previousLibraryId = useRef<string | null>(null);
 
 	const libraryMenuOpen = useSelector(
 		(state: RootState) => state.contextMenu.libraryMenu
@@ -80,6 +82,18 @@ function LibrariesList() {
 		},
 	];
 
+	// This useEffect is needed to update the right panel when the selected library changes
+	useEffect(() => {
+		if (selectedLibrary && selectedLibrary.id !== previousLibraryId.current) {
+			handleSelectLibrary(selectedLibrary);
+			previousLibraryId.current = selectedLibrary.id;
+		}
+	}, [selectedLibrary]);
+
+	useEffect(() => {
+		if (libraries) ReactUtils.saveLibraries(libraries);
+	}, [libraries]);
+
 	const showDeleteDialog = () => {
 		confirmDialog({
 			message: t("removeLibraryMessage"),
@@ -114,10 +128,10 @@ function LibrariesList() {
 		[dispatch]
 	);
 
-	const draggingIndexRef = useRef<number | null>(null); // Índice del elemento arrastrado
+	const draggingIndexRef = useRef<number | null>(null); // Index of the dragged item
 
 	const handleDragStart = (index: number) => {
-		draggingIndexRef.current = index; // Guarda el índice del elemento arrastrado
+		draggingIndexRef.current = index; // Save the index of the dragged item
 		const dragItem = document.querySelectorAll(".libraries-button")[index];
 		dragItem?.classList.add("dragging");
 	};
@@ -125,25 +139,25 @@ function LibrariesList() {
 	const handleDragEnd = () => {
 		const dragItem = document.querySelector(".dragging");
 		dragItem?.classList.remove("dragging");
-		draggingIndexRef.current = null; // Resetea el índice arrastrado
+		draggingIndexRef.current = null; // Reset the dragged index
 	};
 
 	const handleDragOver = (index: number, e: React.DragEvent) => {
 		e.preventDefault();
 		const draggingIndex = draggingIndexRef.current;
 
-		// Evita operaciones innecesarias si el índice no ha cambiado
+		// Avoid unnecessary operations if the index hasn't changed
 		if (draggingIndex === null || draggingIndex === index) return;
 
-		// Actualiza el orden de las bibliotecas localmente
+		// Update the order of libraries locally
 		const updatedLibraries = [...libraries];
 		const [removedItem] = updatedLibraries.splice(draggingIndex, 1);
 		updatedLibraries.splice(index, 0, removedItem);
 
-		// Actualiza el índice en la referencia
+		// Update the index reference
 		draggingIndexRef.current = index;
 
-		// Renderiza el nuevo orden en la UI (sin actualizar Redux aún)
+		// Update Redux
 		dispatch(setLibraries(updatedLibraries));
 	};
 

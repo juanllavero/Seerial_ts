@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { RightPanelSections } from "@data/enums/Sections";
@@ -27,12 +27,28 @@ function RightPanel() {
 	const selectedSeries = useSelector(
 		(state: RootState) => state.data.selectedSeries
 	);
+	const previousLibraryId = useRef<string | null>(null);
+	const previousSeriesId = useRef<string | null>(null);
+
+	// useEffect to reset scroll position when library or series changes
 	useEffect(() => {
 		const scroll = document.getElementById("scroll");
-		if (scroll) {
+		const libraryIdChanged =
+			selectedLibrary && selectedLibrary.id !== previousLibraryId.current;
+		const seriesIdChanged =
+			selectedSeries && selectedSeries.id !== previousSeriesId.current;
+
+		if ((libraryIdChanged || seriesIdChanged) && scroll) {
 			scroll.scrollTop = 0;
 		}
-	}, [selectedSeries, selectedLibrary]);
+
+		if (libraryIdChanged) {
+			previousLibraryId.current = selectedLibrary?.id || null;
+		}
+		if (seriesIdChanged) {
+			previousSeriesId.current = selectedSeries?.id || null;
+		}
+	}, [selectedLibrary, selectedSeries]);
 
 	return (
 		<>

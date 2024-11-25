@@ -62,8 +62,8 @@ function MusicDetails() {
 	const getDiscs = () => {
 		let foundDiscs: number[] = [];
 
-		if (selectedAlbum) {
-			for (const song of selectedAlbum?.episodes) {
+		if (selectedAlbum && selectedAlbum.episodes) {
+			for (const song of selectedAlbum.episodes) {
 				if (
 					song.seasonNumber !== 0 &&
 					!foundDiscs.includes(song.seasonNumber)

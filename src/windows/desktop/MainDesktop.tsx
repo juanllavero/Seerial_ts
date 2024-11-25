@@ -103,7 +103,7 @@ function MainDesktop() {
 			"update-libraries",
 			(_event, newLibraries: LibraryData[]) => {
 				dispatch(setLibraries(newLibraries));
-				saveLibraries(newLibraries);
+				ReactUtils.saveLibraries(newLibraries);
 			}
 		);
 
@@ -119,7 +119,7 @@ function MainDesktop() {
 			(_event, newLibrary: LibraryData, newLibraries: LibraryData[]) => {
 				dispatch(setLibraries(newLibraries));
 				dispatch(selectLibrary(newLibrary));
-				saveLibraries(newLibraries);
+				ReactUtils.saveLibraries(newLibraries);
 			}
 		);
 
@@ -165,18 +165,6 @@ function MainDesktop() {
 
 	const hideControls = () => {
 		window.electronAPI.hideControls();
-	};
-
-	// Save data function
-	const saveLibraries = (newData: LibraryData[]) => {
-		//@ts-ignore
-		window.electronAPI.saveLibraryData(newData).then((success: boolean) => {
-			if (success) {
-				console.log("Datos guardados correctamente");
-			} else {
-				console.error("Error al guardar los datos");
-			}
-		});
 	};
 
 	return (
