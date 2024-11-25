@@ -45,7 +45,7 @@ import LibraryWindow from "@components/desktop/windows/libraryWindow";
 import SeasonWindow from "@components/desktop/windows/seasonWindow";
 import SeriesWindow from "@components/desktop/windows/seriesWindow";
 import LibraryAndSlider from "./rightContent/utils/LibraryAndSlider";
-import MusicPlayer from "windows/fullscreen/MusicPlayer";
+import MusicPlayer from "windows/desktop/rightContent/music/MusicPlayer";
 import useLoadLibraries from "hooks/useLoadLibraries";
 
 function MainDesktop() {

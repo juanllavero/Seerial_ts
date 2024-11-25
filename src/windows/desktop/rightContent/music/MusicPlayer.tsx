@@ -52,28 +52,6 @@ function MusicPlayer() {
 	);
 	const [gradientBackground, setGradientBackground] = useState<string>("");
 
-	/*useEffect(() => {
-        if (songsList && currentSong !== -1 && songsList[currentSong].imgSrc){
-            setTimeout(() => {
-                const newGradient = ReactUtils.getGradientBackground();
-
-                if (gradientBackground !== newGradient){
-                    dispatch(setGradientLoaded(false));
-                }
-
-                setTimeout(() => {
-                    setGradientBackground(newGradient);
-
-                    if (gradientBackground !== newGradient){
-                        dispatch(setGradientLoaded(true));
-                    }
-                }, 200);
-            }, 300);
-        } else {
-            setGradientBackground("none");
-        }
-    }, [songsList, currentSong]);*/
-
 	// Función para actualizar el tiempo de reproducción
 	const updateTime = () => {
 		if (howlerRef.current) {
@@ -437,6 +415,7 @@ function MusicPlayer() {
 							onClick={(e) => e.stopPropagation()}
 						>
 							<button
+								className="svg-button-desktop-transparent"
 								onClick={(e) => {
 									setShowMore(!showMore);
 									e.stopPropagation();
@@ -450,7 +429,7 @@ function MusicPlayer() {
 								value={volume * 100}
 								min={0}
 								max={100}
-								step={1} // Incrementos pequeños para el control de volumen preciso
+								step={1}
 								onChange={(e) => {
 									handleVolumeChange((e.value as number) / 100);
 								}}

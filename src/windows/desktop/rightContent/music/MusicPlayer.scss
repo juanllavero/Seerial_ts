@@ -93,10 +93,11 @@
 
 				.music-controls-left-box {
 					display: flex;
+					position: relative;
 
 					img {
-						width: 4.6em;
-						height: 4.6em;
+						width: 7vh;
+						height: 7vh;
 						margin-left: 0.5em;
 						margin-right: 0.8em;
 						border-radius: 5px;
@@ -142,6 +143,8 @@
 				justify-content: right;
 				align-items: center;
 				height: 100%;
+
+				gap: 1.5em;
 
 				#music-volume-slider {
 					margin-right: 1em;

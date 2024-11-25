@@ -307,7 +307,6 @@ const dataSlice = createSlice({
 
 		//#region EPISODES REDUCERS
 		selectEpisode: (state, action) => {
-			console.log(action.payload);
 			state.selectedEpisode = action.payload;
 		},
 		showMenu: (state, action) => {
