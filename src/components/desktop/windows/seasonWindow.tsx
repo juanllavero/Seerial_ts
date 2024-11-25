@@ -9,6 +9,8 @@ import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from 'react-player'
 import Loading from "@components/utils/Loading";
 import Image from "@components/image/Image";
+import VideoDownloader from "../downloaders/videoDownloader";
+import MusicDownloader from "../downloaders/musicDownloader";
 
 function SeasonWindow() {
     const dispatch = useDispatch();
@@ -199,6 +201,8 @@ function SeasonWindow() {
 
     return (
         <Suspense fallback={<Loading />}>
+            <VideoDownloader />
+            <MusicDownloader />
             <section className={`dialog ${seasonMenuOpen ? ' dialog-active' : ''}`}>
                 <div className="dialog-background" onClick={() => dispatch(toggleSeasonWindow())}></div>
                 <div className="dialog-box">

@@ -47,6 +47,9 @@ import SeriesWindow from "@components/desktop/windows/seriesWindow";
 import LibraryAndSlider from "./rightContent/utils/LibraryAndSlider";
 import MusicPlayer from "windows/desktop/rightContent/music/MusicPlayer";
 import useLoadLibraries from "hooks/useLoadLibraries";
+import VideoDownloader from "@components/desktop/downloaders/videoDownloader";
+import MusicDownloader from "@components/desktop/downloaders/musicDownloader";
+import ImageDownloader from "@components/desktop/downloaders/imageDownloader";
 
 function MainDesktop() {
 	const dispatch = useDispatch();

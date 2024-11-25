@@ -18,6 +18,7 @@ export interface ElectronAPI {
   onWindowStateChange: (callback: (state: string) => void) => void;
   showControls: () => void;
   hideControls: () => void;
+  searchVideos: (query: string) => string;
   getExternalPath: (relativePath: string) => string;
   openFolderDialog: () => Promise<string[]>;
   getImages: (dirPath) => Promise<string[]>;

@@ -17,6 +17,7 @@ import { EpisodeData } from "@interfaces/EpisodeData";
 import { Utils } from "../src/data/utils/Utils";
 import { Library } from "../src/data/objects/Library";
 import { DataManager } from "../src/data/utils/DataManager";
+import { Downloader } from "@data/utils/Downloader";
 
 //#region PROPERTIES AND DATA READING
 
@@ -86,6 +87,10 @@ ipcMain.handle("set-config", (_event, key: string, value: any) => {
 	saveConfig(configData);
 });
 //#endregion
+
+ipcMain.handle("search-videos", async (_event, query: string) => {
+	return await Downloader.searchVideos(query);
+});
 
 //#region EXTERNAL PATHS
 /**
