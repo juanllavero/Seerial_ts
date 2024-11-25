@@ -174,7 +174,7 @@ function LibrariesList() {
 						title={library.name}
 						draggable
 						onDragStart={() => handleDragStart(index)}
-						onDragEnd={() => handleDragEnd(index)}
+						onDragEnd={() => handleDragEnd()}
 						onDragOver={(e) => handleDragOver(index, e)}
 					>
 						{library.type === "Shows" ? (
