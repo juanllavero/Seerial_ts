@@ -103,6 +103,28 @@
 	}
 }
 
+.btn {
+	margin-right: 0.6em;
+
+	padding: 1em 1.3em 1em 1.3em;
+
+	border: none;
+	border-radius: 3px;
+
+	transition: background-color 0.3s ease;
+
+	font-size: small;
+	font-weight: bold;
+	color: v.$color-text-primary;
+	background-color: v.$color-lighter;
+
+	cursor: pointer;
+}
+
+.btn:hover {
+	background-color: v.$color-more-lighter;
+}
+
 /* SCROLL DESIGN */
 .scroll {
 	overflow: auto;

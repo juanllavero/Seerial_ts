@@ -1,5 +1,6 @@
 import { EpisodeData } from "@interfaces/EpisodeData";
 import { LibraryData } from "@interfaces/LibraryData";
+import { MediaSearchResult } from "@interfaces/SearchResults";
 import { SeasonData } from "@interfaces/SeasonData";
 import { SeriesData } from "@interfaces/SeriesData";
 
@@ -18,7 +19,9 @@ export interface ElectronAPI {
   onWindowStateChange: (callback: (state: string) => void) => void;
   showControls: () => void;
   hideControls: () => void;
-  searchVideos: (query: string) => string;
+  searchVideos: (query: string, numberOfResults: number) => MediaSearchResult[];
+  downloadMedia: ({ url, downloadFolder, fileName, isVideo }: { url: string, downloadFolder: string, fileName: string, isVideo: boolean }) => void;
+  getFiles: (dirPath: string) => string[];
   getExternalPath: (relativePath: string) => string;
   openFolderDialog: () => Promise<string[]>;
   getImages: (dirPath) => Promise<string[]>;

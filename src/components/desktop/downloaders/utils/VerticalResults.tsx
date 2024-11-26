@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ResultCard from "./ResultCard";
+import { MediaSearchResult } from "@interfaces/SearchResults";
+import PopUpVideo from "./PopUpVideo";
+import { useDownloadContext } from "context/download.context";
 
-function VerticalResults({ searchQuery }: { searchQuery: string }) {
-	const [results, setResults] = useState([]);
+function VerticalResults() {
+	const { results, playContent, selectedUrl } = useDownloadContext();
 
-	useEffect(() => {
-		const search = async () => {
-			setResults(await window.ipcRenderer.invoke("search-videos", searchQuery));
-		};
-
-		if (searchQuery) search();
-	}, [searchQuery]);
-
-	return <div className="results-container">
-    {results.map((result: {
-      id: string;
-      title: string;
-      url: string;
-      duration: number;
-      thumbnail: string;
-    }) => (
-      <ResultCard key={result.id} result={result} />
-    ))}
-  </div>;
+	return (
+		<>
+			{playContent && selectedUrl !== "" && <PopUpVideo />}
+			<div className="results-container">
+				{results && results.length > 0 ? (
+					results.map((result: MediaSearchResult) => (
+						<ResultCard
+							key={result.id}
+							result={result}
+						/>
+					))
+				) : (
+					<div>No results found</div>
+				)}
+			</div>
+		</>
+	);
 }
 
 export default React.memo(VerticalResults);

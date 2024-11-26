@@ -17,7 +17,7 @@ import { EpisodeData } from "@interfaces/EpisodeData";
 import { Utils } from "../src/data/utils/Utils";
 import { Library } from "../src/data/objects/Library";
 import { DataManager } from "../src/data/utils/DataManager";
-import { Downloader } from "@data/utils/Downloader";
+import { Downloader } from "../src/data/utils/Downloader";
 
 //#region PROPERTIES AND DATA READING
 
@@ -88,8 +88,31 @@ ipcMain.handle("set-config", (_event, key: string, value: any) => {
 });
 //#endregion
 
-ipcMain.handle("search-videos", async (_event, query: string) => {
-	return await Downloader.searchVideos(query);
+ipcMain.handle(
+	"search-yt",
+	async (_event, query: string, numberOfResults: number) => {
+		return await Downloader.searchVideos(query, numberOfResults);
+	}
+);
+
+ipcMain.handle(
+	"start-download",
+	async (_event, { url, downloadFolder, fileName, isVideo }) => {
+		if (!win) return;
+
+		try {
+			if (isVideo)
+				await Downloader.downloadVideo(url, downloadFolder, fileName, win);
+			else
+				await Downloader.downloadAudio(url, downloadFolder, fileName, win);
+		} catch (error: any) {
+			win.webContents.send("download-error", error.message);
+		}
+	}
+);
+
+ipcMain.handle("get-files", async (_event, folder: string) => {
+	return await Utils.getFilesInFolder(Utils.getExternalPath(folder));
 });
 
 //#region EXTERNAL PATHS

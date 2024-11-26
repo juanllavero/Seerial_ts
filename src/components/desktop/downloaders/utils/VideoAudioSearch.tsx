@@ -1,20 +1,28 @@
+import { useDownloadContext } from "context/download.context";
+import { useEffect, useState } from "react";
 
-function VideoAudioSearch({ searchQuery, setSearchQuery }: any) {
-	const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchQuery(event.target.value);
+function VideoAudioSearch() {
+	const { searchQuery, setSearchQuery } = useDownloadContext();
+	const [localQuery, setLocalQuery] = useState<string>(searchQuery);
 
-      setTimeout(() => {
-         // Search
-      }, 500);
-	};
+	useEffect(() => {
+		const search = setTimeout(() => {
+			setSearchQuery(localQuery);
+		}, 700);
+
+		return () => clearTimeout(search);
+	}, [localQuery]);
 
 	return (
 		<div className="search-container">
 			<input
 				type="text"
-				placeholder="Search"
-				value={searchQuery}
-				onChange={handleQueryChange}
+				placeholder=""
+				value={localQuery}
+				onChange={(e) => setLocalQuery(e.target.value)}
+				onKeyDown={(e) => {
+					e.code === "Space" ? e.stopPropagation() : null;
+				}}
 			/>
 		</div>
 	);

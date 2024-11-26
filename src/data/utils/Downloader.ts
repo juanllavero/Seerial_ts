@@ -1,23 +1,22 @@
-import { exec } from "child_process";
+import { MediaSearchResult } from "@interfaces/SearchResults";
+import { exec, spawn } from "child_process";
 import path from "path";
 import { promisify } from "util";
+import { Utils } from "./Utils";
 
 const execAsync = promisify(exec);
 
 export class Downloader {
-	public static async searchVideos(query: string): Promise<
-		{
-			id: string;
-			title: string;
-			url: string;
-			duration: number;
-			thumbnail: string;
-		}[]
-	> {
-      // Obtener la ruta absoluta del archivo yt-dlp.exe en base al directorio actual
-		const ytDlpPath = path.resolve(__dirname, "../../lib/yt-dlp.exe");
+	public static async searchVideos(
+		query: string,
+		numberOfResults: number
+	): Promise<MediaSearchResult[]> {
+		// Get the absolute path of yt-dlp.exe based on the current directory
+		const ytDlpPath = Utils.getInternalPath("lib/yt-dlp.exe");
 
-		const searchQuery = `${ytDlpPath} "ytsearch:${query}" --dump-json --default-search ytsearch --no-playlist --no-check-certificate --geo-bypass --flat-playlist --skip-download --quiet --ignore-errors`;
+		const searchQuery = `${ytDlpPath} "ytsearch${
+			numberOfResults > 0 ? numberOfResults : 1
+		}:${query}" --dump-json --default-search ytsearch --no-playlist --no-check-certificate --geo-bypass --flat-playlist --skip-download --quiet --ignore-errors`;
 
 		try {
 			const { stdout } = await execAsync(searchQuery);
@@ -49,58 +48,73 @@ export class Downloader {
 	public static async downloadVideo(
 		url: string,
 		downloadFolder: string,
-		fileName: string
+		fileName: string,
+		win: Electron.BrowserWindow
 	): Promise<void> {
-		// Obtener la ruta absoluta del archivo yt-dlp.exe en base al directorio actual
-		const ytDlpPath = path.resolve(__dirname, "../../lib/yt-dlp.exe");
+		// Get the absolute path of yt-dlp.exe based on the current directory
+		const ytDlpPath = Utils.getInternalPath("lib/yt-dlp.exe");
 
-		// Aseguramos que la ruta de descarga tenga una barra al final
-		const outputPath = path.join(downloadFolder, `${fileName}.%(ext)s`);
+		const folder = Utils.getExternalPath(downloadFolder);
 
-		// Preparamos el comando yt-dlp
-		const command = `${ytDlpPath} -f "bestvideo[ext=webm]+bestaudio[ext=webm]" -o "${outputPath}" ${url}`;
+		// Make sure the download path has a trailing slash
+		const outputPath = path.join(folder, `${fileName}.webm`);
 
-		try {
-			// Ejecutamos el comando yt-dlp
-			const { stdout, stderr } = await execAsync(command);
+		// Prepare yt-dlp command
+		const command = `${ytDlpPath} -f "bestvideo[ext=webm]+bestaudio[ext=webm]" -o "${outputPath}" ${url} -q --progress --force-overwrite`;
 
-			if (stderr) {
-				console.error("Error en la descarga:", stderr);
-				return;
-			}
-
-			console.log("Descarga completada:", stdout);
-		} catch (error) {
-			console.error("Error al ejecutar yt-dlp:", error);
-		}
+		this.downloadContent(command, win, fileName);
 	}
 
 	public static async downloadAudio(
 		url: string,
 		downloadFolder: string,
-		fileName: string
+		fileName: string,
+		win: Electron.BrowserWindow
 	): Promise<void> {
-		// Obtener la ruta absoluta del archivo yt-dlp.exe en base al directorio actual
-		const ytDlpPath = path.resolve(__dirname, "../../lib/yt-dlp.exe");
+		// Get the absolute path of yt-dlp.exe based on the current directory
+		const ytDlpPath = Utils.getInternalPath("lib/yt-dlp.exe");
 
-      // Aseguramos que la ruta de descarga tenga una barra al final
-		const outputPath = path.join(downloadFolder, `${fileName}.%(ext)s`);
+		// Make sure the download path has a trailing slash
+		const outputPath = path.join(downloadFolder, `${fileName}.opus`);
 
-		// Preparamos el comando yt-dlp para descargar solo el audio (el mejor audio disponible)
-		const command = `${ytDlpPath} -f "bestaudio[ext=webm]" -o "${outputPath}" ${url}`;
+		// Prepare the yt-dlp command to download only the audio (the best audio available)
+		const command = `${ytDlpPath} -f "bestaudio[ext=webm]" -o "${outputPath}" ${url} -q --progress --force-overwrite`;
 
+		this.downloadContent(command, win, fileName);
+	}
+
+	private static async downloadContent(command: string, win: Electron.BrowserWindow, fileName: string) {
 		try {
-			// Ejecutamos el comando yt-dlp
-			const { stdout, stderr } = await execAsync(command);
+			const process = spawn(command, {
+				shell: true,
+			});
 
-			if (stderr) {
-				console.error("Error en la descarga del audio:", stderr);
-				return;
-			}
+			process.stdout.on("data", (data: Buffer) => {
+				const output = data.toString();
 
-			console.log("Descarga de audio completada:", stdout);
+				// Parse progress percentage from yt-dlp output
+				const match = output.match(/(\d+(\.\d+)?)%/);
+				if (match) {
+					const progress = parseFloat(match[1]);
+
+					// Send progress to the renderer process
+					win.webContents.send("download-progress", progress);
+				}
+			});
+
+			process.stderr.on("data", (data: Buffer) => {
+				console.error("Error:", data.toString());
+			});
+
+			process.on("close", (code: number) => {
+				if (code === 0) {
+					win.webContents.send("download-complete", fileName);
+				} else {
+					win.webContents.send("download-error", code);
+				}
+			});
 		} catch (error) {
-			console.error("Error al ejecutar yt-dlp para el audio:", error);
+			console.error("Error executing yt-dlp:", error);
 		}
 	}
 }
