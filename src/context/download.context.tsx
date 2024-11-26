@@ -1,13 +1,12 @@
 import { MediaSearchResult } from "@interfaces/SearchResults";
-import { ipcRenderer } from "electron";
 import React, { useContext, useEffect } from "react";
 
 interface DownloadContextProps {
-   showWindow: boolean;
-   setShowWindow: (showWindow: boolean) => void;
+	showWindow: boolean;
+	setShowWindow: (showWindow: boolean) => void;
 	searchQuery: string;
-   results: MediaSearchResult[];
-   setResults: (results: MediaSearchResult[]) => void;
+	results: MediaSearchResult[];
+	setResults: (results: MediaSearchResult[]) => void;
 	videoContent: boolean;
 	selectedUrl: string;
 	playContent: boolean;
@@ -32,9 +31,9 @@ export const DownloadProvider = ({
 }: {
 	children: React.ReactNode;
 }) => {
-   const [showWindow, setShowWindow] = React.useState<boolean>(false);
+	const [showWindow, setShowWindow] = React.useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = React.useState<string>("");
-   const [results, setResults] = React.useState<MediaSearchResult[]>([]);
+	const [results, setResults] = React.useState<MediaSearchResult[]>([]);
 	const [videoContent, setVideoContent] = React.useState<boolean>(false);
 	const [selectedUrl, setSelectedUrl] = React.useState<string>("");
 	const [playContent, setPlayContent] = React.useState<boolean>(false);
@@ -55,13 +54,13 @@ export const DownloadProvider = ({
 		window.ipcRenderer.on("download-progress", (_event, progress) => {
 			setDownloadedPercentage(progress);
 		});
-		
+
 		window.ipcRenderer.on("download-complete", (_event, _fileName) => {
 			setDownloadingContent(false);
 			setDownloadedPercentage(0);
 			console.log(_fileName);
 		});
-		
+
 		window.ipcRenderer.on("download-error", (_event, _error) => {
 			setDownloadingContent(false);
 			setDownloadedPercentage(0);
@@ -69,8 +68,8 @@ export const DownloadProvider = ({
 	}, []);
 
 	useEffect(() => {
-      if (searchQuery) search();
-   }, [searchQuery]);
+		if (searchQuery) search();
+	}, [searchQuery]);
 
 	const downloadVideo = (elementId: string, url: string) => {
 		window.electronAPI.downloadMedia({
@@ -78,7 +77,7 @@ export const DownloadProvider = ({
 			downloadFolder: "resources/video/",
 			fileName: elementId,
 			isVideo: true,
-		})
+		});
 	};
 
 	const downloadAudio = (elementId: string, url: string) => {
@@ -87,16 +86,16 @@ export const DownloadProvider = ({
 			downloadFolder: "resources/music/",
 			fileName: elementId,
 			isVideo: false,
-		})
+		});
 	};
 
 	return (
 		<DownloadContext.Provider
 			value={{
-            showWindow,
-            setShowWindow,
-            results,
-            setResults,
+				showWindow,
+				setShowWindow,
+				results,
+				setResults,
 				searchQuery,
 				setSearchQuery,
 				videoContent,
