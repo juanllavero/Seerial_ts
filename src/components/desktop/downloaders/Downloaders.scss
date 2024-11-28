@@ -1,156 +1,155 @@
 @use "../../../windows/utils/variables" as v;
 
 .downloader-container {
-   width: 100%;
-   height: 100%;
+	width: 100%;
+	height: 100%;
 
-   position: absolute;
+	position: absolute;
 
-   display: flex;
-   justify-content: center;
-   align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-   z-index: 200;
+	z-index: 200;
 
-   .downloader-background {
-      width: 100%;
-      height: 100%;
+	.downloader-background {
+		width: 100%;
+		height: 100%;
 
-      position: absolute;
-      z-index: 201;
-   }
+		position: absolute;
+		z-index: 201;
+	}
 
-   .downloader-window {
-      background-color: v.$color-dark;
+	.downloader-window {
+		background-color: v.$color-dark;
 
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: center;
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: center;
 
-      width: 52em;
-      height: 70vh;
-      border-radius: 3px;
+		width: 52em;
+		height: 70vh;
+		border-radius: 3px;
 
-      box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.406);
+		box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.406);
 
-      z-index: 202;
+		z-index: 202;
 
-      .progress-container {
-         position: absolute;
-         top: 0;
-         width: 100%;
-         height: 100%;
+		.progress-container {
+			position: absolute;
+			top: 0;
+			width: 100%;
+			height: 100%;
 
-         align-content: center;
+			align-content: center;
 
-         .progress-window {
-            margin: 0 auto;
-            width: 30em;
-            height: 10em;
+			.progress-window {
+				margin: 0 auto;
+				width: 30em;
+				height: 10em;
 
-            padding: 2em;
-            border-radius: 5px;
-            background-color: v.$color-darker;
-            box-shadow: 1px 1px 5px 3px rgba(0, 0, 0, 0.406);
-            
-            display: flex;
-            flex-flow: column nowrap;
-            justify-content: center;
+				padding: 2em;
+				border-radius: 5px;
+				background-color: v.$color-darker;
+				box-shadow: 1px 1px 5px 3px rgba(0, 0, 0, 0.406);
 
-            #progress-bar {
-               height: 1em;
-            }
-         }
-      }
+				display: flex;
+				flex-flow: column nowrap;
+				justify-content: center;
 
-      header {
-         padding: 1em 1.5em;
+				#progress-bar {
+					height: 1em;
+				}
+			}
+		}
 
-         width: 100%;
+		header {
+			padding: 1em 1.5em;
 
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: space-between;
-      }
+			width: 100%;
 
-      .search-container {
-         padding: .5em;
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: space-between;
+		}
 
-         input {
-            padding: 1em 1.3em 1em 1.3em;
-            background-color: v.$color-lighter;
-            border: none;
-            outline: none;
-            border-radius: 3px;
+		.search-container {
+			padding: 0.5em;
 
-            font-size: small;
-            font-family: sans-serif;
+			input {
+				padding: 1em 1.3em 1em 1.3em;
+				background-color: v.$color-lighter;
+				border: none;
+				outline: none;
+				border-radius: 3px;
 
-            color: v.$color-text-primary;
+				font-size: small;
+				font-family: sans-serif;
 
-            transition: background-color .15s ease;
-          }
+				color: v.$color-text-primary;
 
-          input::placeholder {
-            color: v.$color-text-default;
-          }
+				transition: background-color 0.15s ease;
+			}
 
-          input:focus {
-            background-color: v.$color-bright;
-            color: black;
-          }
-      }
+			input::placeholder {
+				color: v.$color-text-default;
+			}
 
-      .pop-up-video {
-         width: 100%;
-         padding: 1em 1.5em;
-      }
+			input:focus {
+				background-color: v.$color-bright;
+				color: black;
+			}
+		}
 
-      .results-container {
-         display: flex;
-         flex-flow: column nowrap;
-         overflow-y: auto;
+		.pop-up-video {
+			width: 100%;
+			padding: 1em 1.5em;
+		}
 
-         padding: 1em 1.5em;
+		.results-container {
+			display: flex;
+			flex-flow: column nowrap;
+			overflow-y: auto;
 
-         gap: 1em;
+			padding: 1em 1.5em;
 
-         .result-card {
-            display: flex;
-            flex-flow: row nowrap;
+			gap: 1em;
 
-            gap: .8em;
+			.result-card {
+				display: flex;
+				flex-flow: row nowrap;
 
-            img {
-               width: auto;
-               height: 8em;
-               
-            }
+				gap: 0.8em;
 
-            .result-info {
-               display: flex;
-               flex-flow: column nowrap;
-               justify-content: space-between;
-               text-align: left;
+				img {
+					width: auto;
+					height: 8em;
+				}
 
-               width: 100%;
-               
-               #result-title {
-                  font-weight: bold;
-               }
+				.result-info {
+					display: flex;
+					flex-flow: column nowrap;
+					justify-content: space-between;
+					text-align: left;
 
-               #result-duration {
-                  margin-top: .5em;
-               }
-            }
+					width: 100%;
 
-            .btns-container {
-               display: flex;
-               flex-flow: column nowrap;
-               
-               justify-content: space-around;
-            }
-         }
-      }
-   }
+					#result-title {
+						font-weight: bold;
+					}
+
+					#result-duration {
+						margin-top: 0.5em;
+					}
+				}
+
+				.btns-container {
+					display: flex;
+					flex-flow: column nowrap;
+
+					justify-content: space-around;
+				}
+			}
+		}
+	}
 }

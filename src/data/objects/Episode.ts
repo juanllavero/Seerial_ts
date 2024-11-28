@@ -35,6 +35,7 @@ export class Episode {
   seasonNumber: number;
   videoSrc: string;
   imgSrc: string;
+  imgUrls: string[];
   seasonID: string;
   watched: boolean;
   timeWatched: number;
@@ -58,6 +59,7 @@ export class Episode {
     this.seasonNumber = 0;
     this.videoSrc = '';
     this.imgSrc = '';
+    this.imgUrls = [];
     this.seasonID = '';
     this.watched = false;
     this.timeWatched = 0;
@@ -94,6 +96,7 @@ export class Episode {
     episode.seasonNumber = json.seasonNumber !== undefined ? json.seasonNumber : episode.seasonNumber;
     episode.videoSrc = json.videoSrc || episode.videoSrc;
     episode.imgSrc = json.imgSrc || episode.imgSrc;
+    episode.imgUrls = json.imgUrls || episode.imgUrls;
     episode.seasonID = json.seasonID || episode.seasonID;
     episode.watched = json.watched !== undefined ? json.watched : episode.watched;
     episode.timeWatched = json.timeWatched !== undefined ? json.timeWatched : episode.timeWatched;
@@ -130,6 +133,7 @@ export class Episode {
       seasonNumber: this.seasonNumber,
       videoSrc: this.videoSrc,
       imgSrc: this.imgSrc,
+      imgUrls: this.imgUrls,
       seasonID: this.seasonID,
       watched: this.watched,
       timeWatched: this.timeWatched,

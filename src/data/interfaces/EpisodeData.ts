@@ -34,6 +34,7 @@ export interface EpisodeData{
     seasonNumber: number;
     videoSrc: string;
     imgSrc: string;
+    imgUrls: string[];
     seasonID: string;
     watched: boolean;
     timeWatched: number;

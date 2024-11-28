@@ -8,6 +8,7 @@ export interface SeriesData{
     name: string;
     overview: string;
     coverSrc: string;
+    coversUrls: string[];
     nameLock: boolean;
     overviewLock: boolean;
 
@@ -16,6 +17,7 @@ export interface SeriesData{
     score: number;
     tagline: string;
     logoSrc: string;
+    logosUrls: string[];
     creator: string[];
     genres: string[];
     cast: CastData[];

@@ -35,7 +35,9 @@ export interface SeasonData{
     order: number;
     seasonNumber: number;
     logoSrc: string;
+    logosUrls: string[];
     coverSrc: string;
+    coversUrls: string[];
     backgroundSrc: string;
     videoSrc: string;
     musicSrc: string;

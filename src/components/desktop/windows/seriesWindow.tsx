@@ -5,12 +5,19 @@ import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import { useTranslation } from "react-i18next";
 import { toggleSeriesWindow, updateSeries } from "redux/slices/dataSlice";
-import { TagsInput } from "react-tag-input-component";
 import Loading from "@components/utils/Loading";
+import DialogHeader from "./utils/DialogHeader";
+import DialogSectionButton from "./utils/DialogSectionButton";
+import DialogInput from "./utils/DialogInput";
+import DialogTextArea from "./utils/DialogTextArea";
+import DialogTags from "./utils/DialogTags";
+import DialogFooter from "./utils/DialogFooter";
+import { useDownloadContext } from "context/download.context";
 
 function SeriesWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
+	const { downloadingContent } = useDownloadContext();
 
 	const menuSection = useSelector(
 		(state: RootState) => state.sectionState.menuSection
@@ -180,6 +187,8 @@ function SeriesWindow() {
 						analyzingFiles: series.analyzingFiles,
 						currentlyWatchingSeason: series.currentlyWatchingSeason,
 						cast: series.cast,
+						logosUrls: series.logosUrls,
+						coversUrls: series.coversUrls,
 					},
 				})
 			);
@@ -207,393 +216,116 @@ function SeriesWindow() {
 					onClick={() => dispatch(toggleSeriesWindow())}
 				></div>
 				<div className="dialog-box">
-					<section className="dialog-top">
-						<span>{t("editButton") + ": " + series?.name}</span>
-						<button
-							className="close-window-btn"
-							onClick={() => dispatch(toggleSeriesWindow())}
-						>
-							<img
-								src="./src/assets/svg/windowClose.svg"
-								style={{
-									width: "24px",
-									height: "24px",
-									filter: "drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))",
-								}}
-							/>
-						</button>
-					</section>
+					<DialogHeader
+						title={t("editButton") + ": " + series?.name}
+						onClose={() => dispatch(toggleSeriesWindow())}
+					/>
 					<section className="dialog-center">
 						<div className="dialog-center-left">
-							<button
-								className={`desktop-dialog-side-btn ${
-									menuSection === WindowSections.General
-										? " desktop-dialog-side-btn-active"
-										: ""
-								}`}
-								onClick={() =>
-									dispatch(changeMenuSection(WindowSections.General))
-								}
-							>
-								{t("generalButton")}
-							</button>
+							<DialogSectionButton
+								title={t("generalButton")}
+								section={WindowSections.General}
+							/>
 							{library?.type === "Shows" ? (
 								<>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Details
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(
-												changeMenuSection(WindowSections.Details)
-											)
-										}
-									>
-										{t("tags")}
-									</button>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Logos
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(
-												changeMenuSection(WindowSections.Logos)
-											)
-										}
-									>
-										{t("logosButton")}
-									</button>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Posters
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(
-												changeMenuSection(WindowSections.Posters)
-											)
-										}
-									>
-										{t("postersButton")}
-									</button>
+									<DialogSectionButton
+										title={t("tags")}
+										section={WindowSections.Tags}
+									/>
+									<DialogSectionButton
+										title={t("logosButton")}
+										section={WindowSections.Logos}
+									/>
+									<DialogSectionButton
+										title={t("postersButton")}
+										section={WindowSections.Posters}
+									/>
 								</>
 							) : series?.isCollection ? (
-								<button
-									className={`desktop-dialog-side-btn ${
-										menuSection === WindowSections.Posters
-											? " desktop-dialog-side-btn-active"
-											: ""
-									}`}
-									onClick={() =>
-										dispatch(
-											changeMenuSection(WindowSections.Posters)
-										)
-									}
-								>
-									{t("postersButton")}
-								</button>
+								<DialogSectionButton
+									title={t("postersButton")}
+									section={WindowSections.Posters}
+								/>
 							) : null}
 						</div>
 						<div className="dialog-center-right scroll">
 							{menuSection === WindowSections.General ? (
 								library?.type === "Shows" ? (
 									<>
-										<div className="dialog-input-box">
-											<span>{t("name")}</span>
-											<div
-												className={`dialog-input-lock ${
-													nameLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() => setNameLock(!nameLock)}
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														x="0px"
-														y="0px"
-														width="22"
-														height="22"
-														viewBox="0 0 24 24"
-													>
-														<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-													</svg>
-												</a>
-												<input
-													type="text"
-													value={name}
-													onChange={(e) => {
-														setNameLock(true);
-														setName(e.target.value);
-													}}
-												/>
-											</div>
-										</div>
-										<div className="dialog-input-box">
-											<span>{t("year")}</span>
-											<div
-												className={`dialog-input-lock ${
-													yearLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() => setYearLock(!yearLock)}
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														x="0px"
-														y="0px"
-														width="22"
-														height="22"
-														viewBox="0 0 24 24"
-													>
-														<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-													</svg>
-												</a>
-												<input
-													type="text"
-													value={year}
-													onChange={(e) => {
-														setYearLock(true);
-														setYear(e.target.value);
-													}}
-												/>
-											</div>
-										</div>
-										<div className="dialog-input-box">
-											<span>{t("tagline")}</span>
-											<div
-												className={`dialog-input-lock ${
-													taglineLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() =>
-														setTaglineLock(!taglineLock)
-													}
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														x="0px"
-														y="0px"
-														width="22"
-														height="22"
-														viewBox="0 0 24 24"
-													>
-														<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-													</svg>
-												</a>
-												<input
-													type="text"
-													value={tagline}
-													onChange={(e) => {
-														setTaglineLock(true);
-														setTagline(e.target.value);
-													}}
-												/>
-											</div>
-										</div>
-										<div className="dialog-input-box">
-											<span>{t("overview")}</span>
-											<div
-												className={`dialog-input-lock ${
-													overviewLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() =>
-														setOverviewLock(!overviewLock)
-													}
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														x="0px"
-														y="0px"
-														width="22"
-														height="22"
-														viewBox="0 0 24 24"
-													>
-														<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-													</svg>
-												</a>
-												<textarea
-													rows={5}
-													value={overview}
-													onChange={(e) => {
-														setOverviewLock(true);
-														setOverview(e.target.value);
-													}}
-												/>
-											</div>
-										</div>
+										<DialogInput
+											type="text"
+											title={t("name")}
+											value={name}
+											setValue={setName}
+											lock={nameLock}
+											setLock={setNameLock}
+										/>
+										<DialogInput
+											type="text"
+											title={t("year")}
+											value={year}
+											setValue={setYear}
+											lock={yearLock}
+											setLock={setYearLock}
+										/>
+										<DialogInput
+											type="text"
+											title={t("tagline")}
+											value={tagline}
+											setValue={setTagline}
+											lock={taglineLock}
+											setLock={setTaglineLock}
+										/>
+										<DialogTextArea
+											title={t("overview")}
+											value={overview}
+											setValue={setOverview}
+											lock={overviewLock}
+											setLock={setOverviewLock}
+										/>
 									</>
 								) : (
 									<>
-										<div className="dialog-input-box">
-											<span>{t("name")}</span>
-											<div
-												className={`dialog-input-lock ${
-													nameLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() => setNameLock(!nameLock)}
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														x="0px"
-														y="0px"
-														width="22"
-														height="22"
-														viewBox="0 0 24 24"
-													>
-														<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-													</svg>
-												</a>
-												<input
-													type="text"
-													value={name}
-													onChange={(e) => {
-														setNameLock(true);
-														setName(e.target.value);
-													}}
-												/>
-											</div>
-										</div>
+										<DialogInput
+											type="text"
+											title={t("name")}
+											value={name}
+											setValue={setName}
+											lock={nameLock}
+											setLock={setNameLock}
+										/>
 									</>
 								)
 							) : menuSection === WindowSections.Details ? (
 								<>
-									<div className="dialog-input-box">
-										<span>{t("genres")}</span>
-										<div
-											className={`dialog-input-lock ${
-												genresLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setGenresLock(!genresLock)}
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													x="0px"
-													y="0px"
-													width="22"
-													height="22"
-													viewBox="0 0 24 24"
-												>
-													<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-												</svg>
-											</a>
-											<TagsInput
-												value={genres}
-												onChange={setGenres}
-												name="genresInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("studios")}</span>
-										<div
-											className={`dialog-input-lock ${
-												studiosLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setStudiosLock(!studiosLock)}
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													x="0px"
-													y="0px"
-													width="22"
-													height="22"
-													viewBox="0 0 24 24"
-												>
-													<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-												</svg>
-											</a>
-											<TagsInput
-												value={studios}
-												onChange={setStudios}
-												name="studiosInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("createdBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												creatorLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setCreatorLock(!creatorLock)}
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													x="0px"
-													y="0px"
-													width="22"
-													height="22"
-													viewBox="0 0 24 24"
-												>
-													<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-												</svg>
-											</a>
-											<TagsInput
-												value={creator}
-												onChange={setCreator}
-												name="creatorInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("musicBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												musicLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setMusicLock(!musicLock)}
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													x="0px"
-													y="0px"
-													width="22"
-													height="22"
-													viewBox="0 0 24 24"
-												>
-													<path d="M 12 1 C 8.6761905 1 6 3.6761905 6 7 L 6 8 C 4.9 8 4 8.9 4 10 L 4 20 C 4 21.1 4.9 22 6 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 10 C 20 8.9 19.1 8 18 8 L 18 7 C 18 3.6761905 15.32381 1 12 1 z M 12 3 C 14.27619 3 16 4.7238095 16 7 L 16 8 L 8 8 L 8 7 C 8 4.7238095 9.7238095 3 12 3 z M 12 13 C 13.1 13 14 13.9 14 15 C 14 16.1 13.1 17 12 17 C 10.9 17 10 16.1 10 15 C 10 13.9 10.9 13 12 13 z"></path>
-												</svg>
-											</a>
-											<TagsInput
-												value={music}
-												onChange={setMusic}
-												name="musicInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
+									<DialogTags
+										title={t("genres")}
+										value={genres}
+										setValue={setGenres}
+										lock={genresLock}
+										setLock={setGenresLock}
+									/>
+									<DialogTags
+										title={t("studios")}
+										value={studios}
+										setValue={setStudios}
+										lock={studiosLock}
+										setLock={setStudiosLock}
+									/>
+									<DialogTags
+										title={t("createdBy")}
+										value={creator}
+										setValue={setCreator}
+										lock={creatorLock}
+										setLock={setCreatorLock}
+									/>
+									<DialogTags
+										title={t("musicBy")}
+										value={music}
+										setValue={setMusic}
+										lock={musicLock}
+										setLock={setMusicLock}
+									/>
 								</>
 							) : menuSection === WindowSections.Logos ? (
 								<>
@@ -769,20 +501,11 @@ function SeriesWindow() {
 							) : null}
 						</div>
 					</section>
-					<section className="dialog-bottom">
-						<button
-							className="desktop-dialog-btn"
-							onClick={() => dispatch(toggleSeriesWindow())}
-						>
-							{t("cancelButton")}
-						</button>
-						<button
-							className="btn-app-color"
-							onClick={() => handleSavingChanges()}
-						>
-							{t("saveButton")}
-						</button>
-					</section>
+					<DialogFooter
+						downloadingContent={downloadingContent}
+						handleSavingChanges={handleSavingChanges}
+						action={() => dispatch(toggleSeriesWindow())}
+					/>
 				</div>
 			</section>
 		</Suspense>

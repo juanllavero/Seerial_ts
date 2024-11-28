@@ -8,6 +8,7 @@ export class Series {
   name: string;
   overview: string;
   coverSrc: string;
+  coversUrls: string[];
   nameLock: boolean;
   overviewLock: boolean;
 
@@ -16,6 +17,7 @@ export class Series {
   score: number;
   tagline: string;
   logoSrc: string;
+  logosUrls: string[];
   creator: string[];
   genres: string[];
   cast: Cast[];
@@ -54,7 +56,9 @@ export class Series {
     this.numberOfSeasons = 0;
     this.numberOfEpisodes = 0;
     this.coverSrc = '';
+    this.coversUrls = [];
     this.logoSrc = '';
+    this.logosUrls = [];
     this.folder = '';
     this.videoZoom = 0;
     this.episodeGroupID = '';
@@ -90,7 +94,9 @@ export class Series {
       numberOfSeasons: this.numberOfSeasons,
       numberOfEpisodes: this.numberOfEpisodes,
       coverSrc: this.coverSrc,
+      coversUrls: this.coversUrls,
       logoSrc: this.logoSrc,
+      logosUrls: this.logosUrls,
       folder: this.folder,
       videoZoom: this.videoZoom,
       episodeGroupID: this.episodeGroupID,
@@ -135,7 +141,9 @@ export class Series {
     series.numberOfSeasons = jsonData.numberOfSeasons || series.numberOfSeasons;
     series.numberOfEpisodes = jsonData.numberOfEpisodes || series.numberOfEpisodes;
     series.coverSrc = jsonData.coverSrc || series.coverSrc;
+    series.coversUrls = jsonData.coversUrls || series.coversUrls;
     series.logoSrc = jsonData.logoSrc || series.logoSrc;
+    series.logosUrls = jsonData.logosUrls || series.logosUrls;
     series.folder = jsonData.folder || series.folder;
     series.videoZoom = jsonData.videoZoom || series.videoZoom;
     series.episodeGroupID = jsonData.episodeGroupID || series.episodeGroupID;

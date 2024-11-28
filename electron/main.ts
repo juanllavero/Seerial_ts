@@ -162,47 +162,54 @@ ipcMain.handle("get-images", async (_event, dirPath) => {
 //#endregion
 
 //#region DOWNLOAD IMAGES
-ipcMain.on(
+ipcMain.handle(
 	"download-image-url",
-	async (event, imageUrl: string, downloadDir: string) => {
+	async (_event, imageUrl: string, downloadDir: string) => {
 		try {
-			// Definir la carpeta donde se guardará la imagen
+			// Create folder if not exists
 			const folderPath = Utils.getExternalPath(downloadDir);
 			if (!fs.existsSync(folderPath)) {
 				fs.mkdirSync(folderPath);
 			}
 
-			// Obtener el número de archivos en la carpeta
-			const files = fs.readdirSync(folderPath);
-			const newFileName = `${files.length + 1}.jpg`; // Sumar 1 para que no haya duplicados
-			const imagePath = path.join(folderPath, newFileName);
+			const fileName = imageUrl.split("/").pop();
 
-			// Descargar la imagen usando axios
+			if (!fileName) return;
+
+			const imagePath = path.join(folderPath, fileName);
+
+			// Download image
 			const response = await axios({
 				url: imageUrl,
 				responseType: "stream",
 			});
 
-			// Guardar la imagen en la carpeta
+			// Save image
 			const writer = fs.createWriteStream(imagePath);
 			response.data.pipe(writer);
-
-			writer.on("finish", () => {
-				event.reply("download-complete", `Imagen guardada en ${imagePath}`);
-			});
-
-			writer.on("error", (err) => {
-				event.reply(
-					"download-error",
-					`Error al guardar la imagen: ${err.message}`
-				);
-			});
 		} catch (error: any) {
-			event.reply(
+			console.error(
 				"download-error",
-				`Error al descargar la imagen: ${error.message}`
+				`Error downloading image: ${error.message}`
 			);
 		}
+	}
+);
+
+ipcMain.handle(
+	"copy-image-file",
+	async (_event, originalSrc: string, destSrc: string) => {
+		if (!fs.existsSync(originalSrc)) {
+			console.error(`No file found: ${originalSrc}`);
+			return;
+		}
+
+		fs.copyFile(originalSrc, destSrc, (err) => {
+			if (err) {
+				console.error("Error copying image:", err);
+				return;
+			}
+		});
 	}
 );
 //#endregion

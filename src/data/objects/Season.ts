@@ -35,7 +35,9 @@ export class Season {
   order: number;
   seasonNumber: number;
   logoSrc: string;
+  logosUrls: string[];
   coverSrc: string;
+  coversUrls: string[];
   backgroundSrc: string;
   videoSrc: string;
   musicSrc: string;
@@ -61,7 +63,9 @@ export class Season {
     this.score = 0;
     this.seasonNumber = 0;
     this.logoSrc = '';
+    this.logosUrls = [];
     this.coverSrc = '';
+    this.coversUrls = [];
     this.backgroundSrc = '';
     this.videoSrc = '';
     this.musicSrc = '';
@@ -110,7 +114,9 @@ export class Season {
     season.score = json.score || season.score;
     season.seasonNumber = json.seasonNumber || season.seasonNumber;
     season.logoSrc = json.logoSrc || season.logoSrc;
+    season.logosUrls = json.logosUrls || season.logosUrls;
     season.coverSrc = json.coverSrc || season.coverSrc;
+    season.coversUrls = json.coversUrls || season.coversUrls;
     season.backgroundSrc = json.backgroundSrc || season.backgroundSrc;
     season.videoSrc = json.videoSrc || season.videoSrc;
     season.musicSrc = json.musicSrc || season.musicSrc;
@@ -159,7 +165,9 @@ export class Season {
       score: this.score,
       seasonNumber: this.seasonNumber,
       logoSrc: this.logoSrc,
+      logosUrls: this.logosUrls,
       coverSrc: this.coverSrc,
+      coversUrls: this.coversUrls,
       backgroundSrc: this.backgroundSrc,
       videoSrc: this.videoSrc,
       musicSrc: this.musicSrc,

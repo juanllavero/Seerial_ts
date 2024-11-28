@@ -796,6 +796,11 @@ html, body {
     color: $color-dark;
   }
 
+  .disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
   .close-window-btn {
     background-color: transparent;
     border: none;

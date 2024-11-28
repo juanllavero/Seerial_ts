@@ -1,18 +1,27 @@
 import { WindowSections } from "@data/enums/Sections";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeMenuSection } from "redux/slices/menuSectionsSlice";
 import { RootState } from "redux/store";
 import { useTranslation } from "react-i18next";
 import { toggleSeasonWindow, updateSeason } from "redux/slices/dataSlice";
-import { TagsInput } from "react-tag-input-component";
 import ReactPlayer from "react-player";
-import Loading from "@components/utils/Loading";
 import Image from "@components/image/Image";
 import VideoAudioDownloader from "../downloaders/VideoAudioDownloader";
 import { useDownloadContext } from "context/download.context";
 import DialogHeader from "./utils/DialogHeader";
-import { DownloadIcon, LinkIcon, LockIcon, RemoveIcon, TickIcon, UploadIcon } from "@components/utils/IconLibrary";
+import {
+	DownloadIcon,
+	LinkIcon,
+	RemoveIcon,
+	UploadIcon,
+} from "@components/utils/IconLibrary";
+import ImagesList from "./utils/ImagesList";
+import DialogInput from "./utils/DialogInput";
+import DialogTags from "./utils/DialogTags";
+import DialogTextArea from "./utils/DialogTextArea";
+import DialogSectionButton from "./utils/DialogSectionButton";
+import DialogFooter from "./utils/DialogFooter";
 
 function SeasonWindow() {
 	const dispatch = useDispatch();
@@ -49,6 +58,9 @@ function SeasonWindow() {
 	const [selectedPoster, selectPoster] = useState<string | undefined>(
 		undefined
 	);
+
+	const [logosUrls, setLogosUrls] = useState<string[]>([]);
+	const [coversUrls, setCoversUrls] = useState<string[]>([]);
 
 	const [nameLock, setNameLock] = useState<boolean>(false);
 	const [orderLock, setOrderLock] = useState<boolean>(false);
@@ -117,6 +129,8 @@ function SeasonWindow() {
 			let noImages: string[] = [];
 			setPosters(noImages);
 			setLogos(noImages);
+			setLogosUrls(season.logosUrls);
+			setCoversUrls(season.coversUrls);
 			dispatch(changeMenuSection(WindowSections.General));
 
 			setName(season.name || "");
@@ -170,7 +184,7 @@ function SeasonWindow() {
 				fetchResolvedPath("resources/music/" + season?.id + ".opus", false);
 			}
 		}
-	}, [downloadingContent, videoSrc, musicSrc]);
+	}, [downloadingContent, videoSrc, musicSrc, season]);
 
 	useEffect(() => {
 		window.ipcRenderer.on("download-complete", (_event, _message) => {
@@ -190,8 +204,35 @@ function SeasonWindow() {
 		});
 	};
 
-	const handleSavingChanges = () => {
+	const downloadUrlImage = async (url: string, downloadPath: string) => {
+		setPasteUrl(false);
+		await window.ipcRenderer.invoke("download-image-url", url, downloadPath);
+	};
+
+	const handleDownloadUrls = async (): Promise<boolean> => {
+		if (!season) return false;
+
+		if (selectedLogo && logosUrls.includes(selectedLogo)) {
+			await downloadUrlImage(
+				selectedLogo,
+				"resources/img/logos/" + season.id + "/"
+			);
+		}
+
+		if (selectedPoster && coversUrls.includes(selectedPoster)) {
+			await downloadUrlImage(
+				selectedPoster,
+				"resources/img/posters/" + season.id + "/"
+			);
+		}
+
+		return true;
+	};
+
+	const handleSavingChanges = async () => {
 		if (season) {
+			await handleDownloadUrls();
+
 			dispatch(
 				updateSeason({
 					name: name,
@@ -203,10 +244,23 @@ function SeasonWindow() {
 					score: season.score,
 					seasonNumber: season.seasonNumber,
 					logoSrc: selectedLogo
-						? "resources/img/logos/" + season.id + "/" + selectedLogo
+						? selectedLogo.startsWith("http")
+							? "resources/img/logos/" +
+							  season.id +
+							  "/" +
+							  selectedLogo.split("/").pop()
+							: "resources/img/logos/" + season.id + "/" + selectedLogo
 						: season.logoSrc,
 					coverSrc: selectedPoster
-						? "resources/img/posters/" + season.id + "/" + selectedPoster
+						? selectedPoster.startsWith("http")
+							? "resources/img/posters/" +
+							  season.id +
+							  "/" +
+							  selectedPoster.split("/").pop()
+							: "resources/img/posters/" +
+							  season.id +
+							  "/" +
+							  selectedPoster
 						: season.coverSrc,
 					backgroundSrc: season.backgroundSrc,
 					videoSrc: videoSrc ? videoSrc : season.videoSrc,
@@ -244,6 +298,9 @@ function SeasonWindow() {
 					directedLock: false,
 					writtenLock: false,
 					genresLock: false,
+					logosUrls: logosUrls.length > 0 ? logosUrls : season.logosUrls,
+					coversUrls:
+						coversUrls.length > 0 ? coversUrls : season.coversUrls,
 				})
 			);
 		}
@@ -251,24 +308,19 @@ function SeasonWindow() {
 		dispatch(toggleSeasonWindow());
 	};
 
-	const handleDownload = () => {
-		setPasteUrl(false);
-		window.ipcRenderer.send(
-			"download-image-url",
-			imageUrl,
-			"resources/img/discCovers/" + season?.id + "/"
-		);
-	};
-
 	return (
-		<Suspense fallback={<Loading />}>
+		<>
 			{showWindow && <VideoAudioDownloader />}
 			<section
 				className={`dialog ${seasonMenuOpen ? " dialog-active" : ""}`}
 			>
 				<div
 					className="dialog-background"
-					onClick={() => dispatch(toggleSeasonWindow())}
+					onClick={() => {
+						if (!downloadingContent) {
+							dispatch(toggleSeasonWindow());
+						}
+					}}
 				></div>
 				<div className="dialog-box">
 					<DialogHeader
@@ -283,354 +335,126 @@ function SeasonWindow() {
 					/>
 					<section className="dialog-center">
 						<div className="dialog-center-left">
-							<button
-								className={`desktop-dialog-side-btn ${
-									menuSection === WindowSections.General
-										? " desktop-dialog-side-btn-active"
-										: ""
-								}`}
-								onClick={() =>
-									dispatch(changeMenuSection(WindowSections.General))
-								}
-							>
-								{t("generalButton")}
-							</button>
+							<DialogSectionButton
+								title={t("generalButton")}
+								section={WindowSections.General}
+							/>
 							{library?.type !== "Shows" ? (
-								<button
-									className={`desktop-dialog-side-btn ${
-										menuSection === WindowSections.Tags
-											? " desktop-dialog-side-btn-active"
-											: ""
-									}`}
-									onClick={() =>
-										dispatch(changeMenuSection(WindowSections.Tags))
-									}
-								>
-									{t("tags")}
-								</button>
+								<DialogSectionButton
+									title={t("tags")}
+									section={WindowSections.Tags}
+								/>
 							) : null}
-							<button
-								className={`desktop-dialog-side-btn ${
-									menuSection === WindowSections.Details
-										? " desktop-dialog-side-btn-active"
-										: ""
-								}`}
-								onClick={() =>
-									dispatch(changeMenuSection(WindowSections.Details))
-								}
-							>
-								{t("media")}
-							</button>
+							<DialogSectionButton
+								title={t("media")}
+								section={WindowSections.Details}
+							/>
 							{library?.type !== "Shows" ? (
 								<>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Logos
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(
-												changeMenuSection(WindowSections.Logos)
-											)
-										}
-									>
-										{t("logosButton")}
-									</button>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Posters
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(
-												changeMenuSection(WindowSections.Posters)
-											)
-										}
-									>
-										{t("postersButton")}
-									</button>
+									<DialogSectionButton
+										title={t("logosButton")}
+										section={WindowSections.Logos}
+									/>
+									<DialogSectionButton
+										title={t("postersButton")}
+										section={WindowSections.Posters}
+									/>
 								</>
-							) : series?.isCollection ? (
-								<button
-									className={`desktop-dialog-side-btn ${
-										menuSection === WindowSections.Logos
-											? " desktop-dialog-side-btn-active"
-											: ""
-									}`}
-									onClick={() =>
-										dispatch(changeMenuSection(WindowSections.Logos))
-									}
-								>
-									EtiquetasTEST
-								</button>
 							) : null}
 						</div>
 						<div className="dialog-center-right scroll">
 							{menuSection === WindowSections.General ? (
 								<>
-									<div className="dialog-input-box">
-										<span>{t("name")}</span>
-										<div
-											className={`dialog-input-lock ${
-												nameLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setNameLock(!nameLock)}
-											>
-												<LockIcon />
-											</a>
-											<input
-												type="text"
-												value={name}
-												onChange={(e) => {
-													setNameLock(true);
-													setName(e.target.value);
-												}}
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("sortingOrder")}</span>
-										<div
-											className={`dialog-input-lock ${
-												orderLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setOrderLock(!orderLock)}
-											>
-												<LockIcon />
-											</a>
-											<input
-												type="number"
-												value={order}
-												onChange={(e) => {
-													setOrderLock(true);
-													setOrder(
-														Number.parseInt(e.target.value) || 0
-													);
-												}}
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("year")}</span>
-										<div
-											className={`dialog-input-lock ${
-												yearLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setYearLock(!yearLock)}
-											>
-												<LockIcon />
-											</a>
-											<input
-												type="text"
-												value={year}
-												onChange={(e) => {
-													setYearLock(true);
-													setYear(e.target.value);
-												}}
-											/>
-										</div>
-									</div>
+									<DialogInput
+										type="text"
+										title={t("name")}
+										value={name}
+										setValue={setName}
+										lock={nameLock}
+										setLock={setNameLock}
+									/>
+									<DialogInput
+										type="number"
+										title={t("sortingOrder")}
+										value={order}
+										setValue={setOrder}
+										lock={orderLock}
+										setLock={setOrderLock}
+									/>
+									<DialogInput
+										type="text"
+										title={t("year")}
+										value={year}
+										setValue={setYear}
+										lock={yearLock}
+										setLock={setYearLock}
+									/>
 
-									{library?.type !== "Shows" ? (
+									{library?.type !== "Shows" && (
 										<>
-											<div className="dialog-input-box">
-												<span>{t("studios")}</span>
-												<div
-													className={`dialog-input-lock ${
-														studiosLock ? " locked" : ""
-													}`}
-												>
-													<a
-														href="#"
-														onClick={() =>
-															setStudiosLock(!studiosLock)
-														}
-													>
-														<LockIcon />
-													</a>
-													<TagsInput
-														value={studios}
-														onChange={setStudios}
-														name="studiosInput"
-														placeHolder=""
-													/>
-												</div>
-											</div>
-											<div className="dialog-input-box">
-												<span>{t("tagline")}</span>
-												<div
-													className={`dialog-input-lock ${
-														taglineLock ? " locked" : ""
-													}`}
-												>
-													<a
-														href="#"
-														onClick={() =>
-															setTaglineLock(!taglineLock)
-														}
-													>
-														<LockIcon />
-													</a>
-													<input
-														type="text"
-														value={tagline}
-														onChange={(e) => {
-															setTaglineLock(true);
-															setTagline(e.target.value);
-														}}
-													/>
-												</div>
-											</div>
-										</>
-									) : null}
-									<div className="dialog-input-box">
-										<span>{t("overview")}</span>
-										<div
-											className={`dialog-input-lock ${
-												overviewLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() =>
-													setOverviewLock(!overviewLock)
-												}
-											>
-												<LockIcon />
-											</a>
-											<textarea
-												rows={5}
-												value={overview}
-												onChange={(e) => {
-													setOverviewLock(true);
-													setOverview(e.target.value);
-												}}
+											<DialogTags
+												title={t("studios")}
+												value={studios}
+												setValue={setStudios}
+												lock={studiosLock}
+												setLock={setStudiosLock}
 											/>
-										</div>
-									</div>
+											<DialogInput
+												type="text"
+												title={t("tagline")}
+												value={tagline}
+												setValue={setTagline}
+												lock={taglineLock}
+												setLock={setTaglineLock}
+											/>
+										</>
+									)}
+
+									<DialogTextArea
+										title={t("overview")}
+										value={overview}
+										setValue={setOverview}
+										lock={overviewLock}
+										setLock={setOverviewLock}
+									/>
 								</>
 							) : menuSection === WindowSections.Tags ? (
 								<>
-									<div className="dialog-input-box">
-										<span>{t("genres")}</span>
-										<div
-											className={`dialog-input-lock ${
-												genresLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setGenresLock(!genresLock)}
-											>
-												<LockIcon />
-											</a>
-											<TagsInput
-												value={genres}
-												onChange={setGenres}
-												name="genresInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("createdBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												creatorLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setCreatorLock(!creatorLock)}
-											>
-												<LockIcon />
-											</a>
-											<TagsInput
-												value={creator}
-												onChange={setCreator}
-												name="creatorInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("directedBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												directedByLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() =>
-													setDirectedByLock(!directedByLock)
-												}
-											>
-												<LockIcon />
-											</a>
-											<TagsInput
-												value={directedBy}
-												onChange={setDirectedBy}
-												name="directedByInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("writtenBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												writtenByLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() =>
-													setWrittenByLock(!writtenByLock)
-												}
-											>
-												<LockIcon />
-											</a>
-											<TagsInput
-												value={writtenBy}
-												onChange={setWrittenBy}
-												name="writtenByInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("musicBy")}</span>
-										<div
-											className={`dialog-input-lock ${
-												musicLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setMusicLock(!musicLock)}
-											>
-												<LockIcon />
-											</a>
-											<TagsInput
-												value={music}
-												onChange={setMusic}
-												name="musicInput"
-												placeHolder=""
-											/>
-										</div>
-									</div>
+									<DialogTags
+										title={t("genres")}
+										value={genres}
+										setValue={setGenres}
+										lock={genresLock}
+										setLock={setGenresLock}
+									/>
+									<DialogTags
+										title={t("createdBy")}
+										value={creator}
+										setValue={setCreator}
+										lock={creatorLock}
+										setLock={setCreatorLock}
+									/>
+									<DialogTags
+										title={t("directedBy")}
+										value={directedBy}
+										setValue={setDirectedBy}
+										lock={directedByLock}
+										setLock={setDirectedByLock}
+									/>
+									<DialogTags
+										title={t("writtenBy")}
+										value={writtenBy}
+										setValue={setWrittenBy}
+										lock={writtenByLock}
+										setLock={setWrittenByLock}
+									/>
+									<DialogTags
+										title={t("musicBy")}
+										value={music}
+										setValue={setMusic}
+										lock={musicLock}
+										setLock={setMusicLock}
+									/>
 								</>
 							) : menuSection === WindowSections.Details ? (
 								<>
@@ -698,10 +522,7 @@ function SeasonWindow() {
 											>
 												{t("cancelButton")}
 											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
+											<button className="desktop-dialog-btn">
 												{t("loadButton")}
 											</button>
 										</div>
@@ -809,169 +630,41 @@ function SeasonWindow() {
 								</>
 							) : menuSection === WindowSections.Logos ? (
 								<>
-									{pasteUrl ? (
-										<div className="horizontal-center-align">
-											<div className="dialog-input-box">
-												<input
-													type="text"
-													placeholder={t("urlText")}
-													onChange={(e) => {
-														setImageUrl(e.target.value);
-													}}
-												/>
-											</div>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("cancelButton")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
-												{t("loadButton")}
-											</button>
-										</div>
-									) : (
-										<div className="horizontal-center-align">
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("selectImage")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(true)}
-											>
-												{t("fromURLButton")}
-											</button>
-										</div>
-									)}
-
-									<div className="dialog-images-scroll">
-										{logos.map((image, index) => (
-											<div
-												key={image}
-												className={`dialog-image-btn ${
-													image.split("\\").pop() === selectedLogo
-														? " dialog-image-btn-active"
-														: ""
-												}`}
-												onClick={() =>
-													selectLogo(image.split("\\").pop())
-												}
-											>
-												<img
-													src={`file://${image}`}
-													alt={`img-${index}`}
-													style={{ width: 290 }}
-												/>
-												{image.split("\\").pop() ===
-												selectedLogo ? (
-													<>
-														<div className="triangle-tick"></div>
-														<TickIcon />
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
+									<ImagesList
+										images={logos}
+										imageWidth={290}
+										imagesUrls={logosUrls}
+										setImagesUrls={setLogosUrls}
+										downloadPath={`resources/img/logos/${season?.id}/`}
+										selectedImage={selectedLogo}
+										selectImage={selectLogo}
+										setImageDownloaded={setImageDownloaded}
+									/>
 								</>
 							) : menuSection === WindowSections.Posters ? (
 								<>
-									{pasteUrl ? (
-										<div className="horizontal-center-align">
-											<div className="dialog-input-box">
-												<input
-													type="text"
-													placeholder={t("urlText")}
-													onChange={(e) => {
-														setImageUrl(e.target.value);
-													}}
-												/>
-											</div>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("cancelButton")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
-												{t("loadButton")}
-											</button>
-										</div>
-									) : (
-										<div className="horizontal-center-align">
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("selectImage")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(true)}
-											>
-												{t("fromURLButton")}
-											</button>
-										</div>
-									)}
-
-									<div className="dialog-images-scroll">
-										{posters.map((image, index) => (
-											<div
-												key={image}
-												className={`dialog-image-btn ${
-													image.split("\\").pop() ===
-													selectedPoster
-														? " dialog-image-btn-active"
-														: ""
-												}`}
-												onClick={() =>
-													selectPoster(image.split("\\").pop())
-												}
-											>
-												<img
-													src={`file://${image}`}
-													alt={`img-${index}`}
-													style={{ width: 185 }}
-												/>
-												{image.split("\\").pop() ===
-												selectedPoster ? (
-													<>
-														<div className="triangle-tick"></div>
-														<TickIcon />
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
+									<ImagesList
+										images={posters}
+										imageWidth={185}
+										imagesUrls={coversUrls}
+										setImagesUrls={setCoversUrls}
+										downloadPath={`resources/img/posters/${season?.id}/`}
+										selectedImage={selectedPoster}
+										selectImage={selectPoster}
+										setImageDownloaded={setImageDownloaded}
+									/>
 								</>
 							) : null}
 						</div>
 					</section>
-					<section className="dialog-bottom">
-						<button
-							className="desktop-dialog-btn"
-							onClick={() => dispatch(toggleSeasonWindow())}
-						>
-							{t("cancelButton")}
-						</button>
-						<button
-							className="btn-app-color"
-							onClick={() => handleSavingChanges()}
-						>
-							{t("saveButton")}
-						</button>
-					</section>
+					<DialogFooter
+						downloadingContent={downloadingContent}
+						handleSavingChanges={handleSavingChanges}
+						action={() => dispatch(toggleSeasonWindow())}
+					/>
 				</div>
 			</section>
-		</Suspense>
+		</>
 	);
 }
 

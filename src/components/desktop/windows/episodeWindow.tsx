@@ -8,13 +8,20 @@ import { toggleEpisodeWindow, updateEpisode } from "redux/slices/dataSlice";
 import { VideoTrackData } from "@interfaces/VideoTrackData";
 import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
-import { TagsInput } from "react-tag-input-component";
-import { LockIcon } from "@components/utils/IconLibrary";
+import { TickIcon } from "@components/utils/IconLibrary";
 import Loading from "@components/utils/Loading";
+import { useDownloadContext } from "context/download.context";
+import DialogHeader from "./utils/DialogHeader";
+import DialogSectionButton from "./utils/DialogSectionButton";
+import DialogInput from "./utils/DialogInput";
+import DialogTextArea from "./utils/DialogTextArea";
+import DialogTags from "./utils/DialogTags";
+import DialogFooter from "./utils/DialogFooter";
 
 function EpisodeWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
+	const { downloadingContent } = useDownloadContext();
 
 	const menuSection = useSelector(
 		(state: RootState) => state.sectionState.menuSection
@@ -116,6 +123,7 @@ function EpisodeWindow() {
 								writtenLock: selectedEpisode.writtenLock,
 								album: "",
 								albumArtist: "",
+								imgUrls: selectedEpisode.imgUrls,
 							},
 						})
 					);
@@ -276,6 +284,7 @@ function EpisodeWindow() {
 						subtitleTracks: selectedEpisode.subtitleTracks,
 						album: "",
 						albumArtist: "",
+						imgUrls: selectedEpisode.imgUrls,
 					},
 				})
 			);
@@ -303,201 +312,80 @@ function EpisodeWindow() {
 					onClick={() => dispatch(toggleEpisodeWindow())}
 				></div>
 				<div className="dialog-box">
-					<section className="dialog-top">
-						<span>
-							{t("editButton") +
-								": " +
-								selectedSeries?.name +
-								" - " +
-								selectedEpisode?.name}
-						</span>
-						<button
-							className="close-window-btn"
-							onClick={() => dispatch(toggleEpisodeWindow())}
-						>
-							<img
-								src="./src/assets/svg/windowClose.svg"
-								style={{
-									width: "24px",
-									height: "24px",
-									filter: "drop-shadow(2px 1px 2px rgb(0 0 0 / 0.5))",
-								}}
-							/>
-						</button>
-					</section>
+					<DialogHeader
+						title={
+							t("editButton") +
+							": " +
+							selectedSeries?.name +
+							" - " +
+							selectedEpisode?.name
+						}
+						onClose={() => dispatch(toggleEpisodeWindow())}
+					/>
 					<section className="dialog-center">
 						<div className="dialog-center-left">
-							<button
-								className={`desktop-dialog-side-btn ${
-									menuSection === WindowSections.General
-										? " desktop-dialog-side-btn-active"
-										: ""
-								}`}
-								onClick={() =>
-									dispatch(changeMenuSection(WindowSections.General))
-								}
-							>
-								{t("generalButton")}
-							</button>
-							{selectedLibrary?.type !== "Music" ? (
+							<DialogSectionButton
+								title={t("generalButton")}
+								section={WindowSections.General}
+							/>
+							{selectedLibrary?.type !== "Music" && (
 								<>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Thumbnails
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(changeMenuSection(WindowSections.Thumbnails))
-										}
-									>
-										{t("thumbnailsButton")}
-									</button>
-									<button
-										className={`desktop-dialog-side-btn ${
-											menuSection === WindowSections.Details
-												? " desktop-dialog-side-btn-active"
-												: ""
-										}`}
-										onClick={() =>
-											dispatch(changeMenuSection(WindowSections.Details))
-										}
-									>
-										{t("details")}
-									</button>
+									<DialogSectionButton
+										title={t("thumbnailsButton")}
+										section={WindowSections.Thumbnails}
+									/>
+									<DialogSectionButton
+										title={t("details")}
+										section={WindowSections.Details}
+									/>
 								</>
-							) : null}
+							)}
 						</div>
 						<div className="dialog-center-right scroll">
 							{menuSection == WindowSections.General ? (
 								<>
-									<div className="dialog-input-box">
-										<span>{t("name")}</span>
-										<div
-											className={`dialog-input-lock ${
-												nameLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setNameLock(!nameLock)}
-											>
-												<LockIcon />
-											</a>
-											<input
-												type="text"
-												value={name}
-												onChange={(e) => {
-													setNameLock(true);
-													setName(e.target.value);
-												}}
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("year")}</span>
-										<div
-											className={`dialog-input-lock ${
-												yearLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() => setYearLock(!yearLock)}
-											>
-												<LockIcon />
-											</a>
-											<input
-												type="text"
-												value={year}
-												onChange={(e) => {
-													setYearLock(true);
-													setYear(e.target.value);
-												}}
-											/>
-										</div>
-									</div>
-									<div className="dialog-input-box">
-										<span>{t("overview")}</span>
-										<div
-											className={`dialog-input-lock ${
-												overviewLock ? " locked" : ""
-											}`}
-										>
-											<a
-												href="#"
-												onClick={() =>
-													setOverviewLock(!overviewLock)
-												}
-											>
-												<LockIcon />
-											</a>
-											<textarea
-												rows={5}
-												value={overview}
-												onChange={(e) => {
-													setOverviewLock(true);
-													setOverview(e.target.value);
-												}}
-											/>
-										</div>
-									</div>
+									<DialogInput
+										type="text"
+										title={t("name")}
+										value={name}
+										setValue={setName}
+										lock={nameLock}
+										setLock={setNameLock}
+									/>
+									<DialogInput
+										type="text"
+										title={t("year")}
+										value={year}
+										setValue={setYear}
+										lock={yearLock}
+										setLock={setYearLock}
+									/>
+									<DialogTextArea
+										title={t("overview")}
+										value={overview}
+										setValue={setOverview}
+										lock={overviewLock}
+										setLock={setOverviewLock}
+									/>
 									{selectedLibrary?.type === "Shows" &&
-									selectedEpisode ? (
-										<div className="dialog-input-box">
-											<span>{t("directedBy")}</span>
-											<div
-												className={`dialog-input-lock ${
-													directedLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() =>
-														setDirectedLock(!directedLock)
-													}
-												>
-													<LockIcon />
-												</a>
-												<TagsInput
+										selectedEpisode && (
+											<>
+												<DialogTags
+													title={t("directedBy")}
 													value={directedBy}
-													onChange={setDirectedBy}
-													name="directedByInput"
-													placeHolder=""
+													setValue={setDirectedBy}
+													lock={directedLock}
+													setLock={setDirectedLock}
 												/>
-											</div>
-										</div>
-									) : (
-										<></>
-									)}
-									{selectedLibrary?.type === "Shows" &&
-									selectedEpisode ? (
-										<div className="dialog-input-box">
-											<span>{t("writtenBy")}</span>
-											<div
-												className={`dialog-input-lock ${
-													writtenLock ? " locked" : ""
-												}`}
-											>
-												<a
-													href="#"
-													onClick={() =>
-														setWrittenLock(!writtenLock)
-													}
-												>
-													<LockIcon />
-												</a>
-												<TagsInput
+												<DialogTags
+													title={t("writtenBy")}
 													value={writtenBy}
-													onChange={setWrittenBy}
-													name="writtenByInput"
-													placeHolder=""
+													setValue={setWrittenBy}
+													lock={writtenLock}
+													setLock={setWrittenLock}
 												/>
-											</div>
-										</div>
-									) : (
-										<></>
-									)}
+											</>
+										)}
 								</>
 							) : menuSection == WindowSections.Thumbnails ? (
 								<>
@@ -564,20 +452,7 @@ function EpisodeWindow() {
 												selectedImage ? (
 													<>
 														<div className="triangle-tick"></div>
-														<svg
-															aria-hidden="true"
-															height="24"
-															viewBox="0 0 48 48"
-															width="24"
-															xmlns="http://www.w3.org/2000/svg"
-														>
-															<path
-																clipRule="evenodd"
-																d="M4 24.7518L18.6461 39.4008L44 14.0497L38.9502 9L18.6461 29.3069L9.04416 19.7076L4 24.7518Z"
-																fill="#EEEEEE"
-																fillRule="evenodd"
-															></path>
-														</svg>
+														<TickIcon />
 													</>
 												) : null}
 											</div>
@@ -669,29 +544,18 @@ function EpisodeWindow() {
 										</section>
 									</div>
 								</>
-							) : (
-								<></>
-							)}
+							) : null}
 						</div>
 					</section>
-					<section className="dialog-bottom">
-						<button
-							className="desktop-dialog-btn"
-							onClick={() => dispatch(toggleEpisodeWindow())}
-						>
-							{t("cancelButton")}
-						</button>
-						<button
-							className="btn-app-color"
-							onClick={() => handleSavingChanges()}
-						>
-							{t("saveButton")}
-						</button>
-					</section>
+					<DialogFooter
+						downloadingContent={downloadingContent}
+						handleSavingChanges={handleSavingChanges}
+						action={() => dispatch(toggleEpisodeWindow())}
+					/>
 				</div>
 			</section>
 		</Suspense>
 	);
-};
+}
 
 export default EpisodeWindow;
