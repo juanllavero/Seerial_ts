@@ -22,6 +22,7 @@ import DialogTags from "./utils/DialogTags";
 import DialogTextArea from "./utils/DialogTextArea";
 import DialogSectionButton from "./utils/DialogSectionButton";
 import DialogFooter from "./utils/DialogFooter";
+import { ReactUtils } from "@data/utils/ReactUtils";
 
 function SeasonWindow() {
 	const dispatch = useDispatch();
@@ -32,6 +33,7 @@ function SeasonWindow() {
 		showWindow,
 		setShowWindow,
 		downloadingContent,
+		setDownloadingContent,
 	} = useDownloadContext();
 
 	const menuSection = useSelector(
@@ -174,13 +176,9 @@ function SeasonWindow() {
 		if (!downloadingContent) {
 			if (videoContent) {
 				setVideoSrc("resources/video/" + season?.id + ".webm");
-			} else {
-				setMusicSrc("resources/music/" + season?.id + ".opus");
-			}
-
-			if (videoContent) {
 				fetchResolvedPath("resources/video/" + season?.id + ".webm", true);
 			} else {
+				setMusicSrc("resources/music/" + season?.id + ".opus");
 				fetchResolvedPath("resources/music/" + season?.id + ".opus", false);
 			}
 		}
@@ -230,8 +228,13 @@ function SeasonWindow() {
 	};
 
 	const handleSavingChanges = async () => {
+		setDownloadingContent(true);
+
 		if (season) {
 			await handleDownloadUrls();
+
+			// Wait 1s for the images to download
+			await ReactUtils.delay(1000);
 
 			dispatch(
 				updateSeason({
@@ -305,6 +308,7 @@ function SeasonWindow() {
 			);
 		}
 
+		setDownloadingContent(false);
 		dispatch(toggleSeasonWindow());
 	};
 

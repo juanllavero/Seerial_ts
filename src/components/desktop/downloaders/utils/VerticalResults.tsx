@@ -13,10 +13,7 @@ function VerticalResults() {
 			<div className="results-container">
 				{results && results.length > 0 ? (
 					results.map((result: MediaSearchResult) => (
-						<ResultCard
-							key={result.id}
-							result={result}
-						/>
+						<ResultCard key={result.id} result={result} />
 					))
 				) : (
 					<div>No results found</div>

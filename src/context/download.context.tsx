@@ -1,3 +1,4 @@
+import { ReactUtils } from "@data/utils/ReactUtils";
 import { MediaSearchResult } from "@interfaces/SearchResults";
 import React, { useContext, useEffect } from "react";
 
@@ -55,10 +56,12 @@ export const DownloadProvider = ({
 			setDownloadedPercentage(progress);
 		});
 
-		window.ipcRenderer.on("download-complete", (_event, _fileName) => {
+		window.ipcRenderer.on("download-complete", async (_event, _fileName) => {
 			setDownloadingContent(false);
 			setDownloadedPercentage(0);
 			console.log(_fileName);
+
+			await ReactUtils.delay(1000);
 		});
 
 		window.ipcRenderer.on("download-error", (_event, _error) => {

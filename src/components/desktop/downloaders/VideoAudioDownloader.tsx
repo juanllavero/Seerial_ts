@@ -8,18 +8,25 @@ import ProgressPopUp from "./utils/ProgressPopUp";
 
 function VideoAudioDownloader() {
 	const { t } = useTranslation();
-	const { videoContent, setShowWindow, downloadingContent } = useDownloadContext();
+	const { videoContent, setShowWindow, downloadingContent } =
+		useDownloadContext();
+
 	return (
 		<div className="downloader-container">
-      <div className="downloader-background" onClick={() => setShowWindow(false)}></div>
+			<div
+				className="downloader-background"
+				onClick={() => setShowWindow(false)}
+			></div>
 			<div className="downloader-window">
-        {downloadingContent && <ProgressPopUp />}
+				{downloadingContent && <ProgressPopUp />}
 				<header>
 					<span>
 						{videoContent ? t("searchVideos") : t("searchMusic")}
 					</span>
-					<button className="svg-button-desktop-transparent"
-          onClick={() => setShowWindow(false)}>
+					<button
+						className="svg-button-desktop-transparent"
+						onClick={() => setShowWindow(false)}
+					>
 						<WindowCloseIcon />
 					</button>
 				</header>
