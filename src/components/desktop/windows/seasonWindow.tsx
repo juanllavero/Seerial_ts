@@ -23,6 +23,7 @@ import DialogTextArea from "./utils/DialogTextArea";
 import DialogSectionButton from "./utils/DialogSectionButton";
 import DialogFooter from "./utils/DialogFooter";
 import { ReactUtils } from "@data/utils/ReactUtils";
+import DialogDownloading from "./utils/DialogDownloading";
 
 function SeasonWindow() {
 	const dispatch = useDispatch();
@@ -215,6 +216,9 @@ function SeasonWindow() {
 				selectedLogo,
 				"resources/img/logos/" + season.id + "/"
 			);
+
+			// Wait 1s for the images to download
+			await ReactUtils.delay(1000);
 		}
 
 		if (selectedPoster && coversUrls.includes(selectedPoster)) {
@@ -222,6 +226,9 @@ function SeasonWindow() {
 				selectedPoster,
 				"resources/img/posters/" + season.id + "/"
 			);
+
+			// Wait 1s for the images to download
+			await ReactUtils.delay(1000);
 		}
 
 		return true;
@@ -232,9 +239,6 @@ function SeasonWindow() {
 
 		if (season) {
 			await handleDownloadUrls();
-
-			// Wait 1s for the images to download
-			await ReactUtils.delay(1000);
 
 			dispatch(
 				updateSeason({
@@ -327,6 +331,7 @@ function SeasonWindow() {
 					}}
 				></div>
 				<div className="dialog-box">
+					<DialogDownloading downloadingContent={downloadingContent} />
 					<DialogHeader
 						title={
 							t("editButton") +
