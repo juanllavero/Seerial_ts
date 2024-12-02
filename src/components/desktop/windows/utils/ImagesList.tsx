@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ImageCard from "./ImageCard";
-import { use } from "i18next";
 import { useDownloadContext } from "context/download.context";
 
 function ImagesList({
@@ -24,23 +23,35 @@ function ImagesList({
 	setImageDownloaded: (imageDownloaded: boolean) => void;
 }) {
 	const { t } = useTranslation();
-   const { setDownloadingContent } = useDownloadContext();
+	const { setDownloadingContent } = useDownloadContext();
 
 	const [pasteUrl, setPasteUrl] = useState<boolean>(false);
 	const [imageUrl, setImageUrl] = useState<string>("");
 
 	const handleDownload = () => {
 		setPasteUrl(false);
-      setDownloadingContent(true);
+		setDownloadingContent(true);
 		window.ipcRenderer
 			.invoke("download-image-url", imageUrl, downloadPath)
 			.then(() => {
 				setImageDownloaded(true);
-            setDownloadingContent(false);
-			}).catch((_e) => {
-            setDownloadingContent(false);
-         });
+				setDownloadingContent(false);
+			})
+			.catch((_e) => {
+				setDownloadingContent(false);
+			});
 	};
+
+	// Preprocess the names of the images in `images` and store them in a Set
+	const imageNamesSet = new Set(
+		images.map((image) => image.split("\\").pop()?.toLowerCase())
+	);
+
+	// Filter the URLs whose name is not in the Set
+	const filteredImagesUrls = imagesUrls.filter((imageUrl) => {
+		const imageNameFromUrl = imageUrl.split("/").pop()?.toLowerCase();
+		return imageNameFromUrl && !imageNamesSet.has(imageNameFromUrl);
+	});
 
 	const handleImageLoad = () => {
 		const input = document.createElement("input");
@@ -54,15 +65,16 @@ function ImagesList({
 					const originalPath = file.path;
 					const destPath = downloadPath + file.name;
 
-               setDownloadingContent(true);
+					setDownloadingContent(true);
 					window.ipcRenderer
 						.invoke("copy-image-file", originalPath, destPath)
 						.then(() => {
-                     setImageDownloaded(true);
-                     setDownloadingContent(false);
-                  }).catch((_e) => {
-                     setDownloadingContent(false);
-                  });
+							setImageDownloaded(true);
+							setDownloadingContent(false);
+						})
+						.catch((_e) => {
+							setDownloadingContent(false);
+						});
 				};
 				reader.readAsDataURL(file);
 			}
@@ -89,7 +101,10 @@ function ImagesList({
 					>
 						{t("cancelButton")}
 					</button>
-					<button className="desktop-dialog-btn" onClick={() => handleDownload()}>
+					<button
+						className="desktop-dialog-btn"
+						onClick={() => handleDownload()}
+					>
 						{t("loadButton")}
 					</button>
 				</div>
@@ -110,30 +125,32 @@ function ImagesList({
 				</div>
 			)}
 			<div className="dialog-images-scroll">
-				{images.map((image: string, index: number) => (
-					<ImageCard
-						key={image}
-						image={image}
-						imageWidth={imageWidth}
-						index={index}
-						selectImage={selectImage}
-						selectedImage={selectedImage}
-						imagePath={`file://${image}`}
-						isUrl={false}
-					/>
-				))}
-				{imagesUrls.map((image: string, index: number) => (
-					<ImageCard
-						key={image}
-						image={image}
-						imageWidth={imageWidth}
-						index={index}
-						selectImage={selectImage}
-						selectedImage={selectedImage}
-						imagePath={image}
-						isUrl={true}
-					/>
-				))}
+				{images &&
+					images.map((image: string, index: number) => (
+						<ImageCard
+							key={image}
+							image={image}
+							imageWidth={imageWidth}
+							index={index}
+							selectImage={selectImage}
+							selectedImage={selectedImage}
+							imagePath={`file://${image}`}
+							isUrl={false}
+						/>
+					))}
+				{filteredImagesUrls &&
+					filteredImagesUrls.map((image: string, index: number) => (
+						<ImageCard
+							key={image}
+							image={image}
+							imageWidth={imageWidth}
+							index={index}
+							selectImage={selectImage}
+							selectedImage={selectedImage}
+							imagePath={image}
+							isUrl={true}
+						/>
+					))}
 			</div>
 		</>
 	);

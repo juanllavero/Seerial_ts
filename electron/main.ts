@@ -184,14 +184,22 @@ ipcMain.handle(
 				responseType: "stream",
 			});
 
-			// Save image
-			const writer = fs.createWriteStream(imagePath);
-			response.data.pipe(writer);
+			// Save image with a promise
+			await new Promise((resolve, reject) => {
+				const writer = fs.createWriteStream(imagePath);
+				response.data.pipe(writer);
+				writer.on("finish", resolve);
+				writer.on("error", reject);
+			});
+
+			return true; // Successfully downloaded and saved
 		} catch (error: any) {
 			console.error(
 				"download-error",
 				`Error downloading image: ${error.message}`
 			);
+			
+			return false;
 		}
 	}
 );

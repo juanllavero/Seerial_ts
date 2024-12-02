@@ -13,11 +13,13 @@ import DialogTextArea from "./utils/DialogTextArea";
 import DialogTags from "./utils/DialogTags";
 import DialogFooter from "./utils/DialogFooter";
 import { useDownloadContext } from "context/download.context";
+import DialogDownloading from "./utils/DialogDownloading";
+import ImagesList from "./utils/ImagesList";
 
 function SeriesWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
-	const { downloadingContent } = useDownloadContext();
+	const { downloadingContent, setDownloadingContent } = useDownloadContext();
 
 	const menuSection = useSelector(
 		(state: RootState) => state.sectionState.menuSection
@@ -41,6 +43,10 @@ function SeriesWindow() {
 		undefined
 	);
 
+	const [logosUrls, setLogosUrls] = useState<string[]>([]);
+	const [coversUrls, setCoversUrls] = useState<string[]>([]);
+
+	//#region ATTRIBUTES
 	const [nameLock, setNameLock] = useState<boolean>(false);
 	const [yearLock, setYearLock] = useState<boolean>(false);
 	const [overviewLock, setOverviewLock] = useState<boolean>(false);
@@ -60,7 +66,9 @@ function SeriesWindow() {
 	const [studios, setStudios] = useState<string[]>([]);
 	const [creator, setCreator] = useState<string[]>([]);
 	const [music, setMusic] = useState<string[]>([]);
+	//#endregion
 
+	// Fetch images
 	useEffect(() => {
 		const fetchLogos = async () => {
 			setPasteUrl(false);
@@ -77,7 +85,6 @@ function SeriesWindow() {
 		};
 
 		const fetchPosters = async () => {
-			console.log(series);
 			const posterPath = await window.electronAPI.getExternalPath(
 				"resources/img/posters/" + series?.id + "/"
 			);
@@ -94,13 +101,16 @@ function SeriesWindow() {
 		} else if (menuSection === WindowSections.Posters && series) {
 			fetchPosters().then(() => setImageDownloaded(false));
 		}
-	}, [menuSection, imageDownloaded]);
+	}, [menuSection, imageDownloaded, series]);
 
+	// Initialize attributes
 	useEffect(() => {
 		if (seriesMenuOpen && series) {
 			let noImages: string[] = [];
 			setPosters(noImages);
 			setLogos(noImages);
+			setLogosUrls(series.logosUrls);
+			setCoversUrls(series.coversUrls);
 			dispatch(changeMenuSection(WindowSections.General));
 
 			if (library?.type === "Shows") {
@@ -137,8 +147,41 @@ function SeriesWindow() {
 		});
 	}, []);
 
-	const handleSavingChanges = () => {
+	const downloadUrlImage = async (url: string, downloadPath: string) => {
+		setPasteUrl(false);
+		return await window.ipcRenderer.invoke(
+			"download-image-url",
+			url,
+			downloadPath
+		);
+	};
+
+	const handleDownloadUrls = async (): Promise<boolean> => {
+		if (!series) return false;
+
+		if (selectedLogo && logosUrls.includes(selectedLogo)) {
+			await downloadUrlImage(
+				selectedLogo,
+				"resources/img/logos/" + series.id + "/"
+			);
+		}
+
+		if (selectedPoster && coversUrls.includes(selectedPoster)) {
+			await downloadUrlImage(
+				selectedPoster,
+				"resources/img/posters/" + series.id + "/"
+			);
+		}
+
+		return true;
+	};
+
+	const handleSavingChanges = async () => {
+		setDownloadingContent(true);
+
 		if (library && series) {
+			await handleDownloadUrls();
+
 			dispatch(
 				updateSeries({
 					libraryId: library.id,
@@ -155,15 +198,27 @@ function SeriesWindow() {
 						creator: creatorLock ? creator : series.creator,
 						musicComposer: musicLock ? music : series.musicComposer,
 						logoSrc: selectedLogo
-							? "resources/img/logos/" + series.id + "/" + selectedLogo
+							? selectedLogo.startsWith("http")
+								? "resources/img/logos/" +
+								  series.id +
+								  "/" +
+								  selectedLogo.split("/").pop()
+								: "resources/img/logos/" +
+								  series.id +
+								  "/" +
+								  selectedLogo
 							: series.logoSrc,
 						coverSrc: selectedPoster
-							? "resources/img/posters/" +
-							  series.id +
-							  "/" +
-							  selectedPoster
+							? selectedPoster.startsWith("http")
+								? "resources/img/posters/" +
+								  series.id +
+								  "/" +
+								  selectedPoster.split("/").pop()
+								: "resources/img/posters/" +
+								  series.id +
+								  "/" +
+								  selectedPoster
 							: series.coverSrc,
-
 						nameLock: nameLock ?? series.nameLock,
 						yearLock: yearLock ?? series.yearLock,
 						overviewLock: overviewLock ?? series.overviewLock,
@@ -194,16 +249,8 @@ function SeriesWindow() {
 			);
 		}
 
+		setDownloadingContent(false);
 		dispatch(toggleSeriesWindow());
-	};
-
-	const handleDownload = () => {
-		setPasteUrl(false);
-		window.ipcRenderer.send(
-			"download-image-url",
-			imageUrl,
-			"resources/img/posters/" + series?.id + "/"
-		);
 	};
 
 	return (
@@ -216,6 +263,7 @@ function SeriesWindow() {
 					onClick={() => dispatch(toggleSeriesWindow())}
 				></div>
 				<div className="dialog-box">
+					<DialogDownloading downloadingContent={downloadingContent} />
 					<DialogHeader
 						title={t("editButton") + ": " + series?.name}
 						onClose={() => dispatch(toggleSeriesWindow())}
@@ -328,176 +376,27 @@ function SeriesWindow() {
 									/>
 								</>
 							) : menuSection === WindowSections.Logos ? (
-								<>
-									{pasteUrl ? (
-										<div className="horizontal-center-align">
-											<div className="dialog-input-box">
-												<input
-													type="text"
-													placeholder={t("urlText")}
-													onChange={(e) => {
-														setImageUrl(e.target.value);
-													}}
-												/>
-											</div>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("cancelButton")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
-												{t("loadButton")}
-											</button>
-										</div>
-									) : (
-										<div className="horizontal-center-align">
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("selectImage")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(true)}
-											>
-												{t("fromURLButton")}
-											</button>
-										</div>
-									)}
-
-									<div className="dialog-images-scroll">
-										{logos.map((image, index) => (
-											<div
-												key={image}
-												className={`dialog-image-btn ${
-													image.split("\\").pop() === selectedLogo
-														? " dialog-image-btn-active"
-														: ""
-												}`}
-												onClick={() =>
-													selectLogo(image.split("\\").pop())
-												}
-											>
-												<img
-													src={`file://${image}`}
-													alt={`img-${index}`}
-													style={{ width: 290 }}
-												/>
-												{image.split("\\").pop() ===
-												selectedLogo ? (
-													<>
-														<div className="triangle-tick"></div>
-														<svg
-															aria-hidden="true"
-															height="24"
-															viewBox="0 0 48 48"
-															width="24"
-															xmlns="http://www.w3.org/2000/svg"
-														>
-															<path
-																clipRule="evenodd"
-																d="M4 24.7518L18.6461 39.4008L44 14.0497L38.9502 9L18.6461 29.3069L9.04416 19.7076L4 24.7518Z"
-																fill="#EEEEEE"
-																fillRule="evenodd"
-															></path>
-														</svg>
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
-								</>
+								<ImagesList
+									images={logos}
+									imageWidth={290}
+									imagesUrls={logosUrls}
+									setImagesUrls={setLogosUrls}
+									downloadPath={`resources/img/logos/${series?.id}/`}
+									selectedImage={selectedLogo}
+									selectImage={selectLogo}
+									setImageDownloaded={setImageDownloaded}
+								/>
 							) : menuSection === WindowSections.Posters ? (
-								<>
-									{pasteUrl ? (
-										<div className="horizontal-center-align">
-											<div className="dialog-input-box">
-												<input
-													type="text"
-													placeholder={t("urlText")}
-													onChange={(e) => {
-														setImageUrl(e.target.value);
-													}}
-												/>
-											</div>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("cancelButton")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
-												{t("loadButton")}
-											</button>
-										</div>
-									) : (
-										<div className="horizontal-center-align">
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("selectImage")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(true)}
-											>
-												{t("fromURLButton")}
-											</button>
-										</div>
-									)}
-
-									<div className="dialog-images-scroll">
-										{posters.map((image, index) => (
-											<div
-												key={image}
-												className={`dialog-image-btn ${
-													image.split("\\").pop() ===
-													selectedPoster
-														? " dialog-image-btn-active"
-														: ""
-												}`}
-												onClick={() =>
-													selectPoster(image.split("\\").pop())
-												}
-											>
-												<img
-													src={`file://${image}`}
-													alt={`img-${index}`}
-													style={{ width: 185 }}
-												/>
-												{image.split("\\").pop() ===
-												selectedPoster ? (
-													<>
-														<div className="triangle-tick"></div>
-														<svg
-															aria-hidden="true"
-															height="24"
-															viewBox="0 0 48 48"
-															width="24"
-															xmlns="http://www.w3.org/2000/svg"
-														>
-															<path
-																clipRule="evenodd"
-																d="M4 24.7518L18.6461 39.4008L44 14.0497L38.9502 9L18.6461 29.3069L9.04416 19.7076L4 24.7518Z"
-																fill="#EEEEEE"
-																fillRule="evenodd"
-															></path>
-														</svg>
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
-								</>
+								<ImagesList
+									images={posters}
+									imageWidth={185}
+									imagesUrls={coversUrls}
+									setImagesUrls={setCoversUrls}
+									downloadPath={`resources/img/posters/${series?.id}/`}
+									selectedImage={selectedPoster}
+									selectImage={selectPoster}
+									setImageDownloaded={setImageDownloaded}
+								/>
 							) : null}
 						</div>
 					</section>

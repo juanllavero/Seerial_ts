@@ -17,11 +17,13 @@ import DialogInput from "./utils/DialogInput";
 import DialogTextArea from "./utils/DialogTextArea";
 import DialogTags from "./utils/DialogTags";
 import DialogFooter from "./utils/DialogFooter";
+import DialogDownloading from "./utils/DialogDownloading";
+import ImagesList from "./utils/ImagesList";
 
 function EpisodeWindow() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
-	const { downloadingContent } = useDownloadContext();
+	const { downloadingContent, setDownloadingContent } = useDownloadContext();
 
 	const menuSection = useSelector(
 		(state: RootState) => state.sectionState.menuSection
@@ -45,7 +47,9 @@ function EpisodeWindow() {
 
 	const [images, setImages] = useState<string[]>([]);
 	const [selectedImage, selectImage] = useState<string | undefined>(undefined);
+	const [imagesUrls, setImagesUrls] = useState<string[]>([]);
 
+	//#region ATTRIBUTES
 	const [nameLock, setNameLock] = useState<boolean>(false);
 	const [yearLock, setYearLock] = useState<boolean>(false);
 	const [overviewLock, setOverviewLock] = useState<boolean>(false);
@@ -57,6 +61,7 @@ function EpisodeWindow() {
 	const [overview, setOverview] = useState<string>("");
 	const [directedBy, setDirectedBy] = useState<string[]>([]);
 	const [writtenBy, setWrittenBy] = useState<string[]>([]);
+	//#endregion
 
 	useEffect(() => {
 		const fetchImages = async () => {
@@ -83,6 +88,7 @@ function EpisodeWindow() {
 		if (episodeMenuOpen && selectedEpisode) {
 			let noImages: string[] = [];
 			setImages(noImages);
+			setImagesUrls(selectedEpisode.imgUrls);
 			dispatch(changeMenuSection(WindowSections.General));
 
 			// @ts-ignore
@@ -243,8 +249,12 @@ function EpisodeWindow() {
 		);
 	};
 
-	const handleSavingChanges = () => {
+	const handleSavingChanges = async () => {
+		setDownloadingContent(true);
+
 		if (selectedEpisode && selectedSeries && selectedLibrary) {
+			await handleDownloadUrls();
+
 			dispatch(
 				updateEpisode({
 					libraryId: selectedLibrary.id,
@@ -255,10 +265,15 @@ function EpisodeWindow() {
 						year: year,
 						order: selectedEpisode.order,
 						imgSrc: selectedImage
-							? "resources/img/thumbnails/video/" +
-							  selectedEpisode?.id +
-							  "/" +
-							  selectedImage
+							? selectedImage.startsWith("http")
+								? "resources/img/thumbnails/video/" +
+								  selectedEpisode.id +
+								  "/" +
+								  selectedImage.split("/").pop()
+								: "resources/img/thumbnails/video/" +
+								  selectedEpisode.id +
+								  "/" +
+								  selectedImage
 							: selectedEpisode.imgSrc,
 						directedBy: directedBy,
 						writtenBy: writtenBy,
@@ -290,16 +305,30 @@ function EpisodeWindow() {
 			);
 		}
 
+		setDownloadingContent(false);
 		dispatch(toggleEpisodeWindow());
 	};
 
-	const handleDownload = () => {
+	const downloadUrlImage = async (url: string, downloadPath: string) => {
 		setPasteUrl(false);
-		window.ipcRenderer.send(
+		return await window.ipcRenderer.invoke(
 			"download-image-url",
-			imageUrl,
-			"resources/img/thumbnails/video/" + selectedEpisode?.id + "/"
+			url,
+			downloadPath
 		);
+	};
+
+	const handleDownloadUrls = async (): Promise<boolean> => {
+		if (!selectedEpisode) return false;
+
+		if (selectedImage && imagesUrls.includes(selectedImage)) {
+			await downloadUrlImage(
+				selectedImage,
+				"resources/img/thumbnails/video/" + selectedEpisode.id + "/"
+			);
+		}
+
+		return true;
 	};
 
 	return (
@@ -312,6 +341,7 @@ function EpisodeWindow() {
 					onClick={() => dispatch(toggleEpisodeWindow())}
 				></div>
 				<div className="dialog-box">
+					<DialogDownloading downloadingContent={downloadingContent} />
 					<DialogHeader
 						title={
 							t("editButton") +
@@ -388,77 +418,16 @@ function EpisodeWindow() {
 										)}
 								</>
 							) : menuSection == WindowSections.Thumbnails ? (
-								<>
-									{pasteUrl ? (
-										<div className="horizontal-center-align">
-											<div className="dialog-input-box">
-												<input
-													type="text"
-													placeholder={t("urlText")}
-													onChange={(e) => {
-														setImageUrl(e.target.value);
-													}}
-												/>
-											</div>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("cancelButton")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={handleDownload}
-											>
-												{t("loadButton")}
-											</button>
-										</div>
-									) : (
-										<div className="horizontal-center-align">
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(false)}
-											>
-												{t("selectImage")}
-											</button>
-											<button
-												className="desktop-dialog-btn"
-												onClick={() => setPasteUrl(true)}
-											>
-												{t("fromURLButton")}
-											</button>
-										</div>
-									)}
-
-									<div className="dialog-images-scroll">
-										{images.map((image, index) => (
-											<div
-												key={image}
-												className={`dialog-image-btn ${
-													image.split("\\").pop() === selectedImage
-														? " dialog-image-btn-active"
-														: ""
-												}`}
-												onClick={() =>
-													selectImage(image.split("\\").pop())
-												}
-											>
-												<img
-													src={`file://${image}`}
-													alt={`img-${index}`}
-													style={{ width: 290 }}
-												/>
-												{image.split("\\").pop() ===
-												selectedImage ? (
-													<>
-														<div className="triangle-tick"></div>
-														<TickIcon />
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
-								</>
+								<ImagesList
+									images={images}
+									imageWidth={290}
+									imagesUrls={imagesUrls}
+									setImagesUrls={setImagesUrls}
+									downloadPath={`resources/img/thumbnails/video/${selectedEpisode?.id}/`}
+									selectedImage={selectedImage}
+									selectImage={selectImage}
+									setImageDownloaded={setImageDownloaded}
+								/>
 							) : menuSection == WindowSections.Details ? (
 								<>
 									<div className="dialog-horizontal-box">

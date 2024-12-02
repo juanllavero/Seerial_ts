@@ -22,7 +22,6 @@ import DialogTags from "./utils/DialogTags";
 import DialogTextArea from "./utils/DialogTextArea";
 import DialogSectionButton from "./utils/DialogSectionButton";
 import DialogFooter from "./utils/DialogFooter";
-import { ReactUtils } from "@data/utils/ReactUtils";
 import DialogDownloading from "./utils/DialogDownloading";
 
 function SeasonWindow() {
@@ -65,6 +64,7 @@ function SeasonWindow() {
 	const [logosUrls, setLogosUrls] = useState<string[]>([]);
 	const [coversUrls, setCoversUrls] = useState<string[]>([]);
 
+	//#region ATTRIBUTES
 	const [nameLock, setNameLock] = useState<boolean>(false);
 	const [orderLock, setOrderLock] = useState<boolean>(false);
 	const [yearLock, setYearLock] = useState<boolean>(false);
@@ -92,7 +92,9 @@ function SeasonWindow() {
 	const [musicSrc, setMusicSrc] = useState<string>("");
 	const [extVideoSrc, setExtVideoSrc] = useState<string>("");
 	const [extMusicSrc, setExtMusicSrc] = useState<string>("");
+	//#endregion
 
+	// Fetch images
 	useEffect(() => {
 		const fetchLogos = async () => {
 			setPasteUrl(false);
@@ -127,6 +129,7 @@ function SeasonWindow() {
 		}
 	}, [menuSection, imageDownloaded, season]);
 
+	// Initialize attributes
 	useEffect(() => {
 		if (seasonMenuOpen && season) {
 			let noImages: string[] = [];
@@ -166,6 +169,7 @@ function SeasonWindow() {
 		}
 	}, [seasonMenuOpen]);
 
+	//#region MUSIC AND VIDEO DOWNLOAD
 	const fetchResolvedPath = async (src: string, isVideo: boolean) => {
 		let absolutePath = await window.electronAPI.getExternalPath(src);
 
@@ -184,6 +188,7 @@ function SeasonWindow() {
 			}
 		}
 	}, [downloadingContent, videoSrc, musicSrc, season]);
+	//#endregion
 
 	useEffect(() => {
 		window.ipcRenderer.on("download-complete", (_event, _message) => {
@@ -205,7 +210,11 @@ function SeasonWindow() {
 
 	const downloadUrlImage = async (url: string, downloadPath: string) => {
 		setPasteUrl(false);
-		await window.ipcRenderer.invoke("download-image-url", url, downloadPath);
+		return await window.ipcRenderer.invoke(
+			"download-image-url",
+			url,
+			downloadPath
+		);
 	};
 
 	const handleDownloadUrls = async (): Promise<boolean> => {
@@ -216,9 +225,6 @@ function SeasonWindow() {
 				selectedLogo,
 				"resources/img/logos/" + season.id + "/"
 			);
-
-			// Wait 1s for the images to download
-			await ReactUtils.delay(1000);
 		}
 
 		if (selectedPoster && coversUrls.includes(selectedPoster)) {
@@ -226,9 +232,6 @@ function SeasonWindow() {
 				selectedPoster,
 				"resources/img/posters/" + season.id + "/"
 			);
-
-			// Wait 1s for the images to download
-			await ReactUtils.delay(1000);
 		}
 
 		return true;
@@ -305,9 +308,8 @@ function SeasonWindow() {
 					directedLock: false,
 					writtenLock: false,
 					genresLock: false,
-					logosUrls: logosUrls.length > 0 ? logosUrls : season.logosUrls,
-					coversUrls:
-						coversUrls.length > 0 ? coversUrls : season.coversUrls,
+					logosUrls: season.logosUrls,
+					coversUrls: season.coversUrls,
 				})
 			);
 		}
@@ -638,31 +640,27 @@ function SeasonWindow() {
 									</div>
 								</>
 							) : menuSection === WindowSections.Logos ? (
-								<>
-									<ImagesList
-										images={logos}
-										imageWidth={290}
-										imagesUrls={logosUrls}
-										setImagesUrls={setLogosUrls}
-										downloadPath={`resources/img/logos/${season?.id}/`}
-										selectedImage={selectedLogo}
-										selectImage={selectLogo}
-										setImageDownloaded={setImageDownloaded}
-									/>
-								</>
+								<ImagesList
+									images={logos}
+									imageWidth={290}
+									imagesUrls={logosUrls}
+									setImagesUrls={setLogosUrls}
+									downloadPath={`resources/img/logos/${season?.id}/`}
+									selectedImage={selectedLogo}
+									selectImage={selectLogo}
+									setImageDownloaded={setImageDownloaded}
+								/>
 							) : menuSection === WindowSections.Posters ? (
-								<>
-									<ImagesList
-										images={posters}
-										imageWidth={185}
-										imagesUrls={coversUrls}
-										setImagesUrls={setCoversUrls}
-										downloadPath={`resources/img/posters/${season?.id}/`}
-										selectedImage={selectedPoster}
-										selectImage={selectPoster}
-										setImageDownloaded={setImageDownloaded}
-									/>
-								</>
+								<ImagesList
+									images={posters}
+									imageWidth={185}
+									imagesUrls={coversUrls}
+									setImagesUrls={setCoversUrls}
+									downloadPath={`resources/img/posters/${season?.id}/`}
+									selectedImage={selectedPoster}
+									selectImage={selectPoster}
+									setImageDownloaded={setImageDownloaded}
+								/>
 							) : null}
 						</div>
 					</section>
