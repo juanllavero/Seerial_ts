@@ -48,7 +48,7 @@ function ImagesList({
 	);
 
 	// Filter the URLs whose name is not in the Set
-	const filteredImagesUrls = imagesUrls.filter((imageUrl) => {
+	const filteredImagesUrls = imagesUrls && imagesUrls.filter((imageUrl) => {
 		const imageNameFromUrl = imageUrl.split("/").pop()?.toLowerCase();
 		return imageNameFromUrl && !imageNamesSet.has(imageNameFromUrl);
 	});

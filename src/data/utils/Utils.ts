@@ -571,7 +571,6 @@ export class Utils {
                 console.error(`stderr: ${stderr}`);
                 reject();
             } else {
-                console.log(`Imagen generada con éxito: ${outputPath}`);
                 resolve();
             }
             });

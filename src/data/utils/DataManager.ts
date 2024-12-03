@@ -19,10 +19,15 @@ import { EpisodeData } from "@interfaces/EpisodeData";
 import { BrowserWindow } from "electron";
 import { LibraryData } from "@interfaces/LibraryData";
 import ffmetadata from "ffmetadata";
+import os from 'os';
+import pLimit from 'p-limit';
 
 export class DataManager {
 	static DATA_PATH: string = "./src/data/data.json";
 	static libraries: Library[] = [];
+
+	// Number of threads (2 are already being used by this app, so -4 to leave some space for other apps)
+	static availableThreads = Math.max(os.cpus().length - 4, 1);
 
 	// Metadata attributes
 	static win: BrowserWindow | null;
@@ -239,46 +244,54 @@ export class DataManager {
 		}
 	};
 
-	public static async scanFiles(
-		newLibrary: Library
-	): Promise<Library | undefined> {
+	public static async scanFiles(newLibrary: Library): Promise<Library | undefined> {
 		if (!newLibrary) return undefined;
-
+  
 		this.library = newLibrary;
 		this.addLibrary(newLibrary);
-
+  
 		this.win?.webContents.send(
-			"add-library",
-			this.library.toLibraryData(),
-			this.libraries.map((library: Library) => library.toLibraryData())
+			 "add-library",
+			 this.library.toLibraryData(),
+			 this.libraries.map((library: Library) => library.toLibraryData())
 		);
-
+  
 		const isoLanguage = this.library.language.split("-")[0];
-
-		if (!this.imageLangs.includes(isoLanguage))
-			this.imageLangs.push(isoLanguage);
-
+		if (!this.imageLangs.includes(isoLanguage)) this.imageLangs.push(isoLanguage);
+  
+		// Get available threads
+		const availableThreads = Math.max(os.cpus().length - 4, 1);
+		const limit = pLimit(availableThreads);
+  
+		const tasks: Promise<void>[] = [];
+  
 		for (const rootFolder of this.library.folders) {
-			const filesInFolder = await Utils.getFilesInFolder(rootFolder);
-
-			for (const file of filesInFolder) {
-				if (this.library.type === "Shows") {
-					await this.scanTVShow(file.parentPath + "\\" + file.name);
-				} else if (this.library.type === "Movies") {
-					await this.scanMovie(file.parentPath + "\\" + file.name);
-				} else {
-					await this.scanMusic(file.parentPath + "\\" + file.name);
-				}
-			}
+			 const filesInFolder = await Utils.getFilesInFolder(rootFolder);
+  
+			 for (const file of filesInFolder) {
+				  const filePath = file.parentPath + "\\" + file.name;
+				  const task = limit(async () => {
+						if (this.library.type === "Shows") {
+							 await this.scanTVShow(filePath);
+						} else if (this.library.type === "Movies") {
+							 await this.scanMovie(filePath);
+						} else {
+							 await this.scanMusic(filePath);
+						}
+				  });
+				  tasks.push(task);
+			 }
 		}
-
+  
+		Promise.all(tasks);
+  
 		this.win?.webContents.send(
-			"update-libraries",
-			this.libraries.map((library: Library) => library.toLibraryData())
+			 "update-libraries",
+			 this.libraries.map((library: Library) => library.toLibraryData())
 		);
-
+  
 		return newLibrary;
-	}
+  }
 
 	public static async scanTVShow(folder: string) {
 		if (!this.moviedb) return undefined;
