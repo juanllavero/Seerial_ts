@@ -47,6 +47,7 @@ import SeriesWindow from "@components/desktop/windows/seriesWindow";
 import LibraryAndSlider from "./rightContent/utils/LibraryAndSlider";
 import MusicPlayer from "windows/desktop/rightContent/music/MusicPlayer";
 import useLoadLibraries from "hooks/useLoadLibraries";
+import Loading from "@components/utils/Loading";
 
 function MainDesktop() {
 	const dispatch = useDispatch();
@@ -283,7 +284,7 @@ function MainDesktop() {
 				<section className="right-panel">
 					<TopBar />
 					{loading ? (
-						<div>Loading...</div>
+						<Loading />
 					) : error ? (
 						<div>Error loading libraries</div>
 					) : (

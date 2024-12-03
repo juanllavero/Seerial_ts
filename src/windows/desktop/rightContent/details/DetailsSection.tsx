@@ -19,11 +19,14 @@ import { Suspense, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EpisodeList from "./EpisodeList";
 import {
+	AddToListIcon,
 	DownArrowIcon,
 	EditIcon,
 	HorizontalDotsIcon,
 	MarkWatchedIcon,
 	PlayIcon,
+	RemoveFromListIcon,
+	UnmarkWatchedIcon,
 	UpArrowIcon,
 } from "@components/utils/IconLibrary";
 import "./DetailsSection.scss";
@@ -280,7 +283,13 @@ function DetailsSection() {
 									className="svg-button-desktop"
 									title="Mark as watched"
 								>
-									<MarkWatchedIcon />
+									{
+										selectedSeason.currentlyWatchingEpisode !== -1 ? (
+											<UnmarkWatchedIcon />
+										) : (
+											<MarkWatchedIcon />
+										)
+									}
 								</button>
 								<button
 									className="svg-button-desktop"

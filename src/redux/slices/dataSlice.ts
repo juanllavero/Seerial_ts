@@ -436,6 +436,90 @@ const dataSlice = createSlice({
 				}
 			}
 		},
+		markEpisodeWatched: (
+			state,
+			action: PayloadAction<{
+				libraryId: string;
+				seriesId: string;
+				seasonId: string;
+				episodeId: string;
+				watched: boolean;
+			}>
+		) => {
+			const library = state.libraries.find(
+				(library) => library.id === action.payload.libraryId
+			);
+			if (!library) return;
+
+			const series = library.series && library.series.find(
+				(series) => series.id === action.payload.seriesId
+			);
+			if (!series) return;
+
+			const season = series.seasons && series.seasons.find(
+				(season) => season.id === action.payload.seasonId
+			);
+			if (!season) return;
+
+			const episode = season.episodes && season.episodes.find(
+				(episode) => episode.id === action.payload.episodeId
+			);
+			if (!episode) return;
+
+			let found = false;
+
+			for (const library of state.libraries) {
+				for (const series of library.series) {
+					for (const season of series.seasons) {
+						for (const episode of season.episodes) {
+							if (episode.id === action.payload.episodeId) {
+								episode.watched = action.payload.watched;
+								found = true;
+
+								if (
+									state.selectedEpisode &&
+									state.selectedEpisode.id === action.payload.episodeId
+								) {
+									state.selectedEpisode.watched = true;
+								}
+							}
+
+							if (found) break;
+						}
+
+						if (found) {
+							if (
+								state.selectedSeason &&
+								state.selectedSeason.id === season.id
+							) {
+								state.selectedSeason = season;
+							}
+							break;
+						}
+					}
+
+					if (found) {
+						if (
+							state.selectedSeries &&
+							state.selectedSeries.id === series.id
+						) {
+							state.selectedSeries = series;
+						}
+						break;
+					}
+				}
+
+				if (found) {
+					if (
+						state.selectedLibrary &&
+						state.selectedLibrary.id === library.id
+					) {
+						state.selectedLibrary = library;
+					}
+					break;
+				}
+			}
+		},
 		//#endregion
 	},
 });
@@ -464,5 +548,6 @@ export const {
 	toggleSeasonWindow,
 	addLibrary,
 	updateLibrary,
+	markEpisodeWatched,
 } = dataSlice.actions;
 export default dataSlice.reducer;

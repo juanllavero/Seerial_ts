@@ -156,22 +156,20 @@ function SeasonWindow() {
 			setVideoSrc(season.videoSrc || "");
 			setMusicSrc(season.musicSrc || "");
 
-			if (library?.type === "Movies") {
-				setTagline(season.tagline || "");
-				setTaglineLock(season.taglineLock || false);
-				setStudiosLock(season.studioLock || false);
-				setGenresLock(season.genresLock || false);
-				setCreatorLock(season.creatorLock || false);
-				setMusicLock(season.musicLock || false);
-				setDirectedByLock(season.directedLock || false);
-				setWrittenByLock(season.writtenLock || false);
-				setStudios(season.productionStudios || []);
-				setGenres(season.genres || []);
-				setMusic(season.musicComposer || []);
-				setCreator(season.creator || []);
-				setDirectedBy(season.directedBy || []);
-				setWrittenBy(season.writtenBy || []);
-			}
+			setTagline(season.tagline || "");
+			setTaglineLock(season.taglineLock || false);
+			setStudiosLock(season.studioLock || false);
+			setGenresLock(season.genresLock || false);
+			setCreatorLock(season.creatorLock || false);
+			setMusicLock(season.musicLock || false);
+			setDirectedByLock(season.directedLock || false);
+			setWrittenByLock(season.writtenLock || false);
+			setStudios(season.productionStudios || []);
+			setGenres(season.genres || []);
+			setMusic(season.musicComposer || []);
+			setCreator(season.creator || []);
+			setDirectedBy(season.directedBy || []);
+			setWrittenBy(season.writtenBy || []);
 		}
 	}, [seasonMenuOpen]);
 
@@ -248,14 +246,14 @@ function SeasonWindow() {
 	const handleDownloadUrls = async (): Promise<boolean> => {
 		if (!season) return false;
 
-		if (selectedLogo && logosUrls.includes(selectedLogo)) {
+		if (selectedLogo && logosUrls && logosUrls.includes(selectedLogo)) {
 			await downloadUrlImage(
 				selectedLogo,
 				"resources/img/logos/" + season.id + "/"
 			);
 		}
 
-		if (selectedPoster && coversUrls.includes(selectedPoster)) {
+		if (selectedPoster && logosUrls && coversUrls.includes(selectedPoster)) {
 			await downloadUrlImage(
 				selectedPoster,
 				"resources/img/posters/" + season.id + "/"
@@ -305,7 +303,9 @@ function SeasonWindow() {
 		setDownloadingContent(true);
 
 		if (season) {
-			await handleDownloadUrls();
+			if (library?.type !== "Music") {
+				await handleDownloadUrls();
+			}
 
 			if (selectedBackground !== "") {
 				await handleBackgroundSave(selectedBackground);

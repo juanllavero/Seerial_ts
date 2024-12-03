@@ -1,7 +1,11 @@
 import Image from "@components/image/Image";
 import { EpisodeData } from "@interfaces/EpisodeData";
 import { toggleEpisodeMenu } from "@redux/slices/contextMenuSlice";
-import { selectEpisode, toggleEpisodeWindow } from "@redux/slices/dataSlice";
+import {
+	markEpisodeWatched,
+	selectEpisode,
+	toggleEpisodeWindow,
+} from "@redux/slices/dataSlice";
 import { loadVideo } from "@redux/slices/videoSlice";
 import { RootState } from "@redux/store";
 import { t } from "i18next";
@@ -12,6 +16,7 @@ import "../Card.scss";
 import {
 	EditIcon,
 	PlayIcon,
+	TickIcon,
 	VerticalDotsIcon,
 } from "@components/utils/IconLibrary";
 
@@ -55,6 +60,11 @@ function EpisodeCard({ episode }: EpisodeCardProps) {
 	return (
 		<div className="card" style={{ maxWidth: `${episodeImageWidth}px` }}>
 			<div className="top-section">
+				{episode.watched && (
+					<div className="watched">
+						<TickIcon />
+					</div>
+				)}
 				<div className="on-hover">
 					<div className="play-btn-container">
 						<button
@@ -135,15 +145,44 @@ function EpisodeCard({ episode }: EpisodeCardProps) {
 					},
 					{
 						label: t("markWatched"),
-						command: () => dispatch(toggleEpisodeMenu()),
+						command: () => {
+							if (!selectedLibrary || !selectedSeries || !selectedSeason) return;
+
+							dispatch(
+								markEpisodeWatched({
+									libraryId: selectedLibrary.id,
+									seriesId: selectedSeries.id,
+									seasonId: selectedSeason.id,
+									episodeId: episode.id,
+									watched: true,
+								})
+							);
+							dispatch(toggleEpisodeMenu());
+						},
 					},
 					{
 						label: t("markUnwatched"),
-						command: () => dispatch(toggleEpisodeMenu()),
+						command: () => {
+							if (!selectedLibrary || !selectedSeries || !selectedSeason) return;
+							
+							dispatch(
+								markEpisodeWatched({
+									libraryId: selectedLibrary.id,
+									seriesId: selectedSeries.id,
+									seasonId: selectedSeason.id,
+									episodeId: episode.id,
+									watched: false,
+								})
+							);
+							dispatch(toggleEpisodeMenu());
+						},
 					},
 					{
 						label: t("removeButton"),
-						command: () => dispatch(toggleEpisodeMenu()),
+						command: () => {
+							// Do something
+							dispatch(toggleEpisodeMenu());
+						},
 					},
 				]}
 				ref={cm2}

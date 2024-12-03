@@ -154,14 +154,14 @@ function SeriesWindow() {
 	const handleDownloadUrls = async (): Promise<boolean> => {
 		if (!series) return false;
 
-		if (selectedLogo && logosUrls.includes(selectedLogo)) {
+		if (selectedLogo && logosUrls && logosUrls.includes(selectedLogo)) {
 			await downloadUrlImage(
 				selectedLogo,
 				"resources/img/logos/" + series.id + "/"
 			);
 		}
 
-		if (selectedPoster && coversUrls.includes(selectedPoster)) {
+		if (selectedPoster && coversUrls && coversUrls.includes(selectedPoster)) {
 			await downloadUrlImage(
 				selectedPoster,
 				"resources/img/posters/" + series.id + "/"

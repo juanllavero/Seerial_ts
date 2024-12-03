@@ -7,7 +7,7 @@ import {
 } from "@redux/slices/contextMenuSlice";
 import { selectSeason, toggleSeasonWindow } from "@redux/slices/dataSlice";
 import { ContextMenu } from "primereact/contextmenu";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
 	EditIcon,
 	HorizontalDotsIcon,
@@ -26,8 +26,8 @@ function MusicDetails() {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
 
-	const [selectionMode, setSelectionMode] = useState<boolean>(false);
-	const [selectedElements, setSelectedElements] = useState<EpisodeData[]>([]);
+	//const [selectionMode, setSelectionMode] = useState<boolean>(false);
+	//const [selectedElements, setSelectedElements] = useState<EpisodeData[]>([]);
 
 	const seriesMenuOpen = useSelector(
 		(state: RootState) => state.contextMenu.seriesMenu
@@ -123,12 +123,12 @@ function MusicDetails() {
 
 	return (
 		<>
-			{selectionMode && selectedElements && (
+			{/*selectionMode && selectedElements && (
 				<div className="floating-box">
 					{selectedElements.length}{" "}
 					{selectedElements.length === 1 ? "row" : "rows"} selected
 				</div>
-			)}
+			)*/}
 			<div className="album-content scroll" id="scroll">
 				<section className="album-info-container">
 					<div className="info-container">
