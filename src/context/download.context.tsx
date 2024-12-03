@@ -3,6 +3,7 @@ import { MediaSearchResult } from "@interfaces/SearchResults";
 import React, { useContext, useEffect } from "react";
 
 interface DownloadContextProps {
+	loaded: boolean;
 	showWindow: boolean;
 	setShowWindow: (showWindow: boolean) => void;
 	searchQuery: string;
@@ -42,13 +43,16 @@ export const DownloadProvider = ({
 		React.useState<boolean>(false);
 	const [downloadedPercentage, setDownloadedPercentage] =
 		React.useState<number>(0);
+	const [loaded, setLoaded] = React.useState<boolean>(false);
 
 	const search = async () => {
+		setLoaded(false);
 		const searchResults = await window.electronAPI.searchVideos(
 			searchQuery,
 			20
 		);
 		setResults(searchResults);
+		setLoaded(true);
 	};
 
 	useEffect(() => {
@@ -56,17 +60,16 @@ export const DownloadProvider = ({
 			setDownloadedPercentage(progress);
 		});
 
-		window.ipcRenderer.on("download-complete", async (_event, _fileName) => {
+		window.ipcRenderer.on("media-download-complete", async (_event, _fileName) => {
 			setDownloadingContent(false);
 			setDownloadedPercentage(0);
-			console.log(_fileName);
-
-			await ReactUtils.delay(1000);
+			setShowWindow(false);
 		});
 
-		window.ipcRenderer.on("download-error", (_event, _error) => {
+		window.ipcRenderer.on("media-download-error", (_event, _error) => {
 			setDownloadingContent(false);
 			setDownloadedPercentage(0);
+			setShowWindow(false);
 		});
 	}, []);
 
@@ -74,7 +77,7 @@ export const DownloadProvider = ({
 		if (searchQuery) search();
 	}, [searchQuery]);
 
-	const downloadVideo = (elementId: string, url: string) => {
+	const downloadVideo = async (elementId: string, url: string) => {
 		window.electronAPI.downloadMedia({
 			url: url,
 			downloadFolder: "resources/video/",
@@ -83,7 +86,7 @@ export const DownloadProvider = ({
 		});
 	};
 
-	const downloadAudio = (elementId: string, url: string) => {
+	const downloadAudio = async (elementId: string, url: string) => {
 		window.electronAPI.downloadMedia({
 			url: url,
 			downloadFolder: "resources/music/",
@@ -95,6 +98,7 @@ export const DownloadProvider = ({
 	return (
 		<DownloadContext.Provider
 			value={{
+				loaded,
 				showWindow,
 				setShowWindow,
 				results,

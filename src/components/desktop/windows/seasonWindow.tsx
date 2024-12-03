@@ -52,6 +52,7 @@ function SeasonWindow() {
 
 	const [pasteUrl, setPasteUrl] = useState<boolean>(false);
 	const [imageUrl, setImageUrl] = useState<string>("");
+	const [selectedBackground, setSelectedBackground] = useState<string>("");
 	const [imageDownloaded, setImageDownloaded] = useState<boolean>(false);
 
 	const [logos, setLogos] = useState<string[]>([]);
@@ -99,18 +100,22 @@ function SeasonWindow() {
 		const fetchLogos = async () => {
 			setPasteUrl(false);
 
+			if (!season) return;
+
 			const logoPath = await window.electronAPI.getExternalPath(
-				"resources/img/logos/" + season?.id + "/"
+				"resources/img/logos/" + season.id + "/"
 			);
 			if (logoPath) {
 				const images = await window.electronAPI.getImages(logoPath);
 				setLogos(images);
 			}
 
-			if (season?.logoSrc) selectLogo(season?.logoSrc.split("/").pop());
+			if (season.logoSrc) selectLogo(season.logoSrc.split("/").pop());
 		};
 
 		const fetchPosters = async () => {
+			if (!season) return;
+
 			const posterPath = await window.electronAPI.getExternalPath(
 				"resources/img/posters/" + season?.id + "/"
 			);
@@ -119,7 +124,7 @@ function SeasonWindow() {
 				setPosters(images);
 			}
 
-			if (season?.coverSrc) selectPoster(season?.coverSrc.split("/").pop());
+			if (season.coverSrc) selectPoster(season.coverSrc.split("/").pop());
 		};
 
 		if (menuSection === WindowSections.Logos && season) {
@@ -133,6 +138,7 @@ function SeasonWindow() {
 	useEffect(() => {
 		if (seasonMenuOpen && season) {
 			let noImages: string[] = [];
+			setSelectedBackground("");
 			setPosters(noImages);
 			setLogos(noImages);
 			setLogosUrls(season.logosUrls);
@@ -178,16 +184,16 @@ function SeasonWindow() {
 	};
 
 	useEffect(() => {
-		if (!downloadingContent) {
+		if (seasonMenuOpen && season && !showWindow) {
 			if (videoContent) {
-				setVideoSrc("resources/video/" + season?.id + ".webm");
-				fetchResolvedPath("resources/video/" + season?.id + ".webm", true);
+				setVideoSrc("resources/video/" + season.id + ".webm");
+				fetchResolvedPath("resources/video/" + season.id + ".webm", true);
 			} else {
-				setMusicSrc("resources/music/" + season?.id + ".opus");
-				fetchResolvedPath("resources/music/" + season?.id + ".opus", false);
+				setMusicSrc("resources/music/" + season.id + ".opus");
+				fetchResolvedPath("resources/music/" + season.id + ".opus", false);
 			}
 		}
-	}, [downloadingContent, videoSrc, musicSrc, season]);
+	}, [seasonMenuOpen, showWindow, season]);
 	//#endregion
 
 	useEffect(() => {
@@ -196,7 +202,7 @@ function SeasonWindow() {
 		});
 
 		window.ipcRenderer.on("download-error", (_event, message) => {
-			alert(`Error: ${message}`);
+			console.error(`Error: ${message}`);
 		});
 	}, []);
 
@@ -216,6 +222,18 @@ function SeasonWindow() {
 			downloadPath
 		);
 	};
+
+	const handleBackgroundImageDownload = async () => {
+		if (!season || !imageUrl) return;
+
+		// Download image in cache folder
+		await downloadUrlImage(imageUrl, "resources/img/DownloadCache/");
+
+		// Check if the downloaded image exists
+		if (await window.ipcRenderer.invoke("file-exists", await window.ipcRenderer.invoke("get-external-path","resources/img/DownloadCache/" + imageUrl.split("/").pop()))) {
+			setSelectedBackground("resources/img/DownloadCache/" + imageUrl.split("/").pop());
+		}
+	}
 
 	const handleDownloadUrls = async (): Promise<boolean> => {
 		if (!season) return false;
@@ -237,11 +255,51 @@ function SeasonWindow() {
 		return true;
 	};
 
+	const handleBackgroundSave = async (src: string) => {
+		if (!season) return;
+
+		await window.ipcRenderer.invoke("save-background", season.id, src);
+	};
+
+	const handleUploadBackground = () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.onchange = () => {
+			const file = input.files?.[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = async () => {
+					const originalPath = file.path;
+					const destPath = "resources/img/DownloadCache/" + file.name;
+
+					setDownloadingContent(true);
+					window.ipcRenderer
+						.invoke("copy-image-file", originalPath, destPath)
+						.then(() => {
+							setImageDownloaded(true);
+							setDownloadingContent(false);
+							setSelectedBackground(destPath);
+						})
+						.catch((_e) => {
+							setDownloadingContent(false);
+						});
+				};
+				reader.readAsDataURL(file);
+			}
+		};
+		input.click();
+	};
+
 	const handleSavingChanges = async () => {
 		setDownloadingContent(true);
 
 		if (season) {
 			await handleDownloadUrls();
+
+			if (selectedBackground !== "") {
+				await handleBackgroundSave(selectedBackground);
+			};
 
 			dispatch(
 				updateSeason({
@@ -272,7 +330,10 @@ function SeasonWindow() {
 							  "/" +
 							  selectedPoster
 						: season.coverSrc,
-					backgroundSrc: season.backgroundSrc,
+					backgroundSrc:
+						selectedBackground !== ""
+							? `resources/img/backgrounds/${season.id}/background.jpg?t=${Date.now()}`
+							: season.backgroundSrc,
 					videoSrc: videoSrc ? videoSrc : season.videoSrc,
 					musicSrc: musicSrc ? musicSrc : season.musicSrc,
 					seriesID: season.seriesID,
@@ -476,9 +537,7 @@ function SeasonWindow() {
 												<button
 													className="desktop-dialog-btn"
 													title={t("loadButton")}
-													onClick={() =>
-														dispatch(toggleSeasonWindow())
-													}
+													onClick={handleUploadBackground}
 												>
 													<UploadIcon />
 												</button>
@@ -489,15 +548,6 @@ function SeasonWindow() {
 												>
 													<LinkIcon />
 												</button>
-												<button
-													className="desktop-dialog-btn"
-													title={t("downloadButton")}
-													onClick={() =>
-														dispatch(toggleSeasonWindow())
-													}
-												>
-													<RemoveIcon />
-												</button>
 											</div>
 											<span>
 												{resolution.width}x{resolution.height}
@@ -505,7 +555,9 @@ function SeasonWindow() {
 										</div>
 										<Image
 											src={
-												season?.backgroundSrc
+												selectedBackground != ""
+													? selectedBackground
+													: season?.backgroundSrc
 													? season.backgroundSrc
 													: ""
 											}
@@ -533,7 +585,12 @@ function SeasonWindow() {
 											>
 												{t("cancelButton")}
 											</button>
-											<button className="desktop-dialog-btn">
+											<button
+												className="desktop-dialog-btn"
+												onClick={() => {
+													handleBackgroundImageDownload();
+												}}
+											>
 												{t("loadButton")}
 											</button>
 										</div>
@@ -567,9 +624,10 @@ function SeasonWindow() {
 												</button>
 												<button
 													className="desktop-dialog-btn"
-													onClick={() =>
-														dispatch(toggleSeasonWindow())
-													}
+													onClick={() => {
+														setExtMusicSrc("");
+														setMusicSrc("");
+													}}
 												>
 													<RemoveIcon />
 												</button>
@@ -584,7 +642,7 @@ function SeasonWindow() {
 												alignItems: "center",
 											}}
 										>
-											{season?.videoSrc !== "" ? (
+											{extMusicSrc && extMusicSrc !== "" ? (
 												<ReactPlayer
 													url={extMusicSrc}
 													controls
@@ -619,15 +677,16 @@ function SeasonWindow() {
 												</button>
 												<button
 													className="desktop-dialog-btn"
-													onClick={() =>
-														dispatch(toggleSeasonWindow())
-													}
+													onClick={() => {
+														setExtVideoSrc("");
+														setVideoSrc("");
+													}}
 												>
 													<RemoveIcon />
 												</button>
 											</div>
 										</div>
-										{season?.videoSrc !== "" ? (
+										{extVideoSrc && extVideoSrc !== "" ? (
 											<ReactPlayer
 												url={extVideoSrc}
 												controls

@@ -8,7 +8,6 @@ import { toggleEpisodeWindow, updateEpisode } from "redux/slices/dataSlice";
 import { VideoTrackData } from "@interfaces/VideoTrackData";
 import { AudioTrackData } from "@interfaces/AudioTrackData";
 import { SubtitleTrackData } from "@interfaces/SubtitleTrackData";
-import { TickIcon } from "@components/utils/IconLibrary";
 import Loading from "@components/utils/Loading";
 import { useDownloadContext } from "context/download.context";
 import DialogHeader from "./utils/DialogHeader";
@@ -41,8 +40,6 @@ function EpisodeWindow() {
 		(state: RootState) => state.data.selectedEpisode
 	);
 
-	const [pasteUrl, setPasteUrl] = useState<boolean>(false);
-	const [imageUrl, setImageUrl] = useState<string>("");
 	const [imageDownloaded, setImageDownloaded] = useState<boolean>(false);
 
 	const [images, setImages] = useState<string[]>([]);
@@ -65,8 +62,6 @@ function EpisodeWindow() {
 
 	useEffect(() => {
 		const fetchImages = async () => {
-			setPasteUrl(false);
-
 			const path = await window.electronAPI.getExternalPath(
 				"resources/img/thumbnails/video/" + selectedEpisode?.id + "/"
 			);
@@ -310,7 +305,6 @@ function EpisodeWindow() {
 	};
 
 	const downloadUrlImage = async (url: string, downloadPath: string) => {
-		setPasteUrl(false);
 		return await window.ipcRenderer.invoke(
 			"download-image-url",
 			url,

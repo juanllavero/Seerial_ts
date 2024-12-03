@@ -32,8 +32,6 @@ function SeriesWindow() {
 	);
 	const series = useSelector((state: RootState) => state.data.seriesMenu);
 
-	const [pasteUrl, setPasteUrl] = useState<boolean>(false);
-	const [imageUrl, setImageUrl] = useState<string>("");
 	const [imageDownloaded, setImageDownloaded] = useState<boolean>(false);
 
 	const [logos, setLogos] = useState<string[]>([]);
@@ -71,8 +69,6 @@ function SeriesWindow() {
 	// Fetch images
 	useEffect(() => {
 		const fetchLogos = async () => {
-			setPasteUrl(false);
-
 			const logoPath = await window.electronAPI.getExternalPath(
 				"resources/img/logos/" + series?.id + "/"
 			);
@@ -148,7 +144,6 @@ function SeriesWindow() {
 	}, []);
 
 	const downloadUrlImage = async (url: string, downloadPath: string) => {
-		setPasteUrl(false);
 		return await window.ipcRenderer.invoke(
 			"download-image-url",
 			url,

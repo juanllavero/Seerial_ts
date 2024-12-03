@@ -198,7 +198,7 @@ ipcMain.handle(
 				"download-error",
 				`Error downloading image: ${error.message}`
 			);
-			
+
 			return false;
 		}
 	}
@@ -220,6 +220,14 @@ ipcMain.handle(
 		});
 	}
 );
+
+ipcMain.handle("file-exists", (_event, filePath: string) => {
+	return fs.existsSync(filePath);
+});
+
+ipcMain.handle("save-background", async (_event, seasonId: string, imageToCopy: string) => {
+	await Utils.saveBackgroundNoSeason(seasonId, imageToCopy);
+});
 //#endregion
 
 //#region MEDIA INFO

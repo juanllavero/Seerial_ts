@@ -108,9 +108,9 @@ export class Downloader {
 
 			process.on("close", (code: number) => {
 				if (code === 0) {
-					win.webContents.send("download-complete", fileName);
+					win.webContents.send("media-download-complete", fileName);
 				} else {
-					win.webContents.send("download-error", code);
+					win.webContents.send("media-download-error", code);
 				}
 			});
 		} catch (error) {

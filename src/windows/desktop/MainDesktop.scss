@@ -720,41 +720,6 @@ html, body {
       padding-right: 0.6em;
       border-top: 1px solid rgba(0, 0, 0, 0.45);
     }
-
-    .dialog-downloading {
-      position: absolute;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-
-      z-index: 999;
-      
-      width: 100%;
-      height: 100%;
-
-      background-color: #000000c4;
-
-      .loading-circle {
-				width: 48px;
-				height: 48px;
-				border-radius: 50%;
-				display: inline-block;
-				border-top: 3px solid v.$app-color;
-				border-right: 3px solid transparent;
-				box-sizing: border-box;
-				animation: rotation 1s linear infinite;
-			}
-
-			@keyframes rotation {
-				0% {
-					transform: rotate(0deg);
-				}
-				100% {
-					transform: rotate(360deg);
-				}
-			}
-    }
   }
 
   .desktop-dialog-side-btn {

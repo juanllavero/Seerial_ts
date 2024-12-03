@@ -5,19 +5,27 @@ import PopUpVideo from "./PopUpVideo";
 import { useDownloadContext } from "context/download.context";
 
 function VerticalResults() {
-	const { results, playContent, selectedUrl } = useDownloadContext();
+	const { results, playContent, selectedUrl, loaded } = useDownloadContext();
 
 	return (
 		<>
 			{playContent && selectedUrl !== "" && <PopUpVideo />}
 			<div className="results-container">
-				{results && results.length > 0 ? (
-					results.map((result: MediaSearchResult) => (
-						<ResultCard key={result.id} result={result} />
-					))
-				) : (
-					<div>No results found</div>
-				)}
+				{
+					loaded ? (
+						results && results.length > 0 ? (
+							results.map((result: MediaSearchResult) => (
+								<ResultCard key={result.id} result={result} />
+							))
+						) : (
+							<div>No results found</div>
+						)
+					) : (
+						<div className="downloading-content">
+							<div className="loading-circle"></div>
+						</div>
+					)
+				}
 			</div>
 		</>
 	);

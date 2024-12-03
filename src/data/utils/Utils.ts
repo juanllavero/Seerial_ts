@@ -166,8 +166,14 @@ export class Utils {
         if (stream.tags["BPS"])
             videoTrack.bitrate = Math.round(parseFloat(stream.tags["BPS"]) / Math.pow(10, 3)).toString();
     
-        if (stream.avg_frame_rate)
-            videoTrack.framerate = eval(stream.avg_frame_rate).toFixed(3) + " fps";
+        if (stream.avg_frame_rate) {
+            const [numerator, denominator] = stream.avg_frame_rate.split('/').map(Number);
+            if (denominator && denominator !== 0) {
+                videoTrack.framerate = (numerator / denominator).toFixed(3) + " fps";
+            } else {
+                videoTrack.framerate = numerator.toFixed(3) + " fps";
+            }
+        }
     
         videoTrack.codedWidth = stream.width ? stream.width : stream.codedWidth;
         videoTrack.codedHeight = stream.height ? stream.height : stream.codedHeight;
@@ -531,6 +537,21 @@ export class Utils {
     
             // Process blur and save
             this.processBlurAndSave(this.getExternalPath(season.getBackgroundSrc()), path.join(baseDir, 'fullBlur.jpg'));
+        } catch (e) {
+            console.error('saveBackground: error processing image with blur');
+        }
+    }
+
+    public static async saveBackgroundNoSeason(seasonId: string, imageToCopy: string) {
+        const baseDir = `resources/img/backgrounds/${seasonId}/`;
+        await fsExtra.ensureDir(baseDir);
+    
+        try {
+            // Copy the original image
+            await fsExtra.copy(imageToCopy, path.join(baseDir, 'background.jpg'));
+    
+            // Process blur and save
+            await this.processBlurAndSave(this.getExternalPath(baseDir + 'background.jpg'), path.join(baseDir, 'fullBlur.jpg'));
         } catch (e) {
             console.error('saveBackground: error processing image with blur');
         }
