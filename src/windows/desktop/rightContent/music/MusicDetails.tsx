@@ -85,9 +85,9 @@ function MusicDetails() {
 			return (
 				<>
 					<span className="disc-text-title">
-						{selectedAlbum.episodes.length} {t("tracks").toLowerCase()}
+						{selectedAlbum.episodes && selectedAlbum.episodes.length} {t("tracks").toLowerCase()}
 					</span>
-					{selectedAlbum.episodes
+					{selectedAlbum.episodes && selectedAlbum.episodes
 						.slice()
 						.sort((a, b) => {
 							const episodeNumberA = a.episodeNumber ?? 0; // Si es undefined o null, usa 0 como valor por defecto
@@ -136,7 +136,7 @@ function MusicDetails() {
 							<Image
 								src={selectedAlbum.coverSrc}
 								alt="Poster"
-								isRelative={false}
+								isRelative={true}
 								errorSrc="./src/resources/img/songDefault.png"
 							/>
 						</div>

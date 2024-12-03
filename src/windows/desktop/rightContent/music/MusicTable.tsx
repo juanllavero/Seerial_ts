@@ -42,7 +42,7 @@ const MusicTable: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
 		selectedLibrary.series.forEach((serie) => {
 			if (serie.seasons && serie.seasons.length > 0) {
 				serie.seasons.forEach((season) =>
-					season.episodes.forEach((episode) => {
+					season.episodes && season.episodes.forEach((episode) => {
 						allSongs.push(episode);
 					})
 				);

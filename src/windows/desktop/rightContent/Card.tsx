@@ -143,7 +143,7 @@ function Card(props: CardProps): JSX.Element {
 							width={seriesImageWidth}
 							height={seriesImageWidth}
 							errorSrc="./src/resources/img/songDefault.png"
-							isRelative={false}
+							isRelative={true}
 						/>
 					)}
 				</div>

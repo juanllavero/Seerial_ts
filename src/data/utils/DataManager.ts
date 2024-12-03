@@ -260,7 +260,11 @@ export class DataManager {
 		if (!this.imageLangs.includes(isoLanguage)) this.imageLangs.push(isoLanguage);
   
 		// Get available threads
-		const availableThreads = Math.max(os.cpus().length - 4, 1);
+		let availableThreads = Math.max(os.cpus().length - 3, 1);
+
+		if (this.library.type === "Music") {
+			availableThreads = Math.min(availableThreads, 4);
+		}
 		const limit = pLimit(availableThreads);
   
 		const tasks: Promise<void>[] = [];
@@ -1850,21 +1854,30 @@ export class DataManager {
 					: []
 			);
 
-			// Search for image in the same folder
-			let imageSrc = await Utils.findImageInFolder(path.dirname(musicFile));
+			if (album.coverSrc === "") {
+				// Search for image in the same folder
+				let imageSrc = await Utils.findImageInFolder(path.dirname(musicFile));
 
-			// If no image is found in the same folder, search in the parent folder
-			if (!imageSrc) {
-				const parentFolder = path.resolve(path.dirname(musicFile), "..");
-				imageSrc = await Utils.findImageInFolder(parentFolder);
-			}
+				// If no image is found in the same folder, search in the parent folder
+				if (!imageSrc) {
+					const parentFolder = path.resolve(path.dirname(musicFile), "..");
+					imageSrc = await Utils.findImageInFolder(parentFolder);
+				}
 
-			if (imageSrc) {
-				song.setImgSrc(imageSrc);
+				if (imageSrc) {
+					await this.createFolder("resources/img/posters/" + album.id);
+					let destPath = Utils.getExternalPath("resources/img/posters/" + album.id + "/" + imageSrc.split("\\").pop());
+					fs.copyFile(imageSrc, destPath, (err) => {
+						if (err) {
+							console.error("Error copying image:", err);
+							return;
+						}
+					});
 
-				if (album.coverSrc === "") album.setCoverSrc(imageSrc);
-
-				if (collection.coverSrc === "") collection.setCoverSrc(imageSrc);
+					album.setCoverSrc("resources/img/posters/" + album.id + "/" + imageSrc.split("\\").pop());
+	
+					if (collection.coverSrc === "") collection.setCoverSrc(album.coverSrc);
+				}
 			}
 
 			// Get runtime
@@ -1875,12 +1888,12 @@ export class DataManager {
 			DataManager.library.analyzedFiles.set(musicFile, song.id);
 
 			// Add episode to view
-			this.win?.webContents.send(
+			/*this.win?.webContents.send(
 				"episode-added",
 				this.library.id,
 				collection.id,
 				song.toJSON()
-			);
+			);*/
 		} catch (error) {
 			console.error("Error processing music file", error);
 		}
@@ -1911,5 +1924,7 @@ export class DataManager {
 			return [];
 		}
 	};
+
+	
 	//#endregion
 }
