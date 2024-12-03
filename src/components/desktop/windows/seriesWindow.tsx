@@ -327,6 +327,17 @@ function SeriesWindow() {
 											setLock={setOverviewLock}
 										/>
 									</>
+								) : library?.type === "Movies" ? (
+									<>
+										<DialogInput
+											type="text"
+											title={t("name")}
+											value={name}
+											setValue={setName}
+											lock={nameLock}
+											setLock={setNameLock}
+										/>
+									</>
 								) : (
 									<>
 										<DialogInput

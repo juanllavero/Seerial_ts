@@ -230,10 +230,20 @@ function SeasonWindow() {
 		await downloadUrlImage(imageUrl, "resources/img/DownloadCache/");
 
 		// Check if the downloaded image exists
-		if (await window.ipcRenderer.invoke("file-exists", await window.ipcRenderer.invoke("get-external-path","resources/img/DownloadCache/" + imageUrl.split("/").pop()))) {
-			setSelectedBackground("resources/img/DownloadCache/" + imageUrl.split("/").pop());
+		if (
+			await window.ipcRenderer.invoke(
+				"file-exists",
+				await window.ipcRenderer.invoke(
+					"get-external-path",
+					"resources/img/DownloadCache/" + imageUrl.split("/").pop()
+				)
+			)
+		) {
+			setSelectedBackground(
+				"resources/img/DownloadCache/" + imageUrl.split("/").pop()
+			);
 		}
-	}
+	};
 
 	const handleDownloadUrls = async (): Promise<boolean> => {
 		if (!season) return false;
@@ -299,7 +309,7 @@ function SeasonWindow() {
 
 			if (selectedBackground !== "") {
 				await handleBackgroundSave(selectedBackground);
-			};
+			}
 
 			dispatch(
 				updateSeason({
@@ -332,7 +342,9 @@ function SeasonWindow() {
 						: season.coverSrc,
 					backgroundSrc:
 						selectedBackground !== ""
-							? `resources/img/backgrounds/${season.id}/background.jpg?t=${Date.now()}`
+							? `resources/img/backgrounds/${
+									season.id
+							  }/background.jpg?t=${Date.now()}`
 							: season.backgroundSrc,
 					videoSrc: videoSrc ? videoSrc : season.videoSrc,
 					musicSrc: musicSrc ? musicSrc : season.musicSrc,
@@ -411,28 +423,32 @@ function SeasonWindow() {
 								title={t("generalButton")}
 								section={WindowSections.General}
 							/>
-							{library?.type !== "Shows" ? (
+							{library?.type === "Movies" ? (
 								<DialogSectionButton
 									title={t("tags")}
 									section={WindowSections.Tags}
 								/>
 							) : null}
-							<DialogSectionButton
-								title={t("media")}
-								section={WindowSections.Details}
-							/>
-							{library?.type !== "Shows" ? (
+							{library?.type !== "Music" && (
+								<DialogSectionButton
+									title={t("media")}
+									section={WindowSections.Details}
+								/>
+							)}
+							{library?.type === "Movies" && (
 								<>
 									<DialogSectionButton
 										title={t("logosButton")}
 										section={WindowSections.Logos}
 									/>
-									<DialogSectionButton
-										title={t("postersButton")}
-										section={WindowSections.Posters}
-									/>
 								</>
-							) : null}
+							)}
+							{library?.type !== "Shows" && (
+								<DialogSectionButton
+									title={t("postersButton")}
+									section={WindowSections.Posters}
+								/>
+							)}
 						</div>
 						<div className="dialog-center-right scroll">
 							{menuSection === WindowSections.General ? (
@@ -462,7 +478,7 @@ function SeasonWindow() {
 										setLock={setYearLock}
 									/>
 
-									{library?.type !== "Shows" && (
+									{library?.type === "Movies" && (
 										<>
 											<DialogTags
 												title={t("studios")}
@@ -482,13 +498,25 @@ function SeasonWindow() {
 										</>
 									)}
 
-									<DialogTextArea
-										title={t("overview")}
-										value={overview}
-										setValue={setOverview}
-										lock={overviewLock}
-										setLock={setOverviewLock}
-									/>
+									{library?.type === "Music" && (
+										<DialogTags
+											title={t("genres")}
+											value={genres}
+											setValue={setGenres}
+											lock={genresLock}
+											setLock={setGenresLock}
+										/>
+									)}
+
+									{library?.type !== "Music" && (
+										<DialogTextArea
+											title={t("overview")}
+											value={overview}
+											setValue={setOverview}
+											lock={overviewLock}
+											setLock={setOverviewLock}
+										/>
+									)}
 								</>
 							) : menuSection === WindowSections.Tags ? (
 								<>

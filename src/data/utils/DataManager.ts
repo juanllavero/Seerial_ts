@@ -1765,6 +1765,7 @@ export class DataManager {
 			}
 		}
 
+		collection.isCollection = collection.seasons.length > 1;
 		collection.setAnalyzingFiles(false);
 
 		// Update show in view
@@ -1876,7 +1877,18 @@ export class DataManager {
 
 					album.setCoverSrc("resources/img/posters/" + album.id + "/" + imageSrc.split("\\").pop());
 	
-					if (collection.coverSrc === "") collection.setCoverSrc(album.coverSrc);
+					if (collection.coverSrc === "") {
+						await this.createFolder("resources/img/posters/" + collection.id);
+						let destPath = Utils.getExternalPath("resources/img/posters/" + collection.id + "/" + imageSrc.split("\\").pop());
+						fs.copyFile(imageSrc, destPath, (err) => {
+							if (err) {
+								console.error("Error copying image:", err);
+								return;
+							}
+						});
+
+						collection.setCoverSrc("resources/img/posters/" + collection.id + "/" + imageSrc.split("\\").pop());
+					} 
 				}
 			}
 
