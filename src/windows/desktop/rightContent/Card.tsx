@@ -13,11 +13,15 @@ import {
 	selectSeason,
 	toggleSeriesWindow,
 	showSeriesMenu,
+	setSeriesWatched,
 } from "@redux/slices/dataSlice";
 import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
 import React, { useRef } from "react";
-import { EditIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
+import {
+	EditIcon,
+	VerticalDotsIcon,
+} from "@components/utils/IconLibrary";
 import { LibraryData } from "@interfaces/LibraryData";
 import { ReactUtils } from "@data/utils/ReactUtils";
 import { useSectionContext } from "context/section.context";
@@ -75,9 +79,26 @@ function Card(props: CardProps): JSX.Element {
 		dispatch(closeContextMenu());
 	};
 
+	const countUnWatchedEpisodes = () => {
+		let unWatchedEpisodes = 0;
+
+		for (const season of show.seasons) {
+			for (const episode of season.episodes) {
+				if (!episode.watched) unWatchedEpisodes += 1;
+			}
+		}
+
+		return unWatchedEpisodes;
+	};
+
 	return (
 		<div className="card" style={{ maxWidth: `${seriesImageWidth}px` }}>
 			<div className="top-section">
+				{type === "default" && !show.watched && (
+					<div className="watched-count">
+						<span>{countUnWatchedEpisodes()}</span>
+					</div>
+				)}
 				<div
 					className={`on-loading ${
 						show && show.analyzingFiles ? "visible" : ""
@@ -192,11 +213,29 @@ function Card(props: CardProps): JSX.Element {
 					},
 					{
 						label: t("markWatched"),
-						command: () => dispatch(toggleSeriesMenu()),
+						command: () => {
+							if (!library) return;
+							dispatch(
+								setSeriesWatched({
+									libraryId: library.id,
+									seriesId: show.id,
+									watched: true,
+								})
+							);
+						},
 					},
 					{
 						label: t("markUnwatched"),
-						command: () => dispatch(toggleSeriesMenu()),
+						command: () => {
+							if (!library) return;
+							dispatch(
+								setSeriesWatched({
+									libraryId: library.id,
+									seriesId: show.id,
+									watched: false,
+								})
+							);
+						},
 					},
 					...((library && library.type === "Shows") || !show.isCollection
 						? [

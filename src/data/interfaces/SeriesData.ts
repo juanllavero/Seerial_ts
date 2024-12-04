@@ -31,6 +31,7 @@ export interface SeriesData{
     genresLock: boolean;
 
     //Other
+    watched: boolean;
     themdbID: number;
     isCollection: boolean;
     order: number;

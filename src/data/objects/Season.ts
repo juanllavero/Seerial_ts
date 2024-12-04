@@ -53,6 +53,7 @@ export class Season {
   selectedSubtitleTrack: number;
   episodes: Episode[];
   currentlyWatchingEpisode: number;
+  watched: boolean;
 
   constructor() {
     this.id = crypto.randomUUID();
@@ -100,6 +101,7 @@ export class Season {
     this.directedLock = false;
     this.writtenLock = false;
     this.genresLock = false;
+    this.watched = false;
   }
 
   static fromJSON(json: any): Season {
@@ -151,6 +153,7 @@ export class Season {
     season.directedLock = json.directedLock !== undefined ? json.directedLock : season.directedLock;
     season.writtenLock = json.writtenLock !== undefined ? json.writtenLock : season.writtenLock;
     season.genresLock = json.genresLock !== undefined ? json.genresLock : season.genresLock;
+    season.watched = json.watched !== undefined ? json.watched : season.watched;
 
     return season;
   }
@@ -201,6 +204,7 @@ export class Season {
       musicLock: this.musicLock,
       directedLock: this.directedLock,
       writtenLock: this.writtenLock,
+      watched: this.watched
     };
 
     // Filtrar atributos solo si están asignados o tienen un valor definido

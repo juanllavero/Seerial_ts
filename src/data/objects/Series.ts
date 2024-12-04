@@ -31,6 +31,7 @@ export class Series {
   genresLock: boolean;
 
   //Other
+  watched: boolean;
   themdbID: number;
   isCollection: boolean;
   order: number;
@@ -80,6 +81,7 @@ export class Series {
     this.creatorLock = false;
     this.musicLock = false;
     this.genresLock = false;
+    this.watched = false;
   }
 
   toJSON(): any {
@@ -116,7 +118,8 @@ export class Series {
       taglineLock: this.taglineLock,
       creatorLock: this.creatorLock,
       musicLock: this.musicLock,
-      genresLock: this.genresLock
+      genresLock: this.genresLock,
+      watched: this.watched
     };
 
     // Filter attributes
@@ -164,6 +167,7 @@ export class Series {
     series.creatorLock = jsonData.creatorLock || series.creatorLock;
     series.musicLock = jsonData.musicLock || series.musicLock;
     series.genresLock = jsonData.genresLock || series.genresLock;
+    series.watched = jsonData.watched || series.watched;
 
     return series;
   }

@@ -21,6 +21,24 @@
 			}
 		}
 
+		.watched-count {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background-color: rgb(0, 0, 0);
+
+			z-index: 0;
+			display: flex;
+
+			border-radius: 0 2px 0 3px;
+			padding: .3rem .4rem;
+
+			span {
+				min-width: 1.5rem;
+				text-align: center;
+			}
+		}
+
 		.card-slider {
 			position: absolute;
 			bottom: 0;

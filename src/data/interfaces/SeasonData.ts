@@ -53,4 +53,5 @@ export interface SeasonData{
     selectedSubtitleTrack: number;
     episodes: EpisodeData[];
     currentlyWatchingEpisode: number;
+    watched: boolean;
 }
