@@ -101,8 +101,6 @@ function DetailsSection() {
 			return a.order === 0 ? 1 : -1;
 		});
 
-		console.log(selectedSeries.currentlyWatchingSeason);
-
 		const season = seasons[selectedSeries.currentlyWatchingSeason];
 		if (!season || !season.episodes) return null;
 
@@ -112,7 +110,7 @@ function DetailsSection() {
 		const episode = episodes[season.currentlyWatchingEpisode];
 
 		if (!episode) return null;
-		
+
 		return (
 			<span>
 				{t("inProgress")} — {t("seasonLetter")}
@@ -323,8 +321,7 @@ function DetailsSection() {
 									onClick={() => dispatch(setSeasonWatched({
 										libraryId: selectedLibrary.id,
 										seriesId: selectedSeries.id,
-										seasonId: selectedSeason.id,
-										watched: selectedSeason.currentlyWatchingEpisode === -1
+										seasonId: selectedSeason.id
 									}))}
 								>
 									{selectedSeason.currentlyWatchingEpisode === -1 ? (

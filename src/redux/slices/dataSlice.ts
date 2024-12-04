@@ -346,7 +346,6 @@ const dataSlice = createSlice({
 				libraryId: string;
 				seriesId: string;
 				seasonId: string;
-				watched: boolean;
 			}>
 		) => {
 			const library = state.libraries.find(
@@ -374,10 +373,18 @@ const dataSlice = createSlice({
 						if (season.id === action.payload.seasonId) {
 							season.currentlyWatchingEpisode = -1;
 							found = true;
-						}
 
-						if (!found) {
-							season.currentlyWatchingEpisode = -1;
+							for (const episode of season.episodes) {
+								episode.watched = !episode.watched;
+							}
+						} else {
+							if (!found) {
+								season.currentlyWatchingEpisode = -1;
+							}
+
+							for (const episode of season.episodes) {
+								episode.watched = !found ? true : false;
+							}
 						}
 
 						if (season.currentlyWatchingEpisode !== -1) {
@@ -641,6 +648,7 @@ const dataSlice = createSlice({
 			for (const season of seasons) {
 				if (season.currentlyWatchingEpisode !== -1) {
 					series.currentlyWatchingSeason = seasons.indexOf(season);
+					break;
 				}
 			}
 
