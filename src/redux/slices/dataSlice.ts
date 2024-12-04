@@ -209,6 +209,43 @@ const dataSlice = createSlice({
 				}
 			}
 		},
+		setSeriesWatched: (
+			state,
+			action: PayloadAction<{
+				libraryId: string;
+				seriesId: string;
+				seasonId: string;
+				watched: boolean;
+			}>
+		) => {
+			const library = state.libraries.find(
+				(library) => library.id === action.payload.libraryId
+			);
+			if (library) {
+				const series = library.series.find(
+					(series) => series.id === action.payload.seriesId
+				);
+				if (series) {
+					for (const season of series.seasons) {
+						season.currentlyWatchingEpisode = -1;
+
+						if (state.selectedSeason?.id === season.id) {
+							state.selectedSeason = season;
+						}
+					}
+
+					series.currentlyWatchingSeason = -1;
+
+					if (state.selectedSeries?.id === series.id) {
+						state.selectedSeries = series;
+					}
+				}
+
+				if (state.selectedLibrary?.id === library.id) {
+					state.selectedLibrary = library;
+				}
+			}
+		},
 
 		addSeason: (
 			state,
@@ -300,6 +337,65 @@ const dataSlice = createSlice({
 							state.selectedLibrary = library;
 						}
 					}
+				}
+			}
+		},
+		setSeasonWatched: (
+			state,
+			action: PayloadAction<{
+				libraryId: string;
+				seriesId: string;
+				seasonId: string;
+				watched: boolean;
+			}>
+		) => {
+			const library = state.libraries.find(
+				(library) => library.id === action.payload.libraryId
+			);
+			if (library) {
+				const series = library.series.find(
+					(series) => series.id === action.payload.seriesId
+				);
+				if (series) {
+					const seasons = series.seasons.sort((a, b) => {
+						if (a.order !== 0 && b.order !== 0) {
+							return a.order - b.order;
+						}
+						if (a.order === 0 && b.order === 0) {
+							return (
+								new Date(a.year).getTime() - new Date(b.year).getTime()
+							);
+						}
+						return a.order === 0 ? 1 : -1;
+					});
+
+					let found = false;
+					for (const season of seasons) {
+						if (season.id === action.payload.seasonId) {
+							season.currentlyWatchingEpisode = -1;
+							found = true;
+						}
+
+						if (!found) {
+							season.currentlyWatchingEpisode = -1;
+						}
+
+						if (season.currentlyWatchingEpisode !== -1) {
+							series.currentlyWatchingSeason = seasons.indexOf(season);
+						}
+
+						if (state.selectedSeason?.id === season.id) {
+							state.selectedSeason = season;
+						}
+					}
+
+					if (state.selectedSeries?.id === series.id) {
+						state.selectedSeries = series;
+					}
+				}
+
+				if (state.selectedLibrary?.id === library.id) {
+					state.selectedLibrary = library;
 				}
 			}
 		},
@@ -451,72 +547,113 @@ const dataSlice = createSlice({
 			);
 			if (!library) return;
 
-			const series = library.series && library.series.find(
-				(series) => series.id === action.payload.seriesId
-			);
+			const series =
+				library.series &&
+				library.series.find(
+					(series) => series.id === action.payload.seriesId
+				);
 			if (!series) return;
 
-			const season = series.seasons && series.seasons.find(
-				(season) => season.id === action.payload.seasonId
-			);
-			if (!season) return;
-
-			const episode = season.episodes && season.episodes.find(
-				(episode) => episode.id === action.payload.episodeId
-			);
-			if (!episode) return;
-
 			let found = false;
+			const seasons = series.seasons.sort((a, b) => {
+				if (a.order !== 0 && b.order !== 0) {
+					return a.order - b.order;
+				}
+				if (a.order === 0 && b.order === 0) {
+					return new Date(a.year).getTime() - new Date(b.year).getTime();
+				}
+				return a.order === 0 ? 1 : -1;
+			});
+			for (const season of seasons) {
+				const episodes = season.episodes.sort(
+					(a, b) => a.episodeNumber - b.episodeNumber
+				);
+				for (const episode of episodes) {
+					if (episode.id === action.payload.episodeId) {
+						found = true;
+						episode.watched = action.payload.watched;
 
-			for (const library of state.libraries) {
-				for (const series of library.series) {
-					for (const season of series.seasons) {
-						for (const episode of season.episodes) {
-							if (episode.id === action.payload.episodeId) {
-								episode.watched = action.payload.watched;
-								found = true;
-
-								if (
-									state.selectedEpisode &&
-									state.selectedEpisode.id === action.payload.episodeId
-								) {
-									state.selectedEpisode.watched = true;
-								}
-							}
-
-							if (found) break;
+						if (!episode.watched) {
+							episode.timeWatched = 0;
+							season.currentlyWatchingEpisode =
+								episodes.indexOf(episode);
+							series.currentlyWatchingSeason = seasons.indexOf(season);
 						}
 
+						if (state.selectedEpisode?.id === episode.id) {
+							state.selectedEpisode = episode;
+						}
+
+						if (
+							episodes.indexOf(episode) < episodes.length - 1 &&
+							episode.watched
+						) {
+							season.currentlyWatchingEpisode =
+								episodes.indexOf(episode) + 1;
+							series.currentlyWatchingSeason = seasons.indexOf(season);
+						} else if (episodes.indexOf(episode) < episodes.length - 1) {
+							season.currentlyWatchingEpisode =
+								episodes.indexOf(episode);
+							series.currentlyWatchingSeason = seasons.indexOf(season);
+						} else if (!episode.watched) {
+							season.currentlyWatchingEpisode = -1;
+						}
+					} else {
 						if (found) {
-							if (
-								state.selectedSeason &&
-								state.selectedSeason.id === season.id
-							) {
-								state.selectedSeason = season;
-							}
-							break;
+							episode.watched = false;
+							episode.timeWatched = 0;
+						} else if (action.payload.watched) {
+							episode.watched = true;
 						}
 					}
 
-					if (found) {
-						if (
-							state.selectedSeries &&
-							state.selectedSeries.id === series.id
-						) {
-							state.selectedSeries = series;
+					// If the last episode is marked as watched, set the season as watched
+					if (
+						episodes.indexOf(episode) === episodes.length - 1 &&
+						episode.watched
+					) {
+						season.currentlyWatchingEpisode = -1;
+
+						if (seasons.indexOf(season) < seasons.length - 1) {
+							series.currentlyWatchingSeason =
+								seasons.indexOf(season) + 1;
+
+							const nextSeason = seasons[seasons.indexOf(season) + 1];
+							nextSeason.currentlyWatchingEpisode = 0;
+						} else {
+							series.currentlyWatchingSeason = -1;
 						}
-						break;
 					}
 				}
 
 				if (found) {
 					if (
-						state.selectedLibrary &&
-						state.selectedLibrary.id === library.id
+						state.selectedSeason &&
+						state.selectedSeason.id === season.id
 					) {
-						state.selectedLibrary = library;
+						state.selectedSeason = season;
 					}
-					break;
+				}
+			}
+
+			// If there is a season currently watching, set it on series
+			series.currentlyWatchingSeason = -1;
+			for (const season of seasons) {
+				if (season.currentlyWatchingEpisode !== -1) {
+					series.currentlyWatchingSeason = seasons.indexOf(season);
+				}
+			}
+
+			if (found) {
+				if (state.selectedSeries && state.selectedSeries.id === series.id) {
+					state.selectedSeries = series;
+				}
+
+				if (
+					state.selectedLibrary &&
+					state.selectedLibrary.id === library.id
+				) {
+					state.selectedLibrary = library;
 				}
 			}
 		},
@@ -542,6 +679,8 @@ export const {
 	addSeason,
 	updateSeries,
 	addSeries,
+	setSeriesWatched,
+	setSeasonWatched,
 	toggleEpisodeWindow,
 	updateEpisode,
 	toggleSeriesWindow,

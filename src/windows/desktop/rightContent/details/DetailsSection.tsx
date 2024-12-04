@@ -10,6 +10,7 @@ import {
 	toggleSeasonWindow,
 	setShowPoster,
 	selectSeason,
+	setSeasonWatched,
 } from "@redux/slices/dataSlice";
 import { loadTransparentImage } from "@redux/slices/transparentImageLoadedSlice";
 import { RootState } from "@redux/store";
@@ -84,6 +85,41 @@ function DetailsSection() {
 		setTimeout(() => {
 			dispatch(loadTransparentImage());
 		}, 300);
+	};
+
+	const continueWatchingInfo = () => {
+		if (!selectedSeries || selectedSeries.currentlyWatchingSeason === -1)
+			return null;
+
+		const seasons = [...selectedSeries.seasons].sort((a, b) => {
+			if (a.order !== 0 && b.order !== 0) {
+				return a.order - b.order;
+			}
+			if (a.order === 0 && b.order === 0) {
+				return new Date(a.year).getTime() - new Date(b.year).getTime();
+			}
+			return a.order === 0 ? 1 : -1;
+		});
+
+		console.log(selectedSeries.currentlyWatchingSeason);
+
+		const season = seasons[selectedSeries.currentlyWatchingSeason];
+		if (!season || !season.episodes) return null;
+
+		const episodes = [...season.episodes].sort(
+			(a, b) => a.episodeNumber - b.episodeNumber
+		);
+		const episode = episodes[season.currentlyWatchingEpisode];
+
+		if (!episode) return null;
+		
+		return (
+			<span>
+				{t("inProgress")} — {t("seasonLetter")}
+				{season.seasonNumber} · {t("episodeLetter")}
+				{episode.episodeNumber}
+			</span>
+		);
 	};
 
 	//#region TEXT CLAMP
@@ -196,25 +232,27 @@ function DetailsSection() {
 							{selectedLibrary.type == "Shows" ||
 							showCollectionPoster ? (
 								<Image
-									src={selectedSeries.coverSrc || selectedSeason.coverSrc}
+									src={
+										selectedSeries.coverSrc || selectedSeason.coverSrc
+									}
 									alt="Poster"
 									isRelative={true}
 									errorSrc="./src/resources/img/fileNotFound.jpg"
 								/>
 							) : (
 								<Image
-									src={selectedSeason.coverSrc || selectedSeries.coverSrc}
+									src={
+										selectedSeason.coverSrc || selectedSeries.coverSrc
+									}
 									alt="Poster"
 									isRelative={true}
 									errorSrc="./src/resources/img/fileNotFound.jpg"
 								/>
 							)}
-							{selectedLibrary.type === "Shows" ? (
+							{selectedLibrary.type === "Shows" &&
+							continueWatchingInfo ? (
 								<div className="continue-watching-info">
-									<span>
-										{t("inProgress")} — {t("seasonLetter")}1 ·{" "}
-										{t("episodeLetter")}3
-									</span>
+									{continueWatchingInfo()}
 								</div>
 							) : selectedSeries.seasons &&
 							  selectedSeries.seasons.length > 1 ? (
@@ -281,15 +319,19 @@ function DetailsSection() {
 								</button>
 								<button
 									className="svg-button-desktop"
-									title="Mark as watched"
+									title={selectedSeason.currentlyWatchingEpisode === -1 ? t("markUnwatched") : t("markWatched")}
+									onClick={() => dispatch(setSeasonWatched({
+										libraryId: selectedLibrary.id,
+										seriesId: selectedSeries.id,
+										seasonId: selectedSeason.id,
+										watched: selectedSeason.currentlyWatchingEpisode === -1
+									}))}
 								>
-									{
-										selectedSeason.currentlyWatchingEpisode !== -1 ? (
-											<UnmarkWatchedIcon />
-										) : (
-											<MarkWatchedIcon />
-										)
-									}
+									{selectedSeason.currentlyWatchingEpisode === -1 ? (
+										<UnmarkWatchedIcon />
+									) : (
+										<MarkWatchedIcon />
+									)}
 								</button>
 								<button
 									className="svg-button-desktop"
