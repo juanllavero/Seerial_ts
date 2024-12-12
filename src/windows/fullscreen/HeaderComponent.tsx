@@ -22,9 +22,11 @@ import { useSectionContext } from "context/section.context";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./HeaderComponent.scss";
+import { useFullscreenContext } from "context/fullscreen.context";
 
 function HeaderComponent() {
 	const dispatch = useDispatch();
+	const { inSongsView, setInSongsView } = useFullscreenContext();
 	const { currentFullscreenSection, setCurrentFullscreenSection } =
 		useSectionContext();
 
@@ -33,6 +35,9 @@ function HeaderComponent() {
 	);
 	const selectedLibrary = useSelector(
 		(state: RootState) => state.data.selectedLibrary
+	);
+	const selectedSeries = useSelector(
+		(state: RootState) => state.data.selectedSeries
 	);
 
 	const [time, setTime] = useState(new Date());
@@ -104,7 +109,19 @@ function HeaderComponent() {
 			) : (
 				<button
 					className="go-back-btn"
-					onClick={() => handleSelectLibrary(selectedLibrary)}
+					onClick={() => {
+						if (
+							(!inSongsView ||
+								selectedSeries &&
+								selectedSeries.seasons &&
+								selectedSeries.seasons.length <= 1) ||
+							selectedLibrary?.type !== "Music"
+						) {
+							handleSelectLibrary(selectedLibrary);
+						}
+
+						setInSongsView(false);
+					}}
 				>
 					<GoBackIcon />
 				</button>

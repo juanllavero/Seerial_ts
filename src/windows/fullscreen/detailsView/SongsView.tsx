@@ -23,12 +23,12 @@ function SongsView() {
 	);
 
 	// Check if there are multiple albums and show the corresponding view
-	useEffect(() => {
+	/*useEffect(() => {
 		if (currentShow) {
 			setInSongsView(currentShow.seasons.length <= 1);
 		}
-	}, [currentShow]);
-
+	}, [currentShow]);*/
+	
 	const handleTotalRuntime = () => {
 		let totalRuntime: number = 0;
 		if (currentSeason) {

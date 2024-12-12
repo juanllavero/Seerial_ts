@@ -39,6 +39,8 @@ function BackgroundImages() {
 		if (selectedShow && selectedLibrary?.type === "Music") {
 			if (selectedShow.coverSrc !== "") {
 				ReactUtils.getDominantColors(selectedShow.coverSrc);
+			} else if (currentSeason && currentSeason.coverSrc !== "") {
+				ReactUtils.getDominantColors(currentSeason.coverSrc);
 			} else {
 				ReactUtils.getDominantColors("./src/resources/img/songDefault.png");
 			}
@@ -61,7 +63,7 @@ function BackgroundImages() {
 		} else {
 			setGradientBackground("none");
 		}
-	}, [selectedShow]);
+	}, [selectedShow, currentSeason]);
 
 	return (
 		<>
@@ -88,6 +90,17 @@ function BackgroundImages() {
 							homeBackgroundLoaded ? "loaded-blur-in" : "loaded-blur-out"
 						}`}
 					></div>
+
+					{selectedLibrary?.type === "Music" && (
+						<div
+							className={`gradient-background ${
+								gradientLoaded ? "fade-in" : "fade-out"
+							}`}
+							style={{
+								background: `${gradientBackground}`,
+							}}
+						/>
+					)}
 				</>
 			) : !useImageAsBackground && selectedLibrary?.type !== "Music" ? (
 				<div
@@ -100,7 +113,7 @@ function BackgroundImages() {
 					{selectedLibrary &&
 					currentShowForBackground &&
 					currentShowForBackground.seasons &&
-					currentShowForBackground.seasons.length > 0 && 
+					currentShowForBackground.seasons.length > 0 &&
 					currentShowForBackground.seasons[0].backgroundSrc !== "" ? (
 						<Image
 							src={`/resources/img/backgrounds/${currentShowForBackground.seasons[0].id}/fullBlur.jpg`}
