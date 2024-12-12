@@ -383,6 +383,7 @@ function SeasonWindow() {
 					genresLock: false,
 					logosUrls: season.logosUrls,
 					coversUrls: season.coversUrls,
+					watched: season.watched,
 				})
 			);
 		}

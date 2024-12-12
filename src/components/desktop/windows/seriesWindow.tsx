@@ -239,6 +239,7 @@ function SeriesWindow() {
 						cast: series.cast,
 						logosUrls: series.logosUrls,
 						coversUrls: series.coversUrls,
+						watched: series.watched,
 					},
 				})
 			);
@@ -350,7 +351,7 @@ function SeriesWindow() {
 										/>
 									</>
 								)
-							) : menuSection === WindowSections.Details ? (
+							) : menuSection === WindowSections.Tags ? (
 								<>
 									<DialogTags
 										title={t("genres")}
