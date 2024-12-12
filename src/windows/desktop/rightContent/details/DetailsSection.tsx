@@ -317,15 +317,15 @@ function DetailsSection() {
 								</button>
 								<button
 									className="svg-button-desktop"
-									title={selectedSeries.watched && selectedSeason.currentlyWatchingEpisode === -1 ? t("markUnwatched") : t("markWatched")}
+									title={selectedSeason.watched ? t("markUnwatched") : t("markWatched")}
 									onClick={() => dispatch(setSeasonWatched({
 										libraryId: selectedLibrary.id,
 										seriesId: selectedSeries.id,
 										seasonId: selectedSeason.id,
-										watched: !selectedSeries.watched || selectedSeason.currentlyWatchingEpisode !== -1
+										watched: !selectedSeason.watched
 									}))}
 								>
-									{selectedSeries.watched && selectedSeason.currentlyWatchingEpisode === -1 ? (
+									{selectedSeason.watched ? (
 										<UnmarkWatchedIcon />
 									) : (
 										<MarkWatchedIcon />

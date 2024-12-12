@@ -12,6 +12,7 @@ import Card from "../Card";
 import { LeftArrowIcon, RightArrowIcon } from "@components/utils/IconLibrary";
 import "./HomeSection.scss";
 import Loading from "@components/utils/Loading";
+import ContentCard from "./ContentCard";
 
 function HomeSection() {
 	const { t } = useTranslation();
@@ -52,14 +53,43 @@ function HomeSection() {
 		setCurrentlyWatchingShows([]);
 		for (const library of libraries) {
 			for (const show of library.series) {
-				if (show.seasons && show.seasons.length <= 0) continue;
+				if (
+					!show.seasons ||
+					show.seasons.length <= 0 ||
+					show.currentlyWatchingSeason === -1
+				)
+					continue;
 
-				const season = show.seasons[0];
+				// Get sorted seasons
+				const seasons = [...show.seasons].sort((a, b) => {
+					if (a.order !== 0 && b.order !== 0) {
+						return a.order - b.order;
+					}
+					if (a.order === 0 && b.order === 0) {
+						return (
+							new Date(a.year).getTime() - new Date(b.year).getTime()
+						);
+					}
+					return a.order === 0 ? 1 : -1;
+				});
+
+				// Get currently watching season
+				const season = seasons[show.currentlyWatchingSeason];
 
 				if (season) {
-					if (season.episodes && season.episodes.length <= 0) continue;
+					if (
+						!season.episodes ||
+						season.episodes.length <= 0 ||
+						season.currentlyWatchingEpisode === -1
+					)
+						continue;
 
-					const episode = season.episodes[0];
+					// Get sorted episodes
+					const episodes = [...season.episodes].sort(
+						(a, b) => a.episodeNumber - b.episodeNumber
+					);
+
+					const episode = episodes[season.currentlyWatchingEpisode];
 
 					if (episode) {
 						setCurrentlyWatchingShows((prevElements) => [
@@ -73,21 +103,6 @@ function HomeSection() {
 						]);
 					}
 				}
-				/*
-          if (show.currentlyWatchingSeason !== -1){
-            const season = show.seasons[show.currentlyWatchingSeason];
-
-            if (season) {
-              const episode = season.episodes[season.currentlyWatchingEpisode];
-
-              if (episode){
-                setCurrentlyWatchingShows([...currentlyWatchingShows, {
-                  library, show, season, episode
-                }]);
-              }
-            }
-          }
-          */
 			}
 		}
 	}, [libraries, selectedLibrary]);
@@ -143,104 +158,31 @@ function HomeSection() {
 
 	return (
 		<Suspense fallback={<Loading />}>
-			<div className="home-view-container scroll" id="scroll">
-				<div>
-					<div className="horizontal-scroll-title">
-						<span id="section-title">{t("continueWatching")}</span>
-						<div
-							className={`scroll-btns ${canScrollCW ? "visible" : ""}`}
-						>
-							<button
-								className="svg-button"
-								onClick={() => {
-									handleScroll("left", true);
-								}}
-							>
-								<LeftArrowIcon />
-							</button>
-							<button
-								className="svg-button"
-								onClick={() => {
-									handleScroll("right", true);
-								}}
-							>
-								<RightArrowIcon />
-							</button>
-						</div>
-					</div>
-					<div
-						className="container"
-						id="continueWatchingScroll"
-						ref={continueWatchingContainer}
-					>
-						{[...currentlyWatchingShows]
-							.splice(0, 15)
-							.map(
-								(value: {
-									library: LibraryData;
-									show: SeriesData;
-									season: SeasonData;
-									episode: EpisodeData;
-								}) => (
-									<Card
-										key={value.show.id}
-										show={value.show}
-										season={value.season}
-										type="default"
-									/>
-								)
-							)}
+			{currentlyWatchingShows.length > 0 ? (
+				<div className="home-view-container">
+					<span id="section-title">{t("continueWatching")}</span>
+					<div className="container scroll" id="scroll">
+						{[...currentlyWatchingShows].map(
+							(value: {
+								library: LibraryData;
+								show: SeriesData;
+								season: SeasonData;
+								episode: EpisodeData;
+							}) => (
+								<ContentCard
+									key={value.show.id}
+									library={value.library}
+									show={value.show}
+									season={value.season}
+									episode={value.episode}
+								/>
+							)
+						)}
 					</div>
 				</div>
-				<div className="scroll-container">
-					<div className="horizontal-scroll-title">
-						<span id="section-title">Mi lista</span>
-						<div
-							className={`scroll-btns ${canScrollML ? "visible" : ""}`}
-						>
-							<button
-								className="svg-button"
-								onClick={() => {
-									handleScroll("left", false);
-								}}
-							>
-								<LeftArrowIcon />
-							</button>
-							<button
-								className="svg-button"
-								onClick={() => {
-									handleScroll("right", false);
-								}}
-							>
-								<RightArrowIcon />
-							</button>
-						</div>
-					</div>
-					<div
-						className="container"
-						id="myListScroll"
-						ref={myListContainer}
-					>
-						{[...currentlyWatchingShows]
-							.splice(0, 15)
-							.map(
-								(value: {
-									library: LibraryData;
-									show: SeriesData;
-									season: SeasonData;
-									episode: EpisodeData;
-								}) => (
-									<Card
-										key={value.show.id}
-										show={value.show}
-										season={value.season}
-										type="default"
-									/>
-								)
-							)}
-					</div>
-				</div>
-			</div>
+			) : (
+				<h2>You are not watching any series</h2>
+			)}
 		</Suspense>
 	);
 }

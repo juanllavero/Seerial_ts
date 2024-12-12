@@ -73,7 +73,7 @@ function CollectionsList() {
 					onDragOver={(e) => handleDragOver(index, e)}
 					onDrop={handleDrop}
 				>
-					<Card show={show} type="default" />
+					<Card library={selectedLibrary} show={show} type="default" />
 				</div>
 			))}
 		</div>

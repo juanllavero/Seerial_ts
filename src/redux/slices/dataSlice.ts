@@ -233,28 +233,30 @@ const dataSlice = createSlice({
 				watched: boolean;
 			}>
 		) => {
+			const { libraryId, seriesId, watched } = action.payload;
 			const library = state.libraries.find(
-				(library) => library.id === action.payload.libraryId
+				(library) => library.id === libraryId
 			);
 			if (library) {
 				const series = library.series.find(
-					(series) => series.id === action.payload.seriesId
+					(series) => series.id === seriesId
 				);
 				if (series) {
 					for (const season of series.seasons) {
 						for (const episode of season.episodes) {
-							episode.watched = action.payload.watched;
+							episode.watched = watched;
 						}
 
 						season.currentlyWatchingEpisode = -1;
+						season.watched = watched;
 
 						if (state.selectedSeason?.id === season.id) {
 							state.selectedSeason = season;
 						}
 					}
 
-					series.watched = true;
 					series.currentlyWatchingSeason = -1;
+					series.watched = watched;
 
 					if (state.selectedSeries?.id === series.id) {
 						state.selectedSeries = series;
@@ -373,12 +375,12 @@ const dataSlice = createSlice({
 
 			// Find the library
 			const library = state.libraries.find(
-				(library) => library.id === action.payload.libraryId
+				(library) => library.id === libraryId
 			);
 			if (library) {
 				// Find the series
 				const series = library.series.find(
-					(series) => series.id === action.payload.seriesId
+					(series) => series.id === seriesId
 				);
 				if (series) {
 					// Sort the seasons
@@ -400,7 +402,7 @@ const dataSlice = createSlice({
 					if (library.type === "Movies") {
 						// Find season by id
 						const season = series.seasons.find(
-							(season) => season.id === action.payload.seasonId
+							(season) => season.id === seasonId
 						);
 
 						// If season exists, mark all episodes as watched/unwatched
@@ -411,7 +413,7 @@ const dataSlice = createSlice({
 
 							season.currentlyWatchingEpisode = -1;
 
-							//**** CONTINUAR AQUÍ */
+							season.watched = watched;
 
 							// Update selected season if needed
 							if (state.selectedSeason?.id === season.id) {
@@ -420,14 +422,15 @@ const dataSlice = createSlice({
 						}
 
 						for (const season of seasons) {
-							if (season.currentlyWatchingEpisode !== -1) {
+							if (!season.watched) {
 								isWatched = false;
 							}
 						}
 					} else {
 						for (const season of seasons) {
-							if (season.id === action.payload.seasonId) {
+							if (season.id === seasonId) {
 								season.currentlyWatchingEpisode = -1;
+								season.watched = watched;
 								found = true;
 
 								for (const episode of season.episodes) {
@@ -452,7 +455,7 @@ const dataSlice = createSlice({
 								state.selectedSeason = season;
 							}
 
-							if (season.currentlyWatchingEpisode !== -1)
+							if (!season.watched)
 								isWatched = false;
 						}
 					}

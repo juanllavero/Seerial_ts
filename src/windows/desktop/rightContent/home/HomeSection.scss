@@ -1,65 +1,20 @@
 .home-view-container {
-	margin: 10em 260px 0 40px;
-	overflow-y: auto;
-	overflow-x: hidden;
+	margin: 10rem 260px 0 40px;
 	max-width: fit-content;
 
 	text-align: left;
 
-	.horizontal-scroll-title {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-
-		#section-title {
-			margin-left: 0.5em;
-			font-size: larger;
-			font-weight: bold;
-		}
-
-		.scroll-btns {
-			margin-right: 2em;
-			opacity: 0;
-			pointer-events: none;
-			.svg-button {
-				background-color: transparent;
-				border-radius: 5px;
-				border-color: transparent;
-				padding: 15px;
-				cursor: pointer;
-
-				border: 1px solid transparent;
-				background-color: #00000003;
-
-				border-radius: 50px;
-				color: white;
-
-				transition: opacity 0.3s ease-in-out;
-
-				svg,
-				img {
-					opacity: 0.7;
-				}
-			}
-
-			.svg-button:hover {
-				svg,
-				img {
-					opacity: 1;
-				}
-			}
-		}
-
-		.visible {
-			opacity: 1;
-			pointer-events: auto;
-		}
+	#section-title {
+		margin-left: 0.5rem;
+		font-size: larger;
+		font-weight: bold;
 	}
 
 	.container {
+		margin-top: 1rem;
 		max-width: fit-content;
 		display: flex;
-		flex-flow: row nowrap;
+		flex-flow: row wrap;
 		overflow-x: hidden;
 		scroll-behavior: smooth;
 
@@ -68,6 +23,12 @@
 		margin-bottom: 1.5em;
 		gap: 0.8em;
 	}
+}
+
+h2 {
+	position: absolute;
+	top: 20%;
+	left: 35%;
 }
 
 @media (max-width: 720px) {

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import "./Card.scss";
 import Image from "@components/image/Image";
 import {
+	closeAllMenus,
 	closeContextMenu,
 	toggleSeriesMenu,
 } from "@redux/slices/contextMenuSlice";
@@ -18,10 +19,7 @@ import {
 import { t } from "i18next";
 import { ContextMenu } from "primereact/contextmenu";
 import React, { useRef } from "react";
-import {
-	EditIcon,
-	VerticalDotsIcon,
-} from "@components/utils/IconLibrary";
+import { EditIcon, VerticalDotsIcon } from "@components/utils/IconLibrary";
 import { LibraryData } from "@interfaces/LibraryData";
 import { ReactUtils } from "@data/utils/ReactUtils";
 import { useSectionContext } from "context/section.context";
@@ -93,7 +91,15 @@ function Card(props: CardProps): JSX.Element {
 
 	return (
 		<div className="card" style={{ maxWidth: `${seriesImageWidth}px` }}>
-			<div className="top-section">
+			<div
+				className="top-section"
+				onAuxClick={(e) => {
+					e.stopPropagation();
+					dispatch(showSeriesMenu(show));
+					dispatch(toggleSeriesMenu());
+					cm.current?.show(e);
+				}}
+			>
 				{type === "default" && !show.watched && (
 					<div className="watched-count">
 						<span>{countUnWatchedEpisodes()}</span>

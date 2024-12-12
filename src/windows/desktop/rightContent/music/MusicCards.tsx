@@ -28,7 +28,7 @@ const MusicCards: React.FC<MusicViewProps> = ({ selectedLibrary }) => {
 			)}
 			<div className="music-cards scroll" id="scroll">
 				{selectedLibrary.series.map((collection: SeriesData) => (
-					<Card key={collection.id} show={collection} type="music" />
+					<Card key={collection.id} library={selectedLibrary} show={collection} type="music" />
 				))}
 			</div>
 		</>
