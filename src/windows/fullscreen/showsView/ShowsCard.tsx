@@ -9,7 +9,7 @@ import {
 import { RootState } from "@redux/store";
 import { useFullscreenContext } from "context/fullscreen.context";
 import { useSectionContext } from "context/section.context";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 function ShowsCard({ element }: { element: SeriesData }) {
@@ -39,21 +39,24 @@ function ShowsCard({ element }: { element: SeriesData }) {
 		(state: RootState) => state.seriesImage.height
 	);
 
+	useEffect(() => {
+		if (currentShow && currentShow.id === element.id) {
+			setTimeout(() => {
+				setCollectionsBackgroundLoaded(false);
+				setTimeout(() => {
+					setCurrentShowForBackground(element);
+					setCollectionsBackgroundLoaded(true);
+				}, 200);
+			}, 400);
+		}
+	}, [currentShow]);
+
 	const handleSelectShow = (
 		show: SeriesData | null,
 		automaticSelection: boolean
 	) => {
 		if (show && currentShow !== show) {
 			dispatch(selectSeries(show));
-			setTimeout(() => {
-				if (currentShow !== show) {
-					setCollectionsBackgroundLoaded(false);
-					setTimeout(() => {
-						setCurrentShowForBackground(show);
-						setCollectionsBackgroundLoaded(true);
-					}, 200);
-				}
-			}, 400);
 		} else if (show && !automaticSelection) {
 			if (show.seasons && show.seasons.length > 0) {
 				if (
@@ -100,6 +103,7 @@ function ShowsCard({ element }: { element: SeriesData }) {
 			}
 		}
 	};
+
 	return (
 		<button
 			key={element.id}

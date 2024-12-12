@@ -1,15 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "redux/store";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import "../../i18n";
 import "../../Fullscreen.scss";
-import {
-	setCurrentlyWatchingShows,
-	setHomeInfoElement,
-} from "redux/slices/fullscreenSectionsSlice";
 import HomeView from "./homeView/HomeView";
 import ShowsView from "./showsView/ShowsView";
-import { HomeInfoElement } from "@interfaces/HomeInfoElement";
 import { useSectionContext } from "context/section.context";
 import { FullscreenSections } from "@data/enums/Sections";
 import NoContentFullscreen from "./NoContentFullscreen";
@@ -18,132 +12,17 @@ import BackgroundImages from "./BackgroundImages";
 import DetailsView from "./detailsView/DetailsView";
 import MainMenu from "./MainMenu";
 import useLoadLibraries from "hooks/useLoadLibraries";
+import { selectLibrary } from "@redux/slices/dataSlice";
+import Loading from "@components/utils/Loading";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
 	const { loading, error } = useLoadLibraries();
 	const { currentFullscreenSection } = useSectionContext();
 
-	// Main objects
-	const librariesList = useSelector(
-		(state: RootState) => state.data.libraries
-	);
-	const selectedLibrary = useSelector(
-		(state: RootState) => state.data.selectedLibrary
-	);
-	const currentlyWatchingShows = useSelector(
-		(state: RootState) => state.fullscreenSection.currentlyWatchingShows
-	);
-
-	// Set Currently Watching
 	useEffect(() => {
-		if (!selectedLibrary) {
-			dispatch(setCurrentlyWatchingShows([]));
-			let elements: HomeInfoElement[] = [];
-			for (const library of librariesList) {
-				if (library.type !== "Music") {
-					for (const show of library.series) {
-						const season = show.seasons[0];
-
-						if (season) {
-							const episode = season.episodes[0];
-
-							if (episode) {
-								elements = [
-									...elements,
-									{ library, show, season, episode },
-								];
-							}
-						}
-						/*
-                        if (show.currentlyWatchingSeason !== -1){
-                        const season = show.seasons[show.currentlyWatchingSeason];
-            
-                        if (season) {
-                            const episode = season.episodes[season.currentlyWatchingEpisode];
-            
-                            if (episode){
-                            setCurrentlyWatchingShows([...currentlyWatchingShows, {
-                                library, show, season, episode
-                            }]);
-                            }
-                        }
-                        }
-                        */
-					}
-				}
-			}
-
-			dispatch(setCurrentlyWatchingShows(elements));
-
-			if (currentlyWatchingShows.length > 0) {
-				dispatch(setCurrentlyWatchingShows(currentlyWatchingShows));
-
-				if (!selectedLibrary) {
-					dispatch(setHomeInfoElement(currentlyWatchingShows[0]));
-				}
-			}
-		} else {
-			if (selectedLibrary.series.length > 0) {
-				//handleSelectShow(selectedLibrary.series[0], true);
-			}
-		}
-	}, [librariesList, selectedLibrary]);
-
-	const scrollToCenter = (
-		scrollElement: HTMLElement,
-		scrollOffset: number,
-		duration: number,
-		isVertical: boolean
-	) => {
-		const start = isVertical
-			? scrollElement.scrollTop
-			: scrollElement.scrollLeft;
-		const startTime = performance.now();
-
-		const animateScroll = (currentTime: number) => {
-			const timeElapsed = currentTime - startTime;
-			const progress = Math.min(timeElapsed / duration, 1);
-
-			if (isVertical) {
-				scrollElement.scrollTop = start + scrollOffset * progress; // Scroll vertical
-			} else {
-				scrollElement.scrollLeft = start + scrollOffset * progress; // Scroll horizontal
-			}
-
-			if (timeElapsed < duration) {
-				requestAnimationFrame(animateScroll);
-			}
-		};
-
-		requestAnimationFrame(animateScroll);
-	};
-
-	const handleScrollElementClick = <T extends { id: string }>(
-		index: number,
-		listRef: React.RefObject<HTMLDivElement>,
-		isVertical: boolean
-	) => {
-		const elementButton = listRef.current?.children[index] as HTMLElement;
-		if (elementButton && listRef.current) {
-			const listRect = listRef.current.getBoundingClientRect();
-			const buttonRect = elementButton.getBoundingClientRect();
-
-			const buttonCenter = isVertical
-				? buttonRect.top + buttonRect.height / 2
-				: buttonRect.left + buttonRect.width / 2;
-
-			const listCenter = isVertical
-				? listRect.top + listRect.height / 2
-				: listRect.left + listRect.width / 2;
-
-			if (buttonCenter !== listCenter) {
-				const scrollOffset = buttonCenter - listCenter;
-				scrollToCenter(listRef.current, scrollOffset, 300, isVertical); // 300ms
-			}
-		}
-	};
-	//#endregion
+		dispatch(selectLibrary(null));
+	}, []);
 
 	//#region KEYBOARD DETECTION
 	/*const handleKeyDown = (event: KeyboardEvent) => {
@@ -206,31 +85,41 @@ function MainFullscreen() {
 
 	return (
 		<>
-			{/* MAIN MENU */}
-			<MainMenu />
+			{loading ? (
+				<>
+					<Loading />
+				</>
+			) : (
+				<>
+					{/* MAIN MENU */}
+					<MainMenu />
 
-			{/* BACKGROUND IMAGES */}
-			<BackgroundImages />
+					{/* BACKGROUND IMAGES */}
+					<BackgroundImages />
 
-			{/* HEADER SECTION */}
-			<HeaderComponent />
+					{/* HEADER SECTION */}
+					<HeaderComponent />
 
-			{/* CONTENT SECTION */}
-			<section className="content">
-				{loading ? (
-					<div></div>
-				) : error ? (
-					<NoContentFullscreen />
-				) : currentFullscreenSection === FullscreenSections.Home ? (
-					<HomeView />
-				) : currentFullscreenSection === FullscreenSections.Collections ? (
-					<ShowsView />
-				) : currentFullscreenSection === FullscreenSections.Details ? (
-					<DetailsView />
-				) : (
-					<NoContentFullscreen />
-				)}
-			</section>
+					{/* CONTENT SECTION */}
+					<section className="content">
+						{loading ? (
+							<div></div>
+						) : error ? (
+							<NoContentFullscreen />
+						) : currentFullscreenSection === FullscreenSections.Home ? (
+							<HomeView />
+						) : currentFullscreenSection ===
+						  FullscreenSections.Collections ? (
+							<ShowsView />
+						) : currentFullscreenSection ===
+						  FullscreenSections.Details ? (
+							<DetailsView />
+						) : (
+							<NoContentFullscreen />
+						)}
+					</section>
+				</>
+			)}
 		</>
 	);
 }

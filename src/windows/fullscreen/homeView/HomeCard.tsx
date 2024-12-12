@@ -1,4 +1,5 @@
 import Image from "@components/image/Image";
+import { ReactUtils } from "@data/utils/ReactUtils";
 import { EpisodeData } from "@interfaces/EpisodeData";
 import { LibraryData } from "@interfaces/LibraryData";
 import { SeasonData } from "@interfaces/SeasonData";
@@ -10,13 +11,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 function HomeCard({
 	value,
+	listRef,
+	index,
 }: {
 	value: {
 		library: LibraryData;
 		show: SeriesData;
 		season: SeasonData;
 		episode: EpisodeData;
-	};
+	},
+	listRef: React.RefObject<HTMLDivElement>,
+	index: number,
 }) {
 	const dispatch = useDispatch();
 	const homeInfoElement = useSelector(
@@ -28,6 +33,7 @@ function HomeCard({
 				value === homeInfoElement ? "element-selected" : null
 			}`}
 			onClick={() => {
+				ReactUtils.handleScrollElementClick(index, listRef, false);
 				dispatch(setHomeInfoElement(value));
 			}}
 		>

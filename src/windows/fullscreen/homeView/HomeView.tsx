@@ -1,5 +1,5 @@
 import "../../../i18n";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { useFullscreenContext } from "context/fullscreen.context";
 import { useEffect, useRef, useState } from "react";
@@ -7,8 +7,11 @@ import { ReactUtils } from "data/utils/ReactUtils";
 import Image from "@components/image/Image";
 import HomeCardList from "./HomeCardList";
 import HomeInfo from "./HomeInfo";
+import { HomeInfoElement } from "@interfaces/HomeInfoElement";
+import { setCurrentlyWatchingShows, setHomeInfoElement } from "@redux/slices/fullscreenSectionsSlice";
 
 function HomeView() {
+	const dispatch = useDispatch();
 	const { homeBackgroundLoaded, setHomeBackgroundLoaded } =
 		useFullscreenContext();
 
@@ -19,50 +22,73 @@ function HomeView() {
 		(state: RootState) => state.data.selectedEpisode
 	);
 
+	const librariesList = useSelector(
+		(state: RootState) => state.data.libraries
+	);
+	const selectedLibrary = useSelector(
+		(state: RootState) => state.data.selectedLibrary
+	);
+	const currentlyWatchingShows = useSelector(
+		(state: RootState) => state.fullscreenSection.currentlyWatchingShows
+	);
+
 	const [dominantColor, setDominantColor] = useState<string>("000000");
 
 	const homeInfoElement = useSelector(
 		(state: RootState) => state.fullscreenSection.homeInfoElement
 	);
 
-	const listRef = useRef<HTMLDivElement>(null);
-
-	//#region KEYBOARD DETECTION
-	const handleKeyDown = (event: KeyboardEvent) => {
-		if (!currentSeason) {
-			return;
-		}
-
-		const currentIndex = currentSeason.episodes.findIndex(
-			(episode) => episode === currentEpisode
-		);
-
-		if (event.key === "ArrowRight") {
-			// Mover al siguiente episodio si existe
-			const nextIndex = currentIndex + 1;
-			if (nextIndex < currentSeason.episodes.length) {
-				ReactUtils.handleScrollElementClick(nextIndex, listRef, false);
-			}
-		}
-
-		if (event.key === "ArrowLeft") {
-			// Mover al episodio anterior si existe
-			const prevIndex = currentIndex - 1;
-			if (prevIndex >= 0) {
-				ReactUtils.handleScrollElementClick(prevIndex, listRef, false);
-			}
-		}
-	};
-
-	// Add and Clean Keyboard Events
+	// Set Currently Watching
 	useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
+		if (!selectedLibrary) {
+			dispatch(setCurrentlyWatchingShows([]));
+			let elements: HomeInfoElement[] = [];
+			for (const library of librariesList) {
+				if (library.type !== "Music") {
+					for (const show of library.series) {
+						const season = show.seasons[0];
 
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [currentEpisode, currentSeason?.episodes]);
-	//#endregion
+						if (season) {
+							const episode = season.episodes[0];
+
+							if (episode) {
+								elements = [
+									...elements,
+									{ library, show, season, episode },
+								];
+							}
+						}
+						/*
+                        if (show.currentlyWatchingSeason !== -1){
+                        const season = show.seasons[show.currentlyWatchingSeason];
+            
+                        if (season) {
+                            const episode = season.episodes[season.currentlyWatchingEpisode];
+            
+                            if (episode){
+                            setCurrentlyWatchingShows([...currentlyWatchingShows, {
+                                library, show, season, episode
+                            }]);
+                            }
+                        }
+                        }
+                        */
+					}
+				}
+			}
+
+			dispatch(setCurrentlyWatchingShows(elements));
+
+			if (currentlyWatchingShows.length > 0) {
+				dispatch(setCurrentlyWatchingShows(currentlyWatchingShows));
+				dispatch(setHomeInfoElement(currentlyWatchingShows[0]));
+			}
+		} else {
+			if (selectedLibrary.series.length > 0) {
+				//handleSelectShow(selectedLibrary.series[0], true);
+			}
+		}
+	}, [librariesList, selectedLibrary]);
 
 	// Generate Gradient Background
 	const [gradient, setGradient] = useState<string>("none");
@@ -147,7 +173,7 @@ function HomeView() {
 				</>
 			) : null}
 			<HomeInfo />
-			<HomeCardList />
+			<HomeCardList/>
 		</section>
 	);
 }

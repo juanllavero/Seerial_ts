@@ -171,5 +171,6 @@ export class ReactUtils {
 	 * @param ms - Number of milliseconds to delay
 	 * @returns
 	 */
-	public static delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+	public static delay = (ms: number) =>
+		new Promise((resolve) => setTimeout(resolve, ms));
 }

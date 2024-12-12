@@ -1007,19 +1007,6 @@ html, body {
   padding: 0.5em 0.2em;            
 }
 
-@keyframes fadeIn {
-  from {
-      opacity: 0;
-  }
-  to {
-      opacity: 1;
-  }
-}
-
-.fade-in {
-  animation: fadeIn 1s ease-in-out;
-}
-
 @media (max-width: 720px) {
   .svg-add-library-btn {
     padding: .7em;
