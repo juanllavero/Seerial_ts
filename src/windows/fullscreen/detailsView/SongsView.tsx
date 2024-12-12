@@ -2,16 +2,13 @@ import Image from "@components/image/Image";
 import { PlayIcon } from "@components/utils/IconLibrary";
 import { ReactUtils } from "@data/utils/ReactUtils";
 import { RootState } from "@redux/store";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import "../../../i18n";
-import { useFullscreenContext } from "context/fullscreen.context";
 import SongsList from "./SongsList";
 
 function SongsView() {
 	const { t } = useTranslation();
-	const { setInSongsView } = useFullscreenContext();
 	const currentShow = useSelector(
 		(state: RootState) => state.data.selectedSeries
 	);
@@ -21,13 +18,6 @@ function SongsView() {
 	const currentEpisode = useSelector(
 		(state: RootState) => state.data.selectedEpisode
 	);
-
-	// Check if there are multiple albums and show the corresponding view
-	/*useEffect(() => {
-		if (currentShow) {
-			setInSongsView(currentShow.seasons.length <= 1);
-		}
-	}, [currentShow]);*/
 	
 	const handleTotalRuntime = () => {
 		let totalRuntime: number = 0;

@@ -51,12 +51,6 @@ function HeaderComponent() {
 		return () => clearInterval(timer);
 	}, []);
 
-	const handleGoToMainView = () => {
-		dispatch(selectSeason(null));
-		dispatch(selectEpisode(undefined));
-		setCurrentFullscreenSection(FullscreenSections.Home);
-	};
-
 	const handleSelectLibrary = (library: LibraryData | null) => {
 		if (library) {
 			dispatch(setHomeInfoElement(undefined));
