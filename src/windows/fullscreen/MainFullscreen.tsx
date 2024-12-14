@@ -14,6 +14,7 @@ import MainMenu from "./MainMenu";
 import useLoadLibraries from "hooks/useLoadLibraries";
 import { selectLibrary } from "@redux/slices/dataSlice";
 import Loading from "@components/utils/Loading";
+import VideoControls from "./videoPlayer/VideoControls";
 
 function MainFullscreen() {
 	const dispatch = useDispatch();
@@ -91,6 +92,9 @@ function MainFullscreen() {
 				</>
 			) : (
 				<>
+					{/* VIDEO PLAYER CONTROLS */}
+					<VideoControls />
+
 					{/* MAIN MENU */}
 					<MainMenu />
 

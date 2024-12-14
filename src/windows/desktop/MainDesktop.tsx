@@ -206,16 +206,7 @@ function MainDesktop() {
 				}}
 			>
 				<MainBackgroundImage />
-				<div className="noise-background">
-					<Image
-						src="resources/img/noise.png"
-						alt="Background noise"
-						width={1920}
-						height={1080}
-						isRelative={true}
-						errorSrc="resources/img/noise.png"
-					/>
-				</div>
+				<div className="noise-background"></div>
 
 				<MusicPlayer />
 

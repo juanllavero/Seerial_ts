@@ -269,22 +269,15 @@
 }
 
 .noise-background {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	position: fixed;
+	inset: 0;
 	z-index: 0;
-	width: 100vw;
-	height: 100vh;
 
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-		opacity: 0.02;
-	}
+	background-image: url("/src/resources/img/noise.png");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	opacity: 0.02;
 }
 
 .blur-background-image {
@@ -328,5 +321,5 @@
 }
 
 .fade-out {
-	animation: fadeOut .5s ease-in-out;
+	animation: fadeOut 0.5s ease-in-out;
 }
